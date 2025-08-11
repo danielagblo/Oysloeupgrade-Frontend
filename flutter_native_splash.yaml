@@ -1,0 +1,37 @@
+flutter_native_splash:
+  # Background color for the splash screen
+  color: "#74FFA7"  # Your primary green color
+  
+  # Remove the default Flutter logo
+  image: 
+  
+  # Optional: Use a custom image/logo if you have one
+  # image: assets/images/logo.png
+  
+  # Optional: Set different colors for light and dark mode
+  # color_dark: "#74FFA7"
+  
+  # Optional: Set the branding mode
+  branding_mode: bottom
+  
+  # Optional: Set the branding image (bottom logo)
+  # branding: assets/images/branding.png
+  
+  # Platform specific settings
+  android_12:
+    # Android 12+ specific settings
+    image: 
+    color: "#74FFA7"
+    # Optional: Different image for Android 12+
+    # image: assets/images/android12_logo.png
+  
+  # Remove the background image to ensure solid color
+  background_image: 
+  
+  # Ensure native splash is shown
+  android: true
+  ios: true
+  web: false
+  
+  # Optional: Set fullscreen
+  fullscreen: true
