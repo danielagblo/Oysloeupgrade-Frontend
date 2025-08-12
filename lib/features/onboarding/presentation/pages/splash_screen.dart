@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'dart:math' as math;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  static Route<dynamic> route() =>
+      MaterialPageRoute(builder: (context) => const SplashScreen());
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -102,9 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
     await _textController.forward();
 
     await Future.delayed(const Duration(milliseconds: 1000));
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/onboarding');
-    }
+    if (mounted) context.go('/onboarding');
   }
 
   @override
