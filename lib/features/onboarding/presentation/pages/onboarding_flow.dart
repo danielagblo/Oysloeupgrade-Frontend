@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
@@ -6,9 +7,6 @@ import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({super.key});
-
-  static Route<dynamic> route() =>
-      MaterialPageRoute(builder: (context) => const OnboardingFlow());
 
   @override
   State<OnboardingFlow> createState() => _OnboardingFlowState();
@@ -45,7 +43,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeOut,
       );
-    } else {}
+    } else {
+      if (mounted) {
+        context.goNamed('login');
+      }
+    }
   }
 
   @override

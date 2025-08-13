@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 
@@ -50,9 +51,18 @@ ThemeData buildAppTheme(Brightness brightness) {
     colorScheme: colorScheme,
     scaffoldBackgroundColor: scaffoldBg,
     textTheme: textTheme,
+    cupertinoOverrideTheme: CupertinoThemeData(
+      primaryColor: AppColors.blueGray374957,
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: AppColors.blueGray374957,
+      selectionColor: AppColors.blueGray374957.withValues(alpha: 0.25),
+      selectionHandleColor: AppColors.blueGray374957,
+    ),
     appBarTheme: AppBarTheme(
       backgroundColor: scaffoldBg,
       foregroundColor: textPrimary,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
       centerTitle: false,
       titleTextStyle: textTheme.headlineMedium,
