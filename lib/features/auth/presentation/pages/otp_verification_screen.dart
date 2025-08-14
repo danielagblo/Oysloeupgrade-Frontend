@@ -2,14 +2,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
-import 'package:oysloe_mobile/core/common/widgets/input.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/auth/presentation/widgets/otp_code_input.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class OtpLoginScreen extends StatelessWidget {
-  const OtpLoginScreen({super.key});
+class OtpVerificationScreen extends StatelessWidget {
+  const OtpVerificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +36,14 @@ class OtpLoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 4.h),
-                  AppTextField(
-                    hint: "+233",
-                    leadingSvgAsset: 'assets/icons/phone.svg',
-                    keyboardType: TextInputType.phone,
-                  ),
+                  OtpCodeInput(length: 6),
                   SizedBox(height: 2.h),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: BodyPaddings.large,
                     ),
                     child: Text(
-                      "We’ll send a verification code to the number if it’s being in our system.",
+                      "Enter the OTP sent to your phone number.",
                       style: AppTypography.body.copyWith(
                         fontSize: 15.sp,
                         color: Color(0xFF646161),
@@ -59,9 +55,7 @@ class OtpLoginScreen extends StatelessWidget {
                   CustomButton.filled(
                     label: 'Verify',
                     isPrimary: true,
-                    onPressed: () {
-                      context.pushNamed('otp-verification');
-                    },
+                    onPressed: () {},
                   ),
                   SizedBox(height: 2.5.h),
                   Text('Can\'t login?'),
@@ -122,3 +116,4 @@ class OtpLoginScreen extends StatelessWidget {
     );
   }
 }
+

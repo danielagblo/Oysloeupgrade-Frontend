@@ -24,6 +24,7 @@ class CustomButton extends StatelessWidget {
   final Color? capsuleTextColor;
   final double? capsuleWidth;
   final double? capsuleHeight;
+  final String? capsuleTrailingSvgAsset;
 
   const CustomButton._({
     required _CustomButtonType type,
@@ -42,6 +43,7 @@ class CustomButton extends StatelessWidget {
     this.capsuleTextColor,
     this.capsuleWidth,
     this.capsuleHeight,
+    this.capsuleTrailingSvgAsset,
     super.key,
   }) : _type = type;
 
@@ -83,6 +85,7 @@ class CustomButton extends StatelessWidget {
     Color? fillColor,
     Color? borderColor,
     Color? textColor,
+    String? trailingSvgAsset,
     TextStyle? textStyle,
     EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
       vertical: 10,
@@ -100,6 +103,7 @@ class CustomButton extends StatelessWidget {
       capsuleFillColor: fillColor,
       capsuleBorderColor: borderColor,
       capsuleTextColor: textColor,
+      capsuleTrailingSvgAsset: trailingSvgAsset,
       textStyle: textStyle,
       padding: padding,
       width: width,
@@ -223,7 +227,21 @@ class CustomButton extends StatelessWidget {
           : const EdgeInsets.symmetric(horizontal: 18);
     }
 
-    Widget child = Center(child: Text(label, style: style));
+    Widget child = Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Text(label, style: style),
+          ),
+          if (capsuleTrailingSvgAsset != null) ...[
+            SizedBox(width: 4.w),
+            SvgPicture.asset(capsuleTrailingSvgAsset!, width: 13, height: 13),
+          ],
+        ],
+      ),
+    );
     child = Padding(padding: effectivePadding, child: child);
 
     final button = AnimatedOpacity(

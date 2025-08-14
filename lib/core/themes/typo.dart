@@ -30,7 +30,7 @@ class AppTypography {
 
   static TextStyle get body => GoogleFonts.inter(
         fontSize: 16.sp,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w400,
         height: 1.4,
         color: defaultColor,
       );

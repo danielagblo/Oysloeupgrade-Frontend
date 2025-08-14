@@ -2,7 +2,10 @@ import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/email_password_reset.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/login_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/otp_login_screen.dart';
+import 'package:oysloe_mobile/features/auth/presentation/pages/otp_verification_screen.dart';
+import 'package:oysloe_mobile/features/auth/presentation/pages/referral_code_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
 
@@ -37,6 +40,21 @@ final GoRouter appRouter = GoRouter(
       path: '/otp-login',
       name: 'otp-login',
       builder: (context, state) => const OtpLoginScreen(),
+    ),
+    GoRoute(
+      path: '/referral-code',
+      name: 'referral-code',
+      builder: (context, state) => const ReferralCodeScreen(),
+    ),
+    GoRoute(
+      path: '/home-screen',
+      name: 'home-screen',
+      builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/otp-verification',
+      name: 'otp-verification',
+      builder: (context, state) => const OtpVerificationScreen(),
     ),
   ],
   initialLocation: '/',

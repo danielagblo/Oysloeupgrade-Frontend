@@ -6,6 +6,7 @@ import 'package:oysloe_mobile/core/common/widgets/input.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/core/common/widgets/modal.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class EmailPasswordResetScreen extends StatelessWidget {
@@ -54,7 +55,25 @@ class EmailPasswordResetScreen extends StatelessWidget {
                   CustomButton.filled(
                     label: 'Submit',
                     isPrimary: true,
-                    onPressed: () {},
+                    onPressed: () async {
+                      FocusScope.of(context).unfocus();
+
+                      await showAppModal(
+                        context: context,
+                        gifAsset: 'assets/gifs/mail.gif',
+                        text: 'Reset link sent \nto your email',
+                        actions: [
+                          AppModalAction(
+                            label: 'Close',
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            filled: false,
+                            textColor: AppTypography.defaultColor,
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   SizedBox(height: 2.5.h),
                   Text('Can\'t login?'),

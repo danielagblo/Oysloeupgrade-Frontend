@@ -144,7 +144,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   CustomButton.filled(
                     label: 'Sign up',
                     isPrimary: true,
-                    onPressed: () {},
+                    onPressed: () {
+                      context.pushNamed('referral-code');
+                    },
                   ),
                   SizedBox(height: 2.5.h),
                   CustomButton.filled(
