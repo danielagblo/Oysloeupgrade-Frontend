@@ -67,7 +67,7 @@ class EmailPasswordResetScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.pop('login');
+                          context.goNamed('login');
                         },
                       ),
                       SizedBox(width: 5.w),
@@ -75,7 +75,9 @@ class EmailPasswordResetScreen extends StatelessWidget {
                         label: 'OTP Login',
                         filled: true,
                         fillColor: AppColors.white,
-                        onPressed: () {},
+                        onPressed: () {
+                          context.goNamed('otp-login');
+                        },
                       ),
                     ],
                   ),
@@ -100,7 +102,7 @@ class EmailPasswordResetScreen extends StatelessWidget {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        context.pushNamed('signup');
+                        context.goNamed('signup');
                       },
                   ),
                 ],

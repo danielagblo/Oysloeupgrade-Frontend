@@ -81,7 +81,7 @@ class OtpLoginScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.pop('login');
+                          context.goNamed('login');
                         },
                       ),
                     ],
@@ -107,7 +107,7 @@ class OtpLoginScreen extends StatelessWidget {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        context.pushNamed('signup');
+                        context.goNamed('signup');
                       },
                   ),
                 ],
