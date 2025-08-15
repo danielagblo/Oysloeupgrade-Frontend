@@ -16,10 +16,19 @@ class AppColors {
   static const Color gray222222 = Color(0xFF222222);
   static const Color gray8B959E = Color(0xFF8B959E);
   static const Color greenDEFEED = Color(0xFFDEFEED);
+  static const Color redFF6B6B = Color(0xFFFF6B6B);
 
   static const Color black81Opacity = Color(0xCF000000);
   static const Color gray59Opacity = Color(0x97000000);
   static const Color black72Opacity = Color(0xB8000000);
+
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [primary, blueGray374957, primary, redFF6B6B],
+    stops: [0.0, 0.24, 0.5, 0.76],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    tileMode: TileMode.clamp,
+  );
 }
 
 ThemeData buildAppTheme(Brightness brightness) {

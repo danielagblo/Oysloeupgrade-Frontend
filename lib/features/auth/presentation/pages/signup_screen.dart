@@ -66,7 +66,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     leadingSvgAsset: 'assets/icons/passwordkey.svg',
                     isPassword: true,
                   ),
-                  SizedBox(height: 2.h),
+                  SizedBox(height: 1.5.h),
                   AppTextField(
                     hint: "Retype Password",
                     leadingSvgAsset: 'assets/icons/passwordkey.svg',

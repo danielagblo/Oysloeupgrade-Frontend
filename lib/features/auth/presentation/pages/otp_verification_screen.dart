@@ -55,7 +55,9 @@ class OtpVerificationScreen extends StatelessWidget {
                   CustomButton.filled(
                     label: 'Verify',
                     isPrimary: true,
-                    onPressed: () {},
+                    onPressed: () {
+                      context.pushNamed('home-screen');
+                    },
                   ),
                   SizedBox(height: 2.5.h),
                   Text('Can\'t login?'),
