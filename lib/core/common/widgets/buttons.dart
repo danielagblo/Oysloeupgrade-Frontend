@@ -190,7 +190,7 @@ class CustomButton extends StatelessWidget {
     final bool filled = capsuleFilled ?? false;
     final bool enabled = onPressed != null;
     final defaultOutlineColor = AppColors.grayBFBF.withValues(alpha: 0.29);
-    final defaultFillColor = AppColors.grayD9.withValues(alpha: 0.19);
+    final defaultFillColor = AppColors.grayF9;
     const double defaultCapsuleWidth = 140;
     const double defaultCapsuleHeight = 44;
 
@@ -208,7 +208,7 @@ class CustomButton extends StatelessWidget {
     final style =
         textStyle ??
         theme.textTheme.labelMedium?.copyWith(
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
           color: textColor,
         ) ??
         TextStyle(color: textColor);

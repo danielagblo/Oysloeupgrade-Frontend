@@ -17,7 +17,7 @@ class CategoriesSection extends StatelessWidget {
     (label: 'Games', asset: 'assets/images/games.png'),
     (label: 'Cosmetics', asset: 'assets/images/cosmetics.png'),
     (label: 'Property', asset: 'assets/images/property.png'),
-    (label: 'Services', asset: 'assets/images/furniture.png'),
+    (label: 'Services', asset: 'assets/images/services.png'),
   ];
 
   @override

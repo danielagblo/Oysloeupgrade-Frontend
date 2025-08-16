@@ -5,7 +5,7 @@ import 'package:oysloe_mobile/features/auth/presentation/pages/otp_login_screen.
 import 'package:oysloe_mobile/features/auth/presentation/pages/otp_verification_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/referral_code_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/dashboard_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
 
@@ -49,7 +49,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/home-screen',
       name: 'home-screen',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => const DashboardScreen(),
     ),
     GoRoute(
       path: '/otp-verification',
