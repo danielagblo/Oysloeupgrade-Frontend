@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
@@ -13,6 +14,7 @@ class AdCard extends StatelessWidget {
     required this.location,
     required this.prices,
     this.type = AdDealType.sale,
+    this.onTap,
   });
 
   final String imageUrl;
@@ -20,143 +22,202 @@ class AdCard extends StatelessWidget {
   final String location;
   final List<String> prices;
   final AdDealType type;
+  final VoidCallback? onTap;
 
-  Color get _strokeColor {
+  Color get _borderColor {
     switch (type) {
       case AdDealType.rent:
-        return const Color(0xFFFFECEC); // soft red
+        return Color(0xFFFFECEC);
       case AdDealType.sale:
-        return const Color(0xFFDEFEED); // soft green
+        return Color(0xFFE4F8FF);
       case AdDealType.highPurchase:
-        return const Color(0xFFE4F8FF); // soft blue
+        return Color(0xFFDEFEED);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final stroke = _strokeColor;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.grayF9,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildImageSection(),
+            _buildContentSection(),
+          ],
+        ),
+      ),
+    );
+  }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.grayF9,
-        borderRadius: BorderRadius.circular(18),
+  Widget _buildImageSection() {
+    return Expanded(
+      flex: 7,
+      child: Container(
+        margin: EdgeInsets.all(8.sp),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _borderColor,
+            width: 2.5,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: _buildImage(imageUrl),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 1.0.h, vertical: 0.9.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: stroke, width: 2),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: AspectRatio(
-              aspectRatio: 16 / 10,
-              child: _buildImage(imageUrl),
-            ),
+    );
+  }
+
+  Widget _buildContentSection() {
+    return Expanded(
+      flex: 3,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(12.sp, 8.sp, 12.sp, 10.sp),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildLocationRow(),
+            SizedBox(height: 4.sp),
+            _buildTitle(),
+            const Spacer(),
+            _buildPriceSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SvgPicture.asset(
+          'assets/icons/location.svg',
+          height: 10.sp,
+          colorFilter: ColorFilter.mode(
+            AppColors.gray8B959E,
+            BlendMode.srcIn,
           ),
-          SizedBox(height: 0.6.h),
-          // Location
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.location_on, size: 15.sp, color: AppColors.gray8B959E),
-              SizedBox(width: 1.w),
-              Flexible(
-                child: Text(
-                  location,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.labelSmall.copyWith(
-                    color: AppColors.gray8B959E,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 0.35.h),
-          // Title
-          Text(
-            title,
-            maxLines: 2,
+        ),
+        SizedBox(width: 4.sp),
+        Flexible(
+          child: Text(
+            location,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTypography.body.copyWith(
-              color: AppColors.blueGray374957,
-              fontWeight: FontWeight.w600,
-              fontSize: 14.sp,
+            style: AppTypography.labelSmall.copyWith(
+              color: AppColors.gray8B959E,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w400,
             ),
           ),
-          SizedBox(height: 0.5.h),
-          // Price(s)
-          if (prices.length <= 1)
-            Text(
-              prices.isEmpty ? '' : prices.first,
-              style: AppTypography.body.copyWith(
-                color: AppColors.blueGray374957,
-                fontWeight: FontWeight.w700,
-                fontSize: 14.sp,
-              ),
-            )
-          else if (type == AdDealType.highPurchase)
-            Wrap(
-              spacing: 1.6.w,
-              runSpacing: 0.3.h,
-              children: [
-                for (final p in prices)
-                  Text(
-                    p,
-                    style: AppTypography.body.copyWith(
-                      color: AppColors.blueGray374957,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-              ],
-            )
-          else
-            Wrap(
-              spacing: 1.w,
-              runSpacing: 0.6.h,
-              children: [
-                for (final p in prices)
-                  _PricePill(text: p, borderColor: stroke),
-              ],
-            ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      title,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: AppTypography.body.copyWith(
+        color: AppColors.blueGray374957,
+        fontWeight: FontWeight.w600,
+        fontSize: 13.sp,
+        height: 1.2,
       ),
+    );
+  }
+
+  Widget _buildPriceSection() {
+    if (prices.isEmpty) return const SizedBox.shrink();
+
+    if (prices.length == 1) {
+      return _buildSinglePrice();
+    }
+
+    return _buildMultiplePrices();
+  }
+
+  Widget _buildSinglePrice() {
+    return Text(
+      prices.first,
+      style: AppTypography.body.copyWith(
+        color: AppColors.blueGray374957,
+        fontWeight: FontWeight.w700,
+        fontSize: 13.sp,
+      ),
+    );
+  }
+
+  Widget _buildMultiplePrices() {
+    return Wrap(
+      spacing: 8.sp,
+      runSpacing: 4.sp,
+      children: prices.take(3).map((price) {
+        return Text(
+          price,
+          style: AppTypography.body.copyWith(
+            color: AppColors.blueGray374957,
+            fontWeight: FontWeight.w700,
+            fontSize: 13.sp,
+          ),
+        );
+      }).toList(),
     );
   }
 
   Widget _buildImage(String url) {
     if (url.startsWith('http')) {
-      return Image.network(url, fit: BoxFit.cover);
+      return Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildLoadingWidget(loadingProgress);
+        },
+      );
     }
-    return Image.asset(url, fit: BoxFit.cover);
+
+    return Image.asset(
+      url,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
+    );
   }
-}
 
-class _PricePill extends StatelessWidget {
-  const _PricePill({required this.text, required this.borderColor});
-
-  final String text;
-  final Color borderColor;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildErrorWidget() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 2.4.w, vertical: 0.5.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor, width: 1.5),
+      color: AppColors.grayF9,
+      child: Center(
+        child: Icon(
+          Icons.image_not_supported_outlined,
+          color: AppColors.gray8B959E,
+          size: 24.sp,
+        ),
       ),
-      child: Text(
-        text,
-        style: AppTypography.labelSmall.copyWith(
-          fontWeight: FontWeight.w700,
-          color: AppColors.blueGray374957,
+    );
+  }
+
+  Widget _buildLoadingWidget(ImageChunkEvent loadingProgress) {
+    return Container(
+      color: AppColors.grayF9,
+      child: Center(
+        child: CircularProgressIndicator(
+          value: loadingProgress.expectedTotalBytes != null
+              ? loadingProgress.cumulativeBytesLoaded /
+                  loadingProgress.expectedTotalBytes!
+              : null,
+          strokeWidth: 2,
+          color: _borderColor,
         ),
       ),
     );

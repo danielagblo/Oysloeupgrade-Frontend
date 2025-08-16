@@ -69,7 +69,7 @@ class AdsSection extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 1.4.h,
         crossAxisSpacing: 3.w,
-        childAspectRatio: 0.86,
+        childAspectRatio: 0.95,
       ),
       itemCount: items.length,
       itemBuilder: (context, i) {

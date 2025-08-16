@@ -157,8 +157,11 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                       },
                     ),
                     SizedBox(height: 3.h),
-                    const CategoriesSection(),
-                    SizedBox(height: 3.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2.5.w),
+                      child: const CategoriesSection(),
+                    ),
+                    SizedBox(height: 4.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -172,7 +175,8 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                         CustomButton.capsule(
                           label: 'Show All',
                           filled: true,
-                          width: 25.w,
+                          width: 22.w,
+                          height: 4.5.h,
                           textStyle: AppTypography.body.copyWith(
                             color: AppColors.blueGray374957,
                             fontSize: 14.sp,
@@ -181,7 +185,7 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                         ),
                       ],
                     ),
-                    SizedBox(height: 2.h),
+                    SizedBox(height: 3.h),
                     const StatsSection(),
                     SizedBox(height: 3.h),
                     const AdsSection(),
