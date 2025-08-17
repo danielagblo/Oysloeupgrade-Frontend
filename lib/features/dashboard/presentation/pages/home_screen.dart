@@ -142,19 +142,22 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 2.5.h),
-                    AnimatedBuilder(
-                      animation: _animation,
-                      builder: (context, child) {
-                        return AnimatedOpacity(
-                          opacity:
-                              1.0 - (_animation.value * 1.2).clamp(0.0, 1.0),
-                          duration: const Duration(milliseconds: 200),
-                          child: Transform.translate(
-                            offset: Offset(0, _animation.value * -15),
-                            child: _buildFullSearch(),
-                          ),
-                        );
-                      },
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w),
+                      child: AnimatedBuilder(
+                        animation: _animation,
+                        builder: (context, child) {
+                          return AnimatedOpacity(
+                            opacity:
+                                1.0 - (_animation.value * 1.2).clamp(0.0, 1.0),
+                            duration: const Duration(milliseconds: 200),
+                            child: Transform.translate(
+                              offset: Offset(0, _animation.value * -15),
+                              child: _buildFullSearch(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     SizedBox(height: 3.h),
                     Padding(
@@ -201,7 +204,7 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
   }
 
   Widget _buildFullSearch() {
-    final BorderRadius radius = BorderRadius.circular(32);
+    final BorderRadius radius = BorderRadius.circular(30);
     final Color innerColor =
         Theme.of(context).inputDecorationTheme.fillColor ??
         (Theme.of(context).brightness == Brightness.dark
@@ -227,17 +230,17 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
-            prefixIconConstraints: const BoxConstraints(minWidth: 48),
+            prefixIconConstraints: const BoxConstraints(minWidth: 40),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 15,
-              vertical: 12,
+              vertical: 19,
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 12),
               child: SvgPicture.asset(
                 'assets/icons/search.svg',
-                width: 20,
-                height: 20,
+                width: 17,
+                height: 17,
               ),
             ),
           ),
@@ -286,8 +289,8 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
               padding: const EdgeInsets.only(left: 8),
               child: SvgPicture.asset(
                 'assets/icons/search.svg',
-                width: 15,
-                height: 15,
+                width: 14,
+                height: 14,
               ),
             ),
           ),

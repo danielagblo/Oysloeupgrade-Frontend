@@ -8,10 +8,8 @@ class AppModalAction {
   final String label;
   final VoidCallback? onPressed;
 
-  /// When true, the capsule appears filled; otherwise outlined.
   final bool filled;
 
-  /// Optional style overrides mapped to [CustomButton.capsule].
   final Color? fillColor;
   final Color? borderColor;
   final Color? textColor;
@@ -28,12 +26,11 @@ class AppModalAction {
   });
 }
 
-/// A simple modal content widget.
-/// Layout order: GIF -> text -> up to two capsule buttons.
+
 class AppModal extends StatelessWidget {
   final String gifAsset;
   final String text;
-  final List<AppModalAction> actions; // max 2
+  final List<AppModalAction> actions;
   final EdgeInsetsGeometry contentPadding;
   final BorderRadiusGeometry borderRadius;
 
@@ -54,6 +51,7 @@ class AppModal extends StatelessWidget {
       color: AppColors.blueGray374957,
       height: 1.25,
       letterSpacing: 0.15,
+      decoration: TextDecoration.none, 
     );
 
     final maxWidth = 92.w;
@@ -72,9 +70,16 @@ class AppModal extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(gifAsset, fit: BoxFit.contain, height: 90,),
+              Image.asset(gifAsset, fit: BoxFit.contain, height: 90),
               SizedBox(height: 2.5.h),
-              Text(text, textAlign: TextAlign.center, style: textStyle),
+              DefaultTextStyle(
+                style: textStyle,
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: textStyle,
+                ),
+              ),
               SizedBox(height: 2.5.h),
 
               if (actions.isNotEmpty) _buildActionsRow(context),
@@ -108,7 +113,7 @@ class AppModal extends StatelessWidget {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [buttons[0], SizedBox(width: 12), buttons[1]],
+      children: [buttons[0], const SizedBox(width: 12), buttons[1]],
     );
   }
 }
@@ -125,10 +130,13 @@ Future<T?> showAppModal<T>({
     context: context,
     barrierDismissible: barrierDismissible,
     barrierColor: Colors.black.withValues(alpha: 0.65),
-    builder: (ctx) => Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: AppModal(gifAsset: gifAsset, text: text, actions: actions),
+    builder: (ctx) => Material(
+      type: MaterialType.transparency,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: AppModal(gifAsset: gifAsset, text: text, actions: actions),
+        ),
       ),
     ),
   );
