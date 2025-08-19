@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/core/common/widgets/animated_gradient_search_input.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/categories_section.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/stats_section.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ads_section.dart';
@@ -204,98 +204,14 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
   }
 
   Widget _buildFullSearch() {
-    final BorderRadius radius = BorderRadius.circular(30);
-    final Color innerColor =
-        Theme.of(context).inputDecorationTheme.fillColor ??
-        (Theme.of(context).brightness == Brightness.dark
-            ? AppColors.blueGray374957
-            : AppColors.white);
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: radius,
-      ),
-      padding: const EdgeInsets.all(1.8),
-      child: Container(
-        decoration: BoxDecoration(color: innerColor, borderRadius: radius),
-        child: TextField(
-          controller: _searchController,
-          style: AppTypography.body,
-          decoration: InputDecoration(
-            isDense: true,
-            hintText: 'Search anything up for good',
-            hintStyle: AppTypography.body,
-            filled: false,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            prefixIconConstraints: const BoxConstraints(minWidth: 40),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 19,
-            ),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: SvgPicture.asset(
-                'assets/icons/search.svg',
-                width: 17,
-                height: 17,
-              ),
-            ),
-          ),
-        ),
-      ),
+    return AnimatedGradientSearchInput.full(
+      controller: _searchController,
     );
   }
 
   Widget _buildCompactSearch() {
-    final BorderRadius radius = BorderRadius.circular(24);
-    final Color innerColor =
-        Theme.of(context).inputDecorationTheme.fillColor ??
-        (Theme.of(context).brightness == Brightness.dark
-            ? AppColors.blueGray374957
-            : AppColors.white);
-
-    return Container(
-      height: 38,
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: radius,
-      ),
-      padding: const EdgeInsets.all(1.5),
-      child: Container(
-        decoration: BoxDecoration(color: innerColor, borderRadius: radius),
-        child: TextField(
-          controller: _searchController,
-          style: AppTypography.body.copyWith(fontSize: 14.sp),
-          decoration: InputDecoration(
-            isDense: true,
-            hintText: 'Search anything up for good',
-            hintStyle: AppTypography.body.copyWith(
-              fontSize: 13.sp,
-              color: Theme.of(context).hintColor.withValues(alpha: 0.7),
-            ),
-            filled: false,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            prefixIconConstraints: const BoxConstraints(minWidth: 36),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: SvgPicture.asset(
-                'assets/icons/search.svg',
-                width: 14,
-                height: 14,
-              ),
-            ),
-          ),
-        ),
-      ),
+    return AnimatedGradientSearchInput.compact(
+      controller: _searchController,
     );
   }
 }

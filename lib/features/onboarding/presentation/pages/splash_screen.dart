@@ -146,14 +146,15 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 55.w,
                   child: Stack(
                     children: [
+                      // Large outer circle (blue-gray)
                       Positioned(
                         left: 5.w + (_bigCircleSlideAnimation.value * 4.w),
                         top: 5.w,
                         child: Transform.scale(
                           scale: _bigCircleAnimation.value,
                           child: Container(
-                            width: 40.w,
-                            height: 40.w,
+                            width: 44.w,
+                            height: 44.w,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: AppColors.blueGray374957,
@@ -164,17 +165,20 @@ class _SplashScreenState extends State<SplashScreen>
 
                       Positioned(
                         left:
-                            5.w +
-                            20.w +
-                            (16.w * math.cos(200 * math.pi / 180)) +
-                            (_smallCircleSlideAnimation.value * 3.w),
+                            6.w +
+                            20.w -
+                            16.w +
+                            (_smallCircleSlideAnimation.value *
+                                3.w), 
                         top:
-                            5.w + 20.w + (16.w * math.sin(200 * math.pi / 180)),
+                            9.w +
+                            22.w -
+                            16.w, 
                         child: Transform.scale(
                           scale: _smallCircleAnimation.value,
                           child: Container(
-                            width: 22.w,
-                            height: 22.w,
+                            width: 30.w,
+                            height: 30.w,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: AppColors.primary,
