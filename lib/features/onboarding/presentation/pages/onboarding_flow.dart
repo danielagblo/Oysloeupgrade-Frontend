@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:lottie/lottie.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 
@@ -12,28 +14,47 @@ class OnboardingFlow extends StatefulWidget {
   State<OnboardingFlow> createState() => _OnboardingFlowState();
 }
 
-class _OnboardingFlowState extends State<OnboardingFlow> {
+class _OnboardingFlowState extends State<OnboardingFlow>
+    with TickerProviderStateMixin {
   final PageController _controller = PageController();
   int _page = 0;
+  late List<AnimationController> _animationControllers;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationControllers = List.generate(
+      _pages.length,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+
+    _animationControllers[0].repeat();
+  }
 
   static const List<_OnboardData> _pages = [
     _OnboardData(
       title: 'User Safety \nGuarantee',
       subtitle:
           'Buyers and sellers undergo strict checks and \nverification to ensure authenticity and reliability',
-      image: 'assets/gifs/onboarding1.gif',
+      image: 'assets/json/usersafety.json',
+      isLottie: true,
     ),
     _OnboardData(
       title: 'Scale you \nto Success',
       subtitle:
           'Watch your business grow with our designed \nmarketing tools, and automated processes.',
-      image: 'assets/gifs/onboarding2.gif',
+      image: 'assets/json/scaletosuccess.json',
+      isLottie: true,
     ),
     _OnboardData(
       title: 'Your journey \nbegins now',
       subtitle:
           'Optimized for all business owners with\nseamless experience for everyone',
-      image: 'assets/gifs/onboarding3.gif',
+      image: 'assets/json/journeybeginsnow.json',
+      isLottie: true,
     ),
   ];
 
@@ -53,6 +74,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   @override
   void dispose() {
     _controller.dispose();
+    for (final controller in _animationControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -67,7 +91,16 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: _pages.length,
-                onPageChanged: (i) => setState(() => _page = i),
+                onPageChanged: (i) {
+                  setState(() => _page = i);
+                  for (int j = 0; j < _animationControllers.length; j++) {
+                    if (j == i) {
+                      _animationControllers[j].repeat();
+                    } else {
+                      _animationControllers[j].stop();
+                    }
+                  }
+                },
                 itemBuilder: (context, index) {
                   final data = _pages[index];
                   return Padding(
@@ -80,7 +113,36 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                               mainAxisSize: MainAxisSize.min,
                               spacing: 2.h,
                               children: [
-                                Image.asset(data.image, height: 22.h),
+                                data.isLottie
+                                    ? Lottie.asset(
+                                        data.image,
+                                        height: 22.h,
+                                        controller:
+                                            _animationControllers[index],
+                                        delegates: index == 0
+                                            ? LottieDelegates(
+                                                values: [
+                                                  ValueDelegate.color(
+                                                    [
+                                                      'shield',
+                                                      'Group 1',
+                                                      'Fill 1'
+                                                    ],
+                                                    value: AppColors.primary,
+                                                  ),
+                                                  ValueDelegate.color(
+                                                    [
+                                                      'tick',
+                                                      'Group 1',
+                                                      'Stroke 1'
+                                                    ],
+                                                    value: AppColors.white,
+                                                  ),
+                                                ],
+                                              )
+                                            : null,
+                                      )
+                                    : Image.asset(data.image, height: 22.h),
                                 Text(
                                   data.title,
                                   style: AppTypography.large,
@@ -158,9 +220,11 @@ class _OnboardData {
   final String title;
   final String subtitle;
   final String image;
+  final bool isLottie;
   const _OnboardData({
     required this.title,
     required this.subtitle,
     required this.image,
+    this.isLottie = false,
   });
 }

@@ -24,17 +24,6 @@ class AdCard extends StatelessWidget {
   final AdDealType type;
   final VoidCallback? onTap;
 
-  Color get _borderColor {
-    switch (type) {
-      case AdDealType.rent:
-        return Color(0xFFFFECEC);
-      case AdDealType.sale:
-        return Color(0xFFE4F8FF);
-      case AdDealType.highPurchase:
-        return Color(0xFFDEFEED);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -63,10 +52,6 @@ class AdCard extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: _borderColor,
-            width: 2.5,
-          ),
         ),
         clipBehavior: Clip.antiAlias,
         child: _buildImage(imageUrl),
@@ -216,8 +201,6 @@ class AdCard extends StatelessWidget {
               ? loadingProgress.cumulativeBytesLoaded /
                   loadingProgress.expectedTotalBytes!
               : null,
-          strokeWidth: 2,
-          color: _borderColor,
         ),
       ),
     );

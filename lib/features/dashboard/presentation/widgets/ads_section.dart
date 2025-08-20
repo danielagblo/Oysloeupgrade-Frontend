@@ -18,42 +18,42 @@ class AdsSection extends StatelessWidget {
           })
         >[
           (
-            img: 'assets/images/ad1.png',
+            img: 'assets/images/ad1.jpg',
             title: 'Six bedroom apartment',
             loc: 'Santamaria-kotobabi',
             type: AdDealType.rent,
             prices: ['₵ 120 for 6 days'],
           ),
           (
-            img: 'assets/images/ad2.png',
+            img: 'assets/images/ad2.jpg',
             title: 'Six bedroom apartment',
             loc: 'Santamaria-kotobabi',
             type: AdDealType.sale,
             prices: ['₵ 1,700,000'],
           ),
           (
-            img: 'assets/images/ad3.png',
+            img: 'assets/images/ad3.jpg',
             title: 'Samsung galaxy ultra',
             loc: 'Santamaria-kotobabi',
             type: AdDealType.highPurchase,
             prices: ['₵ 120', '₵ 720', '₵ 65,000'],
           ),
           (
-            img: 'assets/images/ad4.png',
+            img: 'assets/images/ad4.jpg',
             title: 'Samsung AQ ultra smart',
             loc: 'Santamaria-kotobabi',
             type: AdDealType.sale,
             prices: ['₵ 1,670,000'],
           ),
           (
-            img: 'assets/images/ad2.png',
+            img: 'assets/images/ad5.jpg',
             title: 'Samsung AQ ultra smart',
             loc: 'Santamaria-kotobabi',
             type: AdDealType.sale,
             prices: ['₵ 1,670,000'],
           ),
           (
-            img: 'assets/images/ad5.png',
+            img: 'assets/images/ad6.jpg',
             title: 'Samsung AQ ultra smart',
             loc: 'Santamaria-kotobabi',
             type: AdDealType.sale,
