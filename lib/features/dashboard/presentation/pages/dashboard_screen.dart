@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 
@@ -14,7 +15,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _pages = [
     const AnimatedHomeScreen(),
-    const _PlaceholderScreen(title: 'Alerts'),
+    const AlertsScreen(),
     const _PlaceholderScreen(title: 'Post Ad'),
     const _PlaceholderScreen(title: 'Inbox'),
     const _PlaceholderScreen(title: 'Profile'),

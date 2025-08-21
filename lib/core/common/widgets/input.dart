@@ -76,7 +76,7 @@ class _AppTextFieldState extends State<AppTextField> {
     final iconColor = _focusNode.hasFocus
         ? focusColor
         : (theme.iconTheme.color ??
-              theme.colorScheme.onSurface.withValues(alpha: 0.6));
+            theme.colorScheme.onSurface.withValues(alpha: 0.6));
     final baseBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(20),
       borderSide: BorderSide(color: AppColors.grayBFBF, width: 1),
@@ -91,8 +91,7 @@ class _AppTextFieldState extends State<AppTextField> {
       focusNode: _focusNode,
       cursorColor: Theme.of(context).textSelectionTheme.cursorColor,
       enabled: widget.enabled,
-      keyboardType:
-          widget.keyboardType ??
+      keyboardType: widget.keyboardType ??
           (widget.isPassword
               ? TextInputType.visiblePassword
               : TextInputType.text),

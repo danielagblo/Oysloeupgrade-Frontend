@@ -50,6 +50,9 @@ linked_*.ds
 unlinked.ds
 unlinked_spec.ds
 
+assets/.DS_Store
+.metadata
+
 # Android related
 **/android/**/gradle-wrapper.jar
 .gradle/

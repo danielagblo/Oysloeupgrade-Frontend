@@ -6,6 +6,8 @@ import 'package:oysloe_mobile/features/auth/presentation/pages/otp_verification_
 import 'package:oysloe_mobile/features/auth/presentation/pages/referral_code_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/dashboard_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
 
@@ -55,6 +57,22 @@ final GoRouter appRouter = GoRouter(
       path: '/otp-verification',
       name: 'otp-verification',
       builder: (context, state) => const OtpVerificationScreen(),
+    ),
+    GoRoute(
+      path: '/ad-detail/:adId',
+      name: 'ad-detail',
+      builder: (context, state) {
+        final adId = state.pathParameters['adId']!;
+        final extra = state.extra as Map<String, dynamic>?;
+        return AdDetailScreen(
+          adId: adId,
+          adType: extra?['adType'] as AdDealType?,
+          imageUrl: extra?['imageUrl'] as String?,
+          title: extra?['title'] as String?,
+          location: extra?['location'] as String?,
+          prices: extra?['prices'] as List<String>?,
+        );
+      },
     ),
   ],
   initialLocation: '/',
