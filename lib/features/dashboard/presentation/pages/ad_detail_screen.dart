@@ -219,7 +219,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
             const SizedBox(width: 4),
             Text(
               label,
-              style: AppTypography.bodySmall,
+              style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold, fontSize: 13.sp),
               textAlign: TextAlign.center,
             ),
           ],
@@ -374,9 +374,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                       SizedBox(width: 4),
                       Text(
                         widget.location ?? 'Lashibi, Accra',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                        style: AppTypography.bodySmall,
                       ),
                     ],
                   ),
@@ -798,22 +796,22 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               ),
                               child: Text(
                                 'Chat is secured',
-                                style: AppTypography.labelSmall,
+                                style: AppTypography.bodySmall.copyWith(fontSize: 12.sp),
                               ),
                             ),
                             Positioned(
-                              top: -2,
+                              top: -3,
                               right: -6,
                               child: Container(
-                                padding: const EdgeInsets.all(3),
+                                padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: SvgPicture.asset(
                                   'assets/icons/lock_on.svg',
-                                  height: 12,
-                                  width: 12,
+                                  height: 14,
+                                  width: 14,
                                 ),
                               ),
                             ),
@@ -876,7 +874,10 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                   const SizedBox(width: 6),
                                   Text(
                                     'High Level',
-                                    style: AppTypography.labelSmall,
+                                    style: AppTypography.labelSmall.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12.sp,
+                                    ),
                                   ),
                                 ],
                               ),

@@ -10,6 +10,7 @@ import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dar
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
@@ -160,7 +161,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/dashboard/inbox',
           name: 'inbox',
-          builder: (context, state) => const PlaceholderScreen(title: 'Inbox'),
+          builder: (context, state) => const InboxScreen(),
         ),
 
         // Profile Tab

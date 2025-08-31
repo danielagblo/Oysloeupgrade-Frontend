@@ -58,7 +58,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         (actions ?? const <Widget>[]).take(2).toList(growable: false);
 
     return Material(
-      color: AppColors.grayF9,
+      color: backgroundColor ?? AppColors.grayF9,
       elevation: 0,
       child: SafeArea(
         bottom: false,

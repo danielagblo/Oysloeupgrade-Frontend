@@ -176,7 +176,6 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            fixedSize: Size(23.w, 2.2.h),
                             backgroundColor: Color(0xFFF3F3F3),
                             foregroundColor: AppColors.grayD9,
                             elevation: 0,

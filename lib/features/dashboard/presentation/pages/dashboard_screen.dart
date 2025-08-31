@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const AnimatedHomeScreen(),
     const AlertsScreen(),
     const _PlaceholderScreen(title: 'Post Ad'),
-    const _PlaceholderScreen(title: 'Inbox'),
+    const InboxScreen(),
     const _PlaceholderScreen(title: 'Profile'),
   ];
 
