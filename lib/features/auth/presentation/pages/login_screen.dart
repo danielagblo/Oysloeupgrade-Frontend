@@ -52,7 +52,7 @@ class LoginScreen extends StatelessWidget {
                     label: 'Login',
                     isPrimary: true,
                     onPressed: () {
-                      context.pushNamed('home-screen');
+                      context.go('/dashboard/home');
                     },
                   ),
                   SizedBox(height: 2.5.h),

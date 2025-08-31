@@ -56,7 +56,7 @@ class OtpVerificationScreen extends StatelessWidget {
                     label: 'Verify',
                     isPrimary: true,
                     onPressed: () {
-                      context.pushNamed('home-screen');
+                      context.go('/dashboard/home');
                     },
                   ),
                   SizedBox(height: 2.5.h),

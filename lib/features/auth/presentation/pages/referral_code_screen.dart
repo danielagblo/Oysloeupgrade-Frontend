@@ -35,7 +35,7 @@ class ReferralCodeScreen extends StatelessWidget {
                 label: 'Submit',
                 isPrimary: true,
                 onPressed: () {
-                  // context.goNamed('home-screen');
+                  context.go('/dashboard/home');
                 },
               ),
               CustomButton.capsule(
@@ -46,7 +46,7 @@ class ReferralCodeScreen extends StatelessWidget {
                 textStyle: AppTypography.body,
                 trailingSvgAsset: 'assets/icons/arrow_right.svg',
                 onPressed: () {
-                  context.goNamed('home-screen');
+                  context.go('/dashboard/home');
                 },
               ),
               SizedBox(height: 3.h),

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
-import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ads_section.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/rating_overview.dart'
+    as rating_widget;
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/reviews_bottom_sheet.dart'
+    as reviews_widget;
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class AdDetailScreen extends StatefulWidget {
@@ -93,6 +96,103 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
     ];
   }
 
+  List<reviews_widget.ReviewComment> _getSampleReviews() {
+    return [
+      reviews_widget.ReviewComment(
+        userName: 'Sandra Biom',
+        userImage: 'assets/images/man.jpg',
+        rating: 4,
+        comment:
+            'I have went with the seller to see this ad.i must confess i was impressed and i am willing to pay for it in the coming month.',
+        date: 'Yesterday',
+        likes: 20,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'Sandra Biom',
+        userImage: 'assets/images/man.jpg',
+        rating: 4,
+        comment:
+            'I have went with the seller to see this ad.i must confess i was impressed and i am willing to pay for it in the coming month.',
+        date: 'Today',
+        likes: 20,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'You',
+        userImage: 'assets/images/man.jpg',
+        rating: 4,
+        comment:
+            'I have went with the seller to see this ad.i must confess i was impressed and i am willing to pay for it in the coming month.',
+        date: '1st April',
+        likes: 20,
+        canEdit: true,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'Sandra Biom',
+        userImage: 'assets/images/man.jpg',
+        rating: 4,
+        comment:
+            'I have went with the seller to see this ad.i must confess i was impressed and i am willing to pay for it in the coming month.',
+        date: '1st April',
+        likes: 20,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'John Doe',
+        userImage: 'assets/images/man.jpg',
+        rating: 5,
+        comment: 'Excellent product, highly recommended!',
+        date: '2nd April',
+        likes: 15,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'Alice Brown',
+        userImage: 'assets/images/man.jpg',
+        rating: 5,
+        comment: 'Perfect condition, exactly as described!',
+        date: '6th April',
+        likes: 25,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'Jane Smith',
+        userImage: 'assets/images/man.jpg',
+        rating: 3,
+        comment: 'It is okay, could be better.',
+        date: '3rd April',
+        likes: 8,
+      ),
+      reviews_widget.ReviewComment(
+        userName: 'David Wilson',
+        userImage: 'assets/images/man.jpg',
+        rating: 3,
+        comment: 'Average quality, met my basic expectations.',
+        date: '7th April',
+        likes: 5,
+      ),
+    ];
+  }
+
+  void _showReviewsBottomSheet(int initialFilter) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      enableDrag: false,
+      builder: (context) => reviews_widget.ReviewsBottomSheet(
+        rating: 4.5,
+        reviewCount: 234,
+        initialFilter: initialFilter,
+        ratingBreakdown: [
+          reviews_widget.RatingBreakdown(stars: 5, percentage: 25),
+          reviews_widget.RatingBreakdown(stars: 4, percentage: 50),
+          reviews_widget.RatingBreakdown(stars: 3, percentage: 25),
+          reviews_widget.RatingBreakdown(stars: 2, percentage: 0),
+          reviews_widget.RatingBreakdown(stars: 1, percentage: 0),
+        ],
+        reviews: _getSampleReviews(),
+      ),
+    );
+  }
+
   Widget _actionChip({
     required String label,
     String? svgAsset,
@@ -110,6 +210,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (svgAsset != null)
               SvgPicture.asset(svgAsset, width: 14, height: 14)
@@ -119,6 +220,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
             Text(
               label,
               style: AppTypography.bodySmall,
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -148,33 +250,6 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
     );
   }
 
-  Widget _ratingFilterChip(String text, {bool isSelected = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.blueGray374957 : AppColors.grayF9,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.star,
-            size: 14,
-            color: isSelected ? AppColors.white : AppColors.blueGray374957,
-          ),
-          SizedBox(width: 4),
-          Text(
-            text,
-            style: AppTypography.bodySmall.copyWith(
-              color: isSelected ? Colors.white : Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -195,7 +270,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
   void _scrollCards(bool forward) {
     if (!_cardsController.hasClients) return;
-    final double cardWidth = 28.w; // smaller cards so ~3 show
+    final double cardWidth = 28.w; 
     const double spacing = 12.0;
     final double delta = cardWidth + spacing;
     final target = forward
@@ -423,16 +498,14 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                 text: TextSpan(
                                   text: '${feature['label']} ',
                                   style: AppTypography.bodySmall.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF646161)
-                                        .withValues(alpha: 0.71),
-                                  ),
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.blueGray374957),
                                   children: [
                                     TextSpan(
                                       text: feature['value'],
                                       style: AppTypography.bodySmall.copyWith(
-                                        color: Color(0xFF646161)
-                                            .withValues(alpha: 0.71),
+                                        color: AppColors.blueGray374957
+                                            .withValues(alpha: 0.85),
                                       ),
                                     ),
                                   ],
@@ -546,7 +619,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               child: Text(
                                 tip,
                                 style: AppTypography.body.copyWith(
-                                  fontSize: 13.sp,
+                                  fontSize: 13.5.sp,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
@@ -576,7 +650,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                             children: [
                               _actionChip(
                                 label: 'Mark Ad as taken',
-                                icon: Icons.check_circle_outline,
+                                svgAsset: 'assets/icons/mark_as_taken.svg',
                                 onTap: () {},
                               ),
                               const SizedBox(width: 12),
@@ -585,34 +659,40 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                 svgAsset: 'assets/icons/flag.svg',
                                 onTap: () {},
                               ),
+                              const SizedBox(width: 12),
+                              _actionChip(
+                                label: 'Favorite',
+                                svgAsset: 'assets/icons/unfavorite.svg',
+                                onTap: () {},
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 12),
-                        // Keep these four on the same row; fit to available space
-                        Wrap(
-                          spacing: 4,
-                          runSpacing: 8,
+                        Row(
                           children: [
-                            _actionChip(
-                              label: 'Caller 1',
-                              svgAsset: 'assets/icons/outgoing_call.svg',
-                              onTap: () {},
+                            Expanded(
+                              child: _actionChip(
+                                label: 'Caller 1',
+                                svgAsset: 'assets/icons/outgoing_call.svg',
+                                onTap: () {},
+                              ),
                             ),
-                            _actionChip(
-                              label: 'Caller 2',
-                              svgAsset: 'assets/icons/outgoing_call.svg',
-                              onTap: () {},
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _actionChip(
+                                label: 'Caller 2',
+                                svgAsset: 'assets/icons/outgoing_call.svg',
+                                onTap: () {},
+                              ),
                             ),
-                            _actionChip(
-                              label: 'Make an offer',
-                              svgAsset: 'assets/icons/inbox.svg',
-                              onTap: () {},
-                            ),
-                            _actionChip(
-                              label: 'Favorite',
-                              svgAsset: 'assets/icons/unfavorite.svg',
-                              onTap: () {},
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _actionChip(
+                                label: 'Make an offer',
+                                svgAsset: 'assets/icons/make_offer.svg',
+                                onTap: () {},
+                              ),
                             ),
                           ],
                         ),
@@ -655,7 +735,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide(
-                                    color: AppColors.grayBFBF, width: 1),
+                                    color: AppColors.grayBFBF, width: 1.5),
                               ),
                               hintText: 'Start a chat',
                               hintStyle: AppTypography.body,
@@ -761,7 +841,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
             SizedBox(height: 1.h),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 10),
-              padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
+              padding: EdgeInsets.only(left: 10, right: 10, top: 16, bottom: 8),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -961,7 +1041,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Total ads: 2k',
+                                    'Total ads: 2K',
                                     style: AppTypography.bodySmall,
                                   ),
                                 ],
@@ -975,153 +1055,23 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
                   /// [Rating breakdown]
                   SizedBox(height: 1.h),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Left side - Rating display
-                            Column(
-                              children: [
-                                Text(
-                                  '4.5',
-                                  style: TextStyle(
-                                    fontSize: 32.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.blueGray374957,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    ...List.generate(
-                                        4,
-                                        (index) => Icon(
-                                              Icons.star,
-                                              color: AppColors.blueGray374957,
-                                              size: 16,
-                                            )),
-                                    Icon(
-                                      Icons.star,
-                                      color: Colors.grey[300],
-                                      size: 16,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  '234 Reviews',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(width: 6.w),
-                            // Right side - Rating breakdown
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  ...List.generate(5, (index) {
-                                    final starCount = 5 - index;
-                                    return Padding(
-                                      padding: EdgeInsets.only(bottom: 6),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.star,
-                                            size: 16,
-                                            color: AppColors.blueGray374957,
-                                          ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            '$starCount',
-                                            style: AppTypography.bodySmall
-                                                .copyWith(
-                                              color: AppColors.blueGray374957,
-                                            ),
-                                          ),
-                                          SizedBox(width: 12),
-                                          Expanded(
-                                            child: Stack(
-                                              children: [
-                                                Container(
-                                                  height: 6,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey[300],
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4),
-                                                  ),
-                                                ),
-                                                FractionallySizedBox(
-                                                  widthFactor:
-                                                      0.5, // 50% filled
-                                                  child: Container(
-                                                    height: 6,
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors
-                                                          .blueGray374957,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(width: 12),
-                                          Text(
-                                            '50%',
-                                            style: AppTypography.bodySmall,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 2.h),
-                        // Filter buttons
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              _ratingFilterChip('All', isSelected: true),
-                              SizedBox(width: 12),
-                              _ratingFilterChip('1'),
-                              SizedBox(width: 12),
-                              _ratingFilterChip('2'),
-                              SizedBox(width: 12),
-                              _ratingFilterChip('3'),
-                              SizedBox(width: 12),
-                              _ratingFilterChip('4'),
-                              SizedBox(width: 12),
-                              _ratingFilterChip('5'),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 3.h),
-                        Center(
-                          child: CustomButton.capsule(
-                            label: 'Seller reviews',
-                            filled: true,
-                            onPressed: null,
-                          ),
-                        ),
-                      ],
-                    ),
+                  rating_widget.RatingOverview(
+                    rating: 4.5,
+                    reviewCount: 234,
+                    selectedFilter: 0, // 0 for "All"
+                    ratingBreakdown: [
+                      rating_widget.RatingBreakdown(stars: 5, percentage: 25),
+                      rating_widget.RatingBreakdown(stars: 4, percentage: 50),
+                      rating_widget.RatingBreakdown(stars: 3, percentage: 25),
+                      rating_widget.RatingBreakdown(stars: 2, percentage: 0),
+                      rating_widget.RatingBreakdown(stars: 1, percentage: 0),
+                    ],
+                    onFilterChanged: (filterIndex) {
+                      _showReviewsBottomSheet(filterIndex);
+                    },
+                    onViewReviewsPressed: () {
+                      _showReviewsBottomSheet(0);
+                    },
                   ),
                 ],
               ),
@@ -1146,9 +1096,12 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
               ),
             ),
             SizedBox(height: 1.h),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AdsSection(),
+            Container(
+              color: AppColors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: AdsSection(),
+              ),
             )
           ],
         ),

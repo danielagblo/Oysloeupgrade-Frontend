@@ -86,8 +86,11 @@ class AdCard extends StatelessWidget {
           'assets/icons/location.svg',
           height: 10.sp,
           colorFilter: ColorFilter.mode(
-            AppColors.gray8B959E,
+            // AppColors.gray8B959E,
+            // BlendMode.srcIn,
+            AppColors.blueGray374957,
             BlendMode.srcIn,
+            
           ),
         ),
         SizedBox(width: 4.sp),
@@ -97,9 +100,9 @@ class AdCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.labelSmall.copyWith(
-              color: AppColors.gray8B959E,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w400,
+              color: AppColors.blueGray374957,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -137,7 +140,7 @@ class AdCard extends StatelessWidget {
       style: AppTypography.body.copyWith(
         color: AppColors.blueGray374957,
         fontWeight: FontWeight.w700,
-        fontSize: 13.sp,
+        fontSize: 15.sp,
       ),
     );
   }
@@ -152,7 +155,7 @@ class AdCard extends StatelessWidget {
           style: AppTypography.body.copyWith(
             color: AppColors.blueGray374957,
             fontWeight: FontWeight.w700,
-            fontSize: 13.sp,
+            fontSize: 15.sp,
           ),
         );
       }).toList(),

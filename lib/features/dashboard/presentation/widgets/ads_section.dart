@@ -72,17 +72,27 @@ class AdsSection extends StatelessWidget {
       padding: EdgeInsets.only(top: 1.2.h),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 1.4.h,
-        crossAxisSpacing: 3.w,
-        childAspectRatio: 0.95,
+        mainAxisSpacing: 0.9.h,
+        crossAxisSpacing: 1.5.w,
+        childAspectRatio: 0.97,
       ),
       itemCount: items.length,
       itemBuilder: (context, i) {
         final it = items[i];
         return GestureDetector(
           onTap: () {
+            // Determine current route to use correct nested route
+            final currentLocation = GoRouterState.of(context).uri.toString();
+            String routeName;
+
+            if (currentLocation.startsWith('/dashboard/alerts')) {
+              routeName = 'alerts-ad-detail';
+            } else {
+              routeName = 'home-ad-detail';
+            }
+
             context.pushNamed(
-              'ad-detail',
+              routeName,
               pathParameters: {'adId': it.id},
               extra: {
                 'adType': it.type,

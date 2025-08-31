@@ -50,10 +50,10 @@ class _StatsSectionState extends State<StatsSection>
         return LayoutBuilder(
           builder: (context, constraints) {
             const count = 5;
-            final spacing = 2.8.w;
+            final spacing = 1.5.w; 
             final avail = constraints.maxWidth;
             final size = math.min(
-              12.5.h,
+              15.h,
               (avail - spacing * (count - 1)) / count,
             );
 
@@ -110,9 +110,7 @@ class _StatCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double stroke = math.max(6, size * 0.065);
-    final colors = Theme.of(context);
-
+    final double stroke = math.max(5.0, size * 0.05); 
     return SizedBox(
       width: size,
       child: Stack(
@@ -135,8 +133,8 @@ class _StatCircle extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: AppTypography.labelSmall.copyWith(
-                  color: colors.colorScheme.onSurface.withValues(alpha: 0.75),
+                style: AppTypography.bodySmall.copyWith(
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),

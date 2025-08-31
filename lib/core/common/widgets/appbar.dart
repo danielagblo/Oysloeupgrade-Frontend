@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 
@@ -29,6 +30,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
+  void _handleDefaultBack(BuildContext context) {
+    final router = GoRouter.of(context);
+    final currentLocation =
+        router.routerDelegate.currentConfiguration.uri.toString();
+
+    if (router.canPop()) {
+      router.pop();
+    } else {
+      if (currentLocation.startsWith('/dashboard/')) {
+        router.go('/dashboard/home');
+      } else {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -56,7 +75,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: _BackWithLabel(
-                      onTap: onBack ?? () => Navigator.of(context).pop(),
+                      onTap: onBack ?? () => _handleDefaultBack(context),
                       labelStyle: textTheme.labelLarge
                           ?.copyWith(fontWeight: FontWeight.w500),
                       arrowAssetPath: arrowAssetPath,

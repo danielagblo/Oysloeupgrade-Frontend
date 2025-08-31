@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
-import 'package:oysloe_mobile/core/constants/body_paddings.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/common/widgets/animated_gradient_search_input.dart';
@@ -137,7 +135,7 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
               controller: _scrollController,
               physics: const BouncingScrollPhysics(),
               child: Padding(
-                padding: BodyPaddings.horizontalPage,
+                padding: EdgeInsets.symmetric(horizontal: 2.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -161,7 +159,7 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                     ),
                     SizedBox(height: 3.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2.5.w),
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
                       child: const CategoriesSection(),
                     ),
                     SizedBox(height: 4.h),
@@ -175,21 +173,34 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                           ),
                         ),
                         SizedBox(width: 3.w),
-                        CustomButton.capsule(
-                          label: 'Show All',
-                          filled: true,
-                          width: 22.w,
-                          height: 4.5.h,
-                          textStyle: AppTypography.body.copyWith(
-                            color: AppColors.blueGray374957,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: Size(23.w, 2.2.h),
+                            backgroundColor: Color(0xFFF3F3F3),
+                            foregroundColor: AppColors.grayD9,
+                            elevation: 0,
+                            textStyle: AppTypography.body.copyWith(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: Text(
+                            'Show All',
+                            style: AppTypography.body.copyWith(
+                              color: AppColors.blueGray374957,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     SizedBox(height: 3.h),
-                    const StatsSection(),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
+                      child: const StatsSection(),
+                    ),
                     SizedBox(height: 3.h),
                     const AdsSection(),
                     SizedBox(height: 3.h),

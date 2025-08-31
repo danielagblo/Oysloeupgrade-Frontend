@@ -129,16 +129,14 @@ class CustomButton extends StatelessWidget {
         : (isPrimary ? AppColors.primary : AppColors.grayF9);
     final bool enabled = onPressed != null;
     final disabledTextColor = AppColors.blueGray374957.withValues(alpha: 0.33);
-    final computedBaseTextColor =
-        filledTextColor ??
+    final computedBaseTextColor = filledTextColor ??
         (isPrimary ? AppColors.gray222222 : AppColors.blueGray374957);
     final txtColor = enabled
         ? computedBaseTextColor
         : (isPrimary
-              ? computedBaseTextColor.withValues(alpha: 0.4)
-              : disabledTextColor);
-    final style =
-        textStyle ??
+            ? computedBaseTextColor.withValues(alpha: 0.4)
+            : disabledTextColor);
+    final style = textStyle ??
         AppTypography.body.copyWith(color: txtColor, fontSize: 16.sp);
 
     final radius = BorderRadius.circular(20);
@@ -190,23 +188,20 @@ class CustomButton extends StatelessWidget {
     final bool filled = capsuleFilled ?? false;
     final bool enabled = onPressed != null;
     final defaultOutlineColor = AppColors.grayBFBF.withValues(alpha: 0.29);
-    final defaultFillColor = AppColors.grayF9;
+    final defaultFillColor = Color(0xFFF3F3F3);
     const double defaultCapsuleWidth = 140;
     const double defaultCapsuleHeight = 44;
 
-    final bgColor = filled
-        ? (capsuleFillColor ?? defaultFillColor)
-        : Colors.transparent;
+    final bgColor =
+        filled ? (capsuleFillColor ?? defaultFillColor) : Colors.transparent;
     final borderColor = filled
         ? (capsuleBorderColor ?? Colors.transparent)
         : (capsuleBorderColor ?? defaultOutlineColor);
-    final textColor =
-        capsuleTextColor ??
+    final textColor = capsuleTextColor ??
         (filled ? AppColors.blueGray374957 : AppColors.blueGray374957);
 
     final theme = Theme.of(context);
-    final style =
-        textStyle ??
+    final style = textStyle ??
         theme.textTheme.labelMedium?.copyWith(
           fontWeight: FontWeight.w600,
           color: textColor,
