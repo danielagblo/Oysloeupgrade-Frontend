@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/navigation/navigation_shell.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/email_password_reset.dart';
@@ -11,28 +10,13 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
 
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  const PlaceholderScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title), automaticallyImplyLeading: false),
-      body: Center(
-        child: Text(
-          '$title Screen',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-}
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -154,7 +138,7 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/post-ad',
           name: 'post-ad',
           builder: (context, state) =>
-              const PlaceholderScreen(title: 'Post Ad'),
+              const PostAdScreen(),
         ),
 
         // Inbox Tab
@@ -162,6 +146,21 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/inbox',
           name: 'inbox',
           builder: (context, state) => const InboxScreen(),
+          routes: [
+            GoRoute(
+              path: 'chat/:chatId',
+              name: 'chat',
+              builder: (context, state) {
+                final chatId = state.pathParameters['chatId']!;
+                final extra = state.extra as Map<String, dynamic>?;
+                return ChatScreen(
+                  chatId: chatId,
+                  otherUserName: extra?['otherUserName'] as String? ?? 'Unknown',
+                  otherUserAvatar: extra?['otherUserAvatar'] as String? ?? 'assets/images/man.jpg',
+                );
+              },
+            ),
+          ],
         ),
 
         // Profile Tab
@@ -169,7 +168,7 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/profile',
           name: 'profile',
           builder: (context, state) =>
-              const PlaceholderScreen(title: 'Profile'),
+              const ProfileScreen()
         ),
       ],
     ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -17,9 +19,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _pages = [
     const AnimatedHomeScreen(),
     const AlertsScreen(),
-    const _PlaceholderScreen(title: 'Post Ad'),
+    const PostAdScreen(),
     const InboxScreen(),
-    const _PlaceholderScreen(title: 'Profile'),
+    const ProfileScreen(),
   ];
 
   @override
@@ -33,25 +35,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _currentIndex = index;
           });
         },
-      ),
-    );
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  const _PlaceholderScreen({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title), automaticallyImplyLeading: false),
-      body: Center(
-        child: Text(
-          '$title Screen',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
       ),
     );
   }

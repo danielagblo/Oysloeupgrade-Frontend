@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
@@ -143,6 +144,7 @@ class _InboxScreenState extends State<InboxScreen> {
     return Column(
       children: [
         _buildChatItem(
+          chatId: 'chat_1',
           name: 'iphone 14 pro max',
           message: 'is the iphone 15 pro max  today...',
           time: 'today',
@@ -151,6 +153,7 @@ class _InboxScreenState extends State<InboxScreen> {
           isClosed: true,
         ),
         _buildChatItem(
+          chatId: 'chat_2',
           name: 'iphone 14 pro max',
           message: 'is the iphone 15 pro max  today...',
           time: 'today',
@@ -159,6 +162,7 @@ class _InboxScreenState extends State<InboxScreen> {
           isClosed: false,
         ),
         _buildChatItem(
+          chatId: 'chat_3',
           name: 'iphone 14 pro max',
           message: 'is the iphone 15 pro max  today...',
           time: 'today',
@@ -167,6 +171,7 @@ class _InboxScreenState extends State<InboxScreen> {
           isClosed: false,
         ),
         _buildChatItem(
+          chatId: 'chat_4',
           name: 'iphone 14 pro max',
           message: 'is the iphone 15 pro max  today...',
           time: 'today',
@@ -296,6 +301,7 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Widget _buildChatItem({
+    required String chatId,
     required String name,
     required String message,
     required String time,
@@ -303,76 +309,91 @@ class _InboxScreenState extends State<InboxScreen> {
     bool isUnread = false,
     bool isClosed = false,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(2.h),
-      decoration: BoxDecoration(
-        color: isUnread ? Colors.white : AppColors.grayF9,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 6.8.h,
-            height: 6.h,
-            decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                image: DecorationImage(
-                  image: AssetImage(avatar),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.circular(10)),
-          ),
-          SizedBox(width: 2.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: AppTypography.bodySmall.copyWith(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.blueGray374957,
+    return GestureDetector(
+      onTap: () {
+        // Only navigate if the chat is not closed
+        if (!isClosed) {
+          context.pushNamed(
+            'chat',
+            pathParameters: {'chatId': chatId},
+            extra: {
+              'otherUserName': name,
+              'otherUserAvatar': avatar,
+            },
+          );
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(2.h),
+        decoration: BoxDecoration(
+          color: isUnread ? Colors.white : AppColors.grayF9,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 6.8.h,
+              height: 6.h,
+              decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  image: DecorationImage(
+                    image: AssetImage(avatar),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            SizedBox(width: 2.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: AppTypography.bodySmall.copyWith(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.blueGray374957,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 0.5.h),
-                if (isClosed)
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.3.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.redFF6B6B,
-                    ),
-                    child: Text(
-                      'Closed',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: Colors.white,
-                        fontSize: 12.sp,
-                      ),
-                    ),
-                  )
-                else
-                  Text(
-                    message,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: isUnread
-                          ? AppColors.blueGray374957
-                          : AppColors.gray8B959E,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    ],
                   ),
-              ],
+                  SizedBox(height: 0.5.h),
+                  if (isClosed)
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.3.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.redFF6B6B,
+                      ),
+                      child: Text(
+                        'Closed',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: Colors.white,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      message,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: isUnread
+                            ? AppColors.blueGray374957
+                            : AppColors.gray8B959E,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -437,27 +458,27 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/no_data.svg',
-            width: 80,
-            height: 80,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'No data to show',
-            style: AppTypography.body.copyWith(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.blueGray374957,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildEmptyState() {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         SvgPicture.asset(
+  //           'assets/icons/no_data.svg',
+  //           width: 80,
+  //           height: 80,
+  //         ),
+  //         SizedBox(height: 16),
+  //         Text(
+  //           'No data to show',
+  //           style: AppTypography.body.copyWith(
+  //             fontSize: 16.sp,
+  //             fontWeight: FontWeight.w600,
+  //             color: AppColors.blueGray374957,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

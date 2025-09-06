@@ -98,7 +98,7 @@ ThemeData buildAppTheme(Brightness brightness) {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: primaryColor, width: 1.5),
+        borderSide: BorderSide(color: Colors.transparent, width: 1.5),
       ),
       hintStyle: textTheme.bodyMedium?.copyWith(color: textSecondary),
     ),
