@@ -7,14 +7,16 @@ import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_input.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class PostAdScreen extends StatefulWidget {
-  const PostAdScreen({super.key});
+class PostAdFormScreen extends StatefulWidget {
+  final List<String>? selectedImages;
+  
+  const PostAdFormScreen({super.key, this.selectedImages});
 
   @override
-  State<PostAdScreen> createState() => _PostAdScreenState();
+  State<PostAdFormScreen> createState() => _PostAdFormScreenState();
 }
 
-class _PostAdScreenState extends State<PostAdScreen> {
+class _PostAdFormScreenState extends State<PostAdFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _titleController = TextEditingController();
@@ -27,19 +29,15 @@ class _PostAdScreenState extends State<PostAdScreen> {
   final _key1Controller = TextEditingController();
   final _key2Controller = TextEditingController();
   final _key3Controller = TextEditingController();
+  final _durationController = TextEditingController();
+  final _dailyDurationController = TextEditingController();
+  final _weeklyDurationController = TextEditingController();
+  final _monthlyDurationController = TextEditingController();
 
   String? _selectedCategory;
   String _selectedPurpose = 'Sale';
-  String? _selectedDuration;
   String? _selectedAreaLocation;
   String? _selectedMapLocation;
-  String? _selectedDailyDuration;
-  String? _selectedWeeklyDuration;
-  String? _selectedMonthlyDuration;
-  String? _selectedBrand;
-  String? _selectedKey1;
-  String? _selectedKey2;
-  String? _selectedKey3;
 
   @override
   void dispose() {
@@ -53,6 +51,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
     _key1Controller.dispose();
     _key2Controller.dispose();
     _key3Controller.dispose();
+    _durationController.dispose();
+    _dailyDurationController.dispose();
+    _weeklyDurationController.dispose();
+    _monthlyDurationController.dispose();
     super.dispose();
   }
 
@@ -62,7 +64,7 @@ Widget _buildPriceSection() {
       return AdInput(
         controller: _priceController,
         labelText: 'Price',
-        hintText: '\$',
+        hintText: '₵',
         keyboardType: TextInputType.number,
       );
 
@@ -75,33 +77,25 @@ Widget _buildPriceSection() {
                 child: AdInput(
                   controller: _dailyPriceController,
                   labelText: 'Daily',
-                  hintText: '\$',
+                  hintText: '₵',
                   keyboardType: TextInputType.number,
                 ),
               ),
               SizedBox(width: 4.w),
               Expanded(
-                child: AdDropdown<String>(
-                  labelText: '',
-                  value: _selectedDailyDuration,
+                child: AdEditableDropdown(
+                  controller: _dailyDurationController,
                   hintText: 'Duration',
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedDailyDuration = value;
-                    });
-                  },
                   items: [
                     '1 Week',
                     '2 Weeks',
                     '1 Month',
                     '3 Months',
                     '6 Months'
-                  ]
-                      .map((duration) => DropdownMenuItem(
-                            value: duration,
-                            child: Text(duration),
-                          ))
-                      .toList(),
+                  ],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
                 ),
               ),
             ],
@@ -113,33 +107,25 @@ Widget _buildPriceSection() {
                 child: AdInput(
                   controller: _weeklyPriceController,
                   labelText: 'Weekly',
-                  hintText: '\$',
+                  hintText: '₵',
                   keyboardType: TextInputType.number,
                 ),
               ),
               SizedBox(width: 4.w),
               Expanded(
-                child: AdDropdown<String>(
-                  labelText: '',
-                  value: _selectedWeeklyDuration,
+                child: AdEditableDropdown(
+                  controller: _weeklyDurationController,
                   hintText: 'Duration',
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedWeeklyDuration = value;
-                    });
-                  },
                   items: [
                     '1 Week',
                     '2 Weeks',
                     '1 Month',
                     '3 Months',
                     '6 Months'
-                  ]
-                      .map((duration) => DropdownMenuItem(
-                            value: duration,
-                            child: Text(duration),
-                          ))
-                      .toList(),
+                  ],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
                 ),
               ),
             ],
@@ -151,33 +137,25 @@ Widget _buildPriceSection() {
                 child: AdInput(
                   controller: _monthlyPriceController,
                   labelText: 'Monthly',
-                  hintText: '\$',
+                  hintText: '₵',
                   keyboardType: TextInputType.number,
                 ),
               ),
               SizedBox(width: 4.w),
               Expanded(
-                child: AdDropdown<String>(
-                  labelText: '',
-                  value: _selectedMonthlyDuration,
+                child: AdEditableDropdown(
+                  controller: _monthlyDurationController,
                   hintText: 'Duration',
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedMonthlyDuration = value;
-                    });
-                  },
                   items: [
                     '1 Week',
                     '2 Weeks',
                     '1 Month',
                     '3 Months',
                     '6 Months'
-                  ]
-                      .map((duration) => DropdownMenuItem(
-                            value: duration,
-                            child: Text(duration),
-                          ))
-                      .toList(),
+                  ],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
                 ),
               ),
             ],
@@ -193,33 +171,25 @@ Widget _buildPriceSection() {
             child: AdInput(
               controller: _priceController,
               labelText: 'Price',
-              hintText: '\$',
+              hintText: '₵',
               keyboardType: TextInputType.number,
             ),
           ),
           SizedBox(width: 4.w),
           Expanded(
-            child: AdDropdown<String>(
-              labelText: '',
-              value: _selectedDuration,
+            child: AdEditableDropdown(
+              controller: _durationController,
               hintText: 'Duration',
-              onChanged: (value) {
-                setState(() {
-                  _selectedDuration = value;
-                });
-              },
               items: [
                 '1 Week',
                 '2 Weeks',
                 '1 Month',
                 '3 Months',
                 '6 Months'
-              ]
-                  .map((duration) => DropdownMenuItem(
-                        value: duration,
-                        child: Text(duration),
-                      ))
-                  .toList(),
+              ],
+              onChanged: (value) {
+                // Value is already set in the controller
+              },
             ),
           ),
         ],
@@ -264,7 +234,7 @@ Widget _buildPriceSection() {
               Text(
                 'Declare ad purpose?',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.white,
+                  color: AppColors.blueGray374957,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -310,9 +280,10 @@ Widget _buildPriceSection() {
                   SizedBox(width: 2.w),
                   Expanded(
                     child: Text(
-                      'We only take the actual location of your product only for verifiable and safety concerns.',
-                      style: AppTypography.labelSmall.copyWith(
+                      ' This is required only for verification and safety purposes.',
+                      style: AppTypography.bodySmall.copyWith(
                         color: AppColors.gray8B959E,
+                        fontSize: 13.sp,
                       ),
                     ),
                   ),
@@ -347,14 +318,9 @@ Widget _buildPriceSection() {
                 ),
               ),
               SizedBox(height: 2.w),
-              AdDropdown<String>(
-                value: _selectedBrand,
+              AdEditableDropdown(
+                controller: _brandController,
                 hintText: 'Brand',
-                onChanged: (value) {
-                  setState(() {
-                    _selectedBrand = value;
-                  });
-                },
                 items: [
                   'Apple',
                   'Samsung',
@@ -364,60 +330,37 @@ Widget _buildPriceSection() {
                   'HP',
                   'Dell',
                   'Other'
-                ]
-                    .map((brand) => DropdownMenuItem(
-                          value: brand,
-                          child: Text(brand),
-                        ))
-                    .toList(),
+                ],
+                onChanged: (value) {
+                  // Value is already set in the controller
+                },
               ),
               SizedBox(height: 3.w),
-              AdDropdown<String>(
-                value: _selectedKey1,
+              AdEditableDropdown(
+                controller: _key1Controller,
                 hintText: 'Key 1',
+                items: ['New', 'Used', 'Refurbished', 'Like New'],
                 onChanged: (value) {
-                  setState(() {
-                    _selectedKey1 = value;
-                  });
+                  // Value is already set in the controller
                 },
-                items: ['New', 'Used', 'Refurbished', 'Like New']
-                    .map((key) => DropdownMenuItem(
-                          value: key,
-                          child: Text(key),
-                        ))
-                    .toList(),
               ),
               SizedBox(height: 3.w),
-              AdDropdown<String>(
-                value: _selectedKey2,
+              AdEditableDropdown(
+                controller: _key2Controller,
                 hintText: 'Key 2',
+                items: ['Original', 'Copy', 'Generic'],
                 onChanged: (value) {
-                  setState(() {
-                    _selectedKey2 = value;
-                  });
+                  // Value is already set in the controller
                 },
-                items: ['Original', 'Copy', 'Generic']
-                    .map((key) => DropdownMenuItem(
-                          value: key,
-                          child: Text(key),
-                        ))
-                    .toList(),
               ),
               SizedBox(height: 3.w),
-              AdDropdown<String>(
-                value: _selectedKey3,
+              AdEditableDropdown(
+                controller: _key3Controller,
                 hintText: 'Key 3',
+                items: ['Warranty', 'No Warranty', '1 Year', '2 Years'],
                 onChanged: (value) {
-                  setState(() {
-                    _selectedKey3 = value;
-                  });
+                  // Value is already set in the controller
                 },
-                items: ['Warranty', 'No Warranty', '1 Year', '2 Years']
-                    .map((key) => DropdownMenuItem(
-                          value: key,
-                          child: Text(key),
-                        ))
-                    .toList(),
               ),
               SizedBox(height: 3.h),
               AdInput(
@@ -449,10 +392,11 @@ Widget _buildPriceSection() {
         onTap: () {
           setState(() {
             _selectedPurpose = purpose;
-            _selectedDuration = null;
-            _selectedDailyDuration = null;
-            _selectedWeeklyDuration = null;
-            _selectedMonthlyDuration = null;
+            // Clear all duration controllers when changing purpose
+            _durationController.clear();
+            _dailyDurationController.clear();
+            _weeklyDurationController.clear();
+            _monthlyDurationController.clear();
           });
         },
         child: Container(
@@ -530,7 +474,7 @@ Widget _buildPriceSection() {
         location,
         style: AppTypography.bodySmall.copyWith(
           fontSize: 11.sp,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.bold,
           color: isDark ? AppColors.white : Color(0xFF222222),
         ),
       ),

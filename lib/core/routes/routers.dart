@@ -11,7 +11,8 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_scree
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
@@ -138,7 +139,17 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/post-ad',
           name: 'post-ad',
           builder: (context, state) =>
-              const PostAdScreen(),
+              const PostAdUploadImagesScreen(),
+          routes: [
+            GoRoute(
+              path: 'form',
+              name: 'post-ad-form',
+              builder: (context, state) {
+                final selectedImages = state.extra as List<String>?;
+                return PostAdFormScreen(selectedImages: selectedImages);
+              },
+            ),
+          ],
         ),
 
         // Inbox Tab

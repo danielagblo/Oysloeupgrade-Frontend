@@ -272,6 +272,308 @@ class AdDropdown<T> extends StatelessWidget {
   }
 }
 
+class AdEditableDropdown extends StatefulWidget {
+  const AdEditableDropdown({
+    super.key,
+    required this.controller,
+    required this.items,
+    this.labelText,
+    this.hintText,
+    this.width,
+    this.validator,
+    this.enabled = true,
+    this.onChanged,
+    this.keyboardType,
+  });
+
+  final TextEditingController controller;
+  final List<String> items;
+  final String? labelText;
+  final String? hintText;
+  final double? width;
+  final String? Function(String?)? validator;
+  final bool enabled;
+  final ValueChanged<String?>? onChanged;
+  final TextInputType? keyboardType;
+
+  @override
+  State<AdEditableDropdown> createState() => _AdEditableDropdownState();
+}
+
+class _AdEditableDropdownState extends State<AdEditableDropdown> {
+  OverlayEntry? _overlayEntry;
+  final LayerLink _layerLink = LayerLink();
+  bool _isDropdownOpen = false;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus && _isDropdownOpen) {
+        _closeDropdown();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _closeDropdown();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _toggleDropdown() {
+    if (_isDropdownOpen) {
+      _closeDropdown();
+    } else {
+      _openDropdown();
+    }
+  }
+
+  void _openDropdown() {
+    if (_isDropdownOpen) return;
+
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry!);
+    setState(() {
+      _isDropdownOpen = true;
+    });
+  }
+
+  void _closeDropdown() {
+    if (!_isDropdownOpen) return;
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() {
+      _isDropdownOpen = false;
+    });
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    Size size = renderBox.size;
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        width: size.width,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0.0, size.height + 4),
+          child: Material(
+            elevation: 4.0,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: 200,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? AppColors.blueGray374957 
+                    : AppColors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? AppColors.blueGray374957 
+                      : AppColors.grayD9,
+                  width: 1,
+                ),
+              ),
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: widget.items.length,
+                itemBuilder: (context, index) {
+                  final item = widget.items[index];
+                  return InkWell(
+                    onTap: () {
+                      widget.controller.text = item;
+                      widget.onChanged?.call(item);
+                      _closeDropdown();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        border: index < widget.items.length - 1
+                            ? Border(
+                                bottom: BorderSide(
+                                  color: Theme.of(context).brightness == Brightness.dark 
+                                      ? AppColors.blueGray374957.withValues(alpha: 0.3)
+                                      : AppColors.grayD9.withValues(alpha: 0.5),
+                                  width: 0.5,
+                                ),
+                              )
+                            : null,
+                      ),
+                      child: Text(
+                        item,
+                        style: AppTypography.body.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark 
+                              ? AppColors.white 
+                              : AppColors.blueGray374957,
+                          fontSize: 15.sp,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Widget field = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.labelText != null) ...[
+          Text(
+            widget.labelText!,
+            style: AppTypography.bodySmall.copyWith(
+              color: isDark ? AppColors.white : AppColors.blueGray374957,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+        CompositedTransformTarget(
+          link: _layerLink,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? AppColors.blueGray374957 : AppColors.grayD9,
+                width: 1,
+              ),
+              color: isDark ? AppColors.blueGray374957 : AppColors.white,
+            ),
+            child: widget.validator != null
+                ? TextFormField(
+                    controller: widget.controller,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    validator: widget.validator,
+                    keyboardType: widget.keyboardType,
+                    onChanged: widget.onChanged,
+                    textAlignVertical: TextAlignVertical.center,
+                    style: AppTypography.body.copyWith(
+                      color: isDark ? AppColors.white : AppColors.blueGray374957,
+                      fontSize: 15.sp,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: widget.hintText,
+                      hintStyle: AppTypography.body.copyWith(
+                        color: AppColors.gray8B959E,
+                        fontSize: 15.sp,
+                      ),
+                      filled: false,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      suffixIcon: GestureDetector(
+                        onTap: widget.enabled ? _toggleDropdown : null,
+                        child: UnconstrainedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 14),
+                            child: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: isDark 
+                                  ? AppColors.blueGray374957.withValues(alpha: 0.3) 
+                                  : AppColors.grayD9.withValues(alpha: 0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                size: 16,
+                                color: isDark ? AppColors.white : AppColors.blueGray374957,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : TextField(
+                    controller: widget.controller,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    keyboardType: widget.keyboardType,
+                    onChanged: widget.onChanged,
+                    textAlignVertical: TextAlignVertical.center,
+                    style: AppTypography.body.copyWith(
+                      color: isDark ? AppColors.white : AppColors.blueGray374957,
+                      fontSize: 15.sp,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: widget.hintText,
+                      hintStyle: AppTypography.body.copyWith(
+                        color: AppColors.gray8B959E,
+                        fontSize: 15.sp,
+                      ),
+                      filled: false,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      suffixIcon: GestureDetector(
+                        onTap: widget.enabled ? _toggleDropdown : null,
+                        child: UnconstrainedBox(
+                          child: Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: isDark 
+                                ? AppColors.blueGray374957.withValues(alpha: 0.3) 
+                                : AppColors.grayD9.withValues(alpha: 0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: isDark ? AppColors.white : AppColors.blueGray374957,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+
+    if (widget.width != null) {
+      return SizedBox(width: widget.width, child: field);
+    }
+
+    return field;
+  }
+}
+
 class AdCategoryDropdown extends StatelessWidget {
   const AdCategoryDropdown({
     super.key,
