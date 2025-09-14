@@ -16,6 +16,7 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.da
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/feedback_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/privacy_policy_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/subscription_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/terms_conditions_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/account_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
@@ -23,7 +24,6 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
-
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -144,8 +144,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/dashboard/post-ad',
           name: 'post-ad',
-          builder: (context, state) =>
-              const PostAdUploadImagesScreen(),
+          builder: (context, state) => const PostAdUploadImagesScreen(),
           routes: [
             GoRoute(
               path: 'form',
@@ -172,8 +171,10 @@ final GoRouter appRouter = GoRouter(
                 final extra = state.extra as Map<String, dynamic>?;
                 return ChatScreen(
                   chatId: chatId,
-                  otherUserName: extra?['otherUserName'] as String? ?? 'Unknown',
-                  otherUserAvatar: extra?['otherUserAvatar'] as String? ?? 'assets/images/man.jpg',
+                  otherUserName:
+                      extra?['otherUserName'] as String? ?? 'Unknown',
+                  otherUserAvatar: extra?['otherUserAvatar'] as String? ??
+                      'assets/images/man.jpg',
                 );
               },
             ),
@@ -194,6 +195,11 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/favorites',
           name: 'favorites',
           builder: (context, state) => const FavoriteScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/subscription',
+          name: 'subscription',
+          builder: (context, state) => const SubscriptionScreen(),
         ),
         GoRoute(
           path: '/dashboard/feedback',

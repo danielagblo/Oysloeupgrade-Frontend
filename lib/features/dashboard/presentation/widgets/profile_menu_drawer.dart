@@ -105,7 +105,13 @@ class ProfileMenuDrawer extends StatelessWidget {
               _MenuTile(
                 iconPath: 'assets/icons/subscription.svg',
                 title: 'Subscription',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('subscription');
+                  });
+                },
               ),
               _MenuTile(
                 iconPath: 'assets/icons/refer_earn.svg',

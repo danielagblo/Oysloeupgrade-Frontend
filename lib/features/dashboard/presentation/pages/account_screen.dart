@@ -17,13 +17,11 @@ class _AccountScreenState extends State<AccountScreen> {
   final TextEditingController _customReasonController = TextEditingController();
 
   final List<String> _deleteReasons = [
-    'Your friend sign up using your link',
-    'Your friend sign up using your link',
-    'Your friend sign up using your link',
-    'Your friend sign up using your link',
-    'Your friend sign up using your link',
-    'Your friend sign up using your link',
-    'Your friend sign up using your link',
+    'Your friend sign up using your link and adding dummy',
+    'Your friend sign up using your link and adding dummy',
+    'Your friend sign up using your link and adding dummy',
+    'Your friend sign up using your link and adding dummy',
+    'Your friend sign up using your link and adding dummy',
     'Other',
   ];
 
@@ -72,55 +70,65 @@ class _AccountScreenState extends State<AccountScreen> {
                 child: Column(
                   children: [
                     ...List.generate(_deleteReasons.length, (index) {
-                      return ListTile(
-                        leading: Transform.scale(
-                          scale: 0.8,
-                          child: GestureDetector(
+                      return Column(
+                        children: [
+                          GestureDetector(
                             onTap: () {
                               setState(() {
                                 _selectedReason = index;
                               });
                             },
                             child: Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: _selectedReason == index
-                                      ? AppColors.blueGray374957
-                                      : AppColors.blueGray374957
-                                          .withValues(alpha: 0.5),
-                                  width: 1,
-                                ),
-                                color: _selectedReason == index
-                                    ? AppColors.white
-                                    : Colors.transparent,
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(vertical: 2.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Transform.scale(
+                                    scale: 0.8,
+                                    child: Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: _selectedReason == index
+                                              ? AppColors.blueGray374957
+                                              : AppColors.blueGray374957
+                                                  .withValues(alpha: 0.5),
+                                          width: 1,
+                                        ),
+                                        color: _selectedReason == index
+                                            ? AppColors.white
+                                            : Colors.transparent,
+                                      ),
+                                      child: _selectedReason == index
+                                          ? const Icon(
+                                              Icons.circle,
+                                              size: 14,
+                                              color: AppColors.blueGray374957,
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                  SizedBox(width: 3.w),
+                                  Text(
+                                    _deleteReasons[index],
+                                    style: AppTypography.body.copyWith(
+                                      fontSize: 13.sp,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: _selectedReason == index
-                                  ? const Icon(
-                                      Icons.circle,
-                                      size: 14,
-                                      color: AppColors.blueGray374957,
-                                    )
-                                  : null,
                             ),
                           ),
-                        ),
-                        title: Text(
-                          _deleteReasons[index],
-                          style: AppTypography.body.copyWith(
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.zero,
-                        horizontalTitleGap: 8,
-                        minLeadingWidth: 20,
-                        onTap: () {
-                          setState(() {
-                            _selectedReason = index;
-                          });
-                        },
+                          if (index < _deleteReasons.length - 1)
+                            Divider(
+                              height: 1,
+                              thickness: 0.5,
+                              color: AppColors.blueGray374957.withValues(alpha: 0.2),
+                            ),
+                        ],
                       );
                     }),
                     if (_selectedReason == _deleteReasons.length - 1) ...[
