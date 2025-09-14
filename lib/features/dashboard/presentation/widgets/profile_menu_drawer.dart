@@ -118,22 +118,46 @@ class ProfileMenuDrawer extends StatelessWidget {
               _MenuTile(
                 iconPath: 'assets/icons/feedback.svg',
                 title: 'Feedback',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('feedback');
+                  });
+                },
               ),
               _MenuTile(
                 iconPath: 'assets/icons/account.svg',
                 title: 'Account',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('account');
+                  });
+                },
               ),
               _MenuTile(
                 iconPath: 'assets/icons/tnc.svg',
                 title: 'T&C',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('terms-conditions');
+                  });
+                },
               ),
               _MenuTile(
                 iconPath: 'assets/icons/privacy_policy.svg',
                 title: 'Privacy policy',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('privacy-policy');
+                  });
+                },
               ),
               SizedBox(height: 2.h),
             ],

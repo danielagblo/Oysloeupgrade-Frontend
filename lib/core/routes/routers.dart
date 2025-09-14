@@ -14,6 +14,10 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/feedback_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/privacy_policy_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/terms_conditions_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/account_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
@@ -190,6 +194,26 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/favorites',
           name: 'favorites',
           builder: (context, state) => const FavoriteScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/feedback',
+          name: 'feedback',
+          builder: (context, state) => const FeedbackScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/privacy-policy',
+          name: 'privacy-policy',
+          builder: (context, state) => const PrivacyPolicyScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/terms-conditions',
+          name: 'terms-conditions',
+          builder: (context, state) => const TermsConditionsScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/account',
+          name: 'account',
+          builder: (context, state) => const AccountScreen(),
         ),
       ],
     ),
