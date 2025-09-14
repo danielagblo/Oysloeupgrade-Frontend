@@ -9,7 +9,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 class PostAdFormScreen extends StatefulWidget {
   final List<String>? selectedImages;
-  
+
   const PostAdFormScreen({super.key, this.selectedImages});
 
   @override
@@ -58,148 +58,142 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
     super.dispose();
   }
 
-Widget _buildPriceSection() {
-  switch (_selectedPurpose) {
-    case 'Sale':
-      return AdInput(
-        controller: _priceController,
-        labelText: 'Price',
-        hintText: '₵',
-        keyboardType: TextInputType.number,
-      );
+  Widget _buildPriceSection() {
+    switch (_selectedPurpose) {
+      case 'Sale':
+        return AdInput(
+          controller: _priceController,
+          labelText: 'Price',
+          hintText: '₵',
+          keyboardType: TextInputType.number,
+        );
 
-    case 'PayLater':
-      return Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: AdInput(
-                  controller: _dailyPriceController,
-                  labelText: 'Daily',
-                  hintText: '₵',
-                  keyboardType: TextInputType.number,
+      case 'PayLater':
+        return Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: AdInput(
+                    controller: _dailyPriceController,
+                    labelText: 'Daily',
+                    hintText: '₵',
+                    keyboardType: TextInputType.number,
+                  ),
                 ),
-              ),
-              SizedBox(width: 4.w),
-              Expanded(
-                child: AdEditableDropdown(
-                  controller: _dailyDurationController,
-                  hintText: 'Duration',
-                  items: [
-                    '1 Week',
-                    '2 Weeks',
-                    '1 Month',
-                    '3 Months',
-                    '6 Months'
-                  ],
-                  onChanged: (value) {
-                    // Value is already set in the controller
-                  },
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: AdEditableDropdown(
+                    controller: _dailyDurationController,
+                    hintText: 'Duration',
+                    items: [
+                      '1 Week',
+                      '2 Weeks',
+                      '1 Month',
+                      '3 Months',
+                      '6 Months'
+                    ],
+                    onChanged: (value) {
+                      // Value is already set in the controller
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 3.h),
-          Row(
-            children: [
-              Expanded(
-                child: AdInput(
-                  controller: _weeklyPriceController,
-                  labelText: 'Weekly',
-                  hintText: '₵',
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(width: 4.w),
-              Expanded(
-                child: AdEditableDropdown(
-                  controller: _weeklyDurationController,
-                  hintText: 'Duration',
-                  items: [
-                    '1 Week',
-                    '2 Weeks',
-                    '1 Month',
-                    '3 Months',
-                    '6 Months'
-                  ],
-                  onChanged: (value) {
-                    // Value is already set in the controller
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 3.h),
-          Row(
-            children: [
-              Expanded(
-                child: AdInput(
-                  controller: _monthlyPriceController,
-                  labelText: 'Monthly',
-                  hintText: '₵',
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(width: 4.w),
-              Expanded(
-                child: AdEditableDropdown(
-                  controller: _monthlyDurationController,
-                  hintText: 'Duration',
-                  items: [
-                    '1 Week',
-                    '2 Weeks',
-                    '1 Month',
-                    '3 Months',
-                    '6 Months'
-                  ],
-                  onChanged: (value) {
-                    // Value is already set in the controller
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-
-    case 'Rent':
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: AdInput(
-              controller: _priceController,
-              labelText: 'Price',
-              hintText: '₵',
-              keyboardType: TextInputType.number,
-            ),
-          ),
-          SizedBox(width: 4.w),
-          Expanded(
-            child: AdEditableDropdown(
-              controller: _durationController,
-              hintText: 'Duration',
-              items: [
-                '1 Week',
-                '2 Weeks',
-                '1 Month',
-                '3 Months',
-                '6 Months'
               ],
-              onChanged: (value) {
-                // Value is already set in the controller
-              },
             ),
-          ),
-        ],
-      );
+            SizedBox(height: 3.h),
+            Row(
+              children: [
+                Expanded(
+                  child: AdInput(
+                    controller: _weeklyPriceController,
+                    labelText: 'Weekly',
+                    hintText: '₵',
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: AdEditableDropdown(
+                    controller: _weeklyDurationController,
+                    hintText: 'Duration',
+                    items: [
+                      '1 Week',
+                      '2 Weeks',
+                      '1 Month',
+                      '3 Months',
+                      '6 Months'
+                    ],
+                    onChanged: (value) {
+                      // Value is already set in the controller
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 3.h),
+            Row(
+              children: [
+                Expanded(
+                  child: AdInput(
+                    controller: _monthlyPriceController,
+                    labelText: 'Monthly',
+                    hintText: '₵',
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: AdEditableDropdown(
+                    controller: _monthlyDurationController,
+                    hintText: 'Duration',
+                    items: [
+                      '1 Week',
+                      '2 Weeks',
+                      '1 Month',
+                      '3 Months',
+                      '6 Months'
+                    ],
+                    onChanged: (value) {
+                      // Value is already set in the controller
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
 
-    default:
-      return Container();
+      case 'Rent':
+        return Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: AdInput(
+                controller: _priceController,
+                labelText: 'Price',
+                hintText: '₵',
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            SizedBox(width: 4.w),
+            Expanded(
+              child: AdEditableDropdown(
+                controller: _durationController,
+                hintText: 'Duration',
+                items: ['1 Week', '2 Weeks', '1 Month', '3 Months', '6 Months'],
+                onChanged: (value) {
+                  // Value is already set in the controller
+                },
+              ),
+            ),
+          ],
+        );
+
+      default:
+        return Container();
+    }
   }
-}
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

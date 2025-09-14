@@ -73,78 +73,81 @@ class AlertsScreen extends StatelessWidget {
           child: ListView(
             padding: EdgeInsets.symmetric(vertical: 16),
             children: [
-                _AlertGroup(
-                  title: 'Today',
-                  alerts: [
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'We\'re excited to have you onboard. You\'ve taken the first step toward smarter shopping and selling. Big things await — stay tuned!',
-                      hasCustomProfile: false,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 2.5.h),
-                _AlertGroup(
-                  title: 'Yesterday',
-                  alerts: [
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'Your subscription expires in 7 days',
-                      hasCustomProfile: false,
-                    ),
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'Your subscription expires in 3 days',
-                      hasCustomProfile: false,
-                    ),
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'Your subscription is expired Subscribe',
-                      hasCustomProfile: false,
-                      hasActionText: true,
-                      actionText: 'Subscribe',
-                    ),
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'we hand picked few items for you show listings',
-                      hasCustomProfile: false,
-                      hasActionText: true,
-                      actionText: 'show listings',
-                    ),
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Akosua Amassa',
-                      message: 'Made a review on your ad Open',
-                      profileImagePath: 'assets/images/man.jpg',
-                      hasCustomProfile: true,
-                      hasActionText: true,
-                      actionText: 'Open',
-                    ),
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'We\'ve given you a free coupon,Your code to redeem is GH32432',
-                      hasCustomProfile: false,
-                    ),
-                    _AlertData(
-                      timeAgo: '10 mins ago',
-                      title: 'Oysloe',
-                      message: 'Your ad Samsung s6 ultra.. is reported as taken. Verify and update the status now!. Be informed you\'ll face suspension if there\'s multiple report on this ad.',
-                      hasCustomProfile: false,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              _AlertGroup(
+                title: 'Today',
+                alerts: [
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message:
+                        'We\'re excited to have you onboard. You\'ve taken the first step toward smarter shopping and selling. Big things await — stay tuned!',
+                    hasCustomProfile: false,
+                  ),
+                ],
+              ),
+              SizedBox(height: 2.5.h),
+              _AlertGroup(
+                title: 'Yesterday',
+                alerts: [
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message: 'Your subscription expires in 7 days',
+                    hasCustomProfile: false,
+                  ),
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message: 'Your subscription expires in 3 days',
+                    hasCustomProfile: false,
+                  ),
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message: 'Your subscription is expired Subscribe',
+                    hasCustomProfile: false,
+                    hasActionText: true,
+                    actionText: 'Subscribe',
+                  ),
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message: 'we hand picked few items for you show listings',
+                    hasCustomProfile: false,
+                    hasActionText: true,
+                    actionText: 'show listings',
+                  ),
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Akosua Amassa',
+                    message: 'Made a review on your ad Open',
+                    profileImagePath: 'assets/images/man.jpg',
+                    hasCustomProfile: true,
+                    hasActionText: true,
+                    actionText: 'Open',
+                  ),
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message:
+                        'We\'ve given you a free coupon,Your code to redeem is GH32432',
+                    hasCustomProfile: false,
+                  ),
+                  _AlertData(
+                    timeAgo: '10 mins ago',
+                    title: 'Oysloe',
+                    message:
+                        'Your ad Samsung s6 ultra.. is reported as taken. Verify and update the status now!. Be informed you\'ll face suspension if there\'s multiple report on this ad.',
+                    hasCustomProfile: false,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      );
-    }
+        ),
+      ],
+    );
+  }
 }
 
 class _AlertGroup extends StatelessWidget {
@@ -192,7 +195,7 @@ class _AlertTile extends StatelessWidget {
         color: AppColors.white,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.grayD9.withValues(alpha:0.3),
+            color: AppColors.grayD9.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -226,8 +229,9 @@ class _AlertTile extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: data.hasActionText ? 
-                          data.message.replaceAll(data.actionText ?? '', '') : data.message,
+                        text: data.hasActionText
+                            ? data.message.replaceAll(data.actionText ?? '', '')
+                            : data.message,
                         style: AppTypography.body.copyWith(
                           color: AppColors.blueGray374957,
                           fontSize: 14.sp,

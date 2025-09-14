@@ -58,10 +58,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  
+
   late AnimationController _typingAnimationController;
   final bool _isOtherUserTyping = false;
-  
+
   static const String _currentUserId = 'current_user';
   static const String _otherUserId = 'other_user';
 
@@ -137,7 +137,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
 
     _textController.clear();
-    
+
     // Animate scroll to bottom
     Future.delayed(const Duration(milliseconds: 100), () {
       _scrollController.animateTo(
@@ -190,17 +190,20 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.photo_library, size: 15, color: AppColors.blueGray374957),
+                leading: Icon(Icons.photo_library,
+                    size: 15, color: AppColors.blueGray374957),
                 title: Text('Photo Library', style: AppTypography.bodySmall),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
-                leading: Icon(Icons.camera_alt, size: 15, color: AppColors.blueGray374957),
+                leading: Icon(Icons.camera_alt,
+                    size: 15, color: AppColors.blueGray374957),
                 title: Text('Camera', style: AppTypography.bodySmall),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
-                leading: Icon(Icons.insert_drive_file, size: 15, color: AppColors.blueGray374957),
+                leading: Icon(Icons.insert_drive_file,
+                    size: 15, color: AppColors.blueGray374957),
                 title: Text('Document', style: AppTypography.bodySmall),
                 onTap: () => Navigator.pop(context),
               ),
@@ -274,7 +277,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final now = DateTime.now();
     final yesterday = DateTime(now.year, now.month, now.day - 1);
     final messageDate = DateTime(date.year, date.month, date.day);
-    
+
     String dateText;
     if (messageDate == DateTime(now.year, now.month, now.day)) {
       dateText = 'Today';
@@ -306,9 +309,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMessage(ChatMessage message, bool showAvatar, bool isLastInGroup) {
+  Widget _buildMessage(
+      ChatMessage message, bool showAvatar, bool isLastInGroup) {
     final isMe = message.authorId == _currentUserId;
-    
+
     return Padding(
       padding: EdgeInsets.only(
         left: isMe ? 15.w : 4.w,
@@ -317,7 +321,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         top: showAvatar ? 2.w : 0,
       ),
       child: Column(
-        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           if (!isMe && showAvatar)
             Padding(
@@ -344,9 +349,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   vertical: 2.5.w,
                 ),
                 decoration: BoxDecoration(
-                  color: isMe
-                      ? const Color(0xFFE8F5E8)
-                      : AppColors.white,
+                  color: isMe ? const Color(0xFFE8F5E8) : AppColors.white,
                   border: Border.all(
                     color: AppColors.blueGray374957.withValues(alpha: 0.15),
                     width: 0.5,
@@ -450,7 +453,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Widget _buildTypingIndicator() {
     if (!_isOtherUserTyping) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: EdgeInsets.only(left: 4.w, bottom: 2.w),
       child: Row(
@@ -484,13 +487,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               builder: (context, child) {
                 return Row(
                   children: List.generate(3, (index) {
-                    final animationValue = (_typingAnimationController.value * 3 - index).clamp(0.0, 1.0);
+                    final animationValue =
+                        (_typingAnimationController.value * 3 - index)
+                            .clamp(0.0, 1.0);
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 1.w),
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: AppColors.gray8B959E.withValues(alpha: 0.3 + animationValue * 0.7),
+                        color: AppColors.gray8B959E
+                            .withValues(alpha: 0.3 + animationValue * 0.7),
                         shape: BoxShape.circle,
                       ),
                     );
@@ -525,7 +531,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: _focusNode.hasFocus 
+                      color: _focusNode.hasFocus
                           ? AppColors.blueGray374957.withValues(alpha: 0.5)
                           : AppColors.blueGray374957.withValues(alpha: 0.32),
                       width: _focusNode.hasFocus ? 1.5 : 1,
@@ -555,7 +561,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           decoration: InputDecoration(
                             hintText: 'Type a message...',
                             hintStyle: AppTypography.body.copyWith(
-                              color: AppColors.gray8B959E.withValues(alpha: 0.6),
+                              color:
+                                  AppColors.gray8B959E.withValues(alpha: 0.6),
                               fontSize: 14.5.sp,
                             ),
                             border: InputBorder.none,
@@ -586,7 +593,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               'assets/icons/send.svg',
                               width: 20,
                               height: 20,
-                              
                             ),
                           ),
                         ),
@@ -665,35 +671,40 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               }(),
               itemBuilder: (context, index) {
                 int currentIndex = 0;
-                
+
                 for (final entry in groupedMessages.entries) {
                   if (currentIndex == index) {
                     return _buildDateSeparator(entry.key);
                   }
                   currentIndex++;
-                  
+
                   for (int i = 0; i < entry.value.length; i++) {
                     if (currentIndex == index) {
                       final message = entry.value[i];
-                      final nextMessage = i < entry.value.length - 1 ? entry.value[i + 1] : null;
-                      
-                      final showAvatar = nextMessage == null || 
+                      final nextMessage = i < entry.value.length - 1
+                          ? entry.value[i + 1]
+                          : null;
+
+                      final showAvatar = nextMessage == null ||
                           nextMessage.authorId != message.authorId ||
-                          nextMessage.timestamp.difference(message.timestamp).inMinutes > 5;
-                      
-                      final isLastInGroup = nextMessage == null || 
+                          nextMessage.timestamp
+                                  .difference(message.timestamp)
+                                  .inMinutes >
+                              5;
+
+                      final isLastInGroup = nextMessage == null ||
                           nextMessage.authorId != message.authorId;
-                      
+
                       return _buildMessage(message, showAvatar, isLastInGroup);
                     }
                     currentIndex++;
                   }
                 }
-                
+
                 if (_isOtherUserTyping && currentIndex == index) {
                   return _buildTypingIndicator();
                 }
-                
+
                 return const SizedBox.shrink();
               },
             ),

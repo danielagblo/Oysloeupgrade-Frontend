@@ -219,7 +219,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
             const SizedBox(width: 4),
             Text(
               label,
-              style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold, fontSize: 13.sp),
+              style: AppTypography.bodySmall
+                  .copyWith(fontWeight: FontWeight.bold, fontSize: 13.sp),
               textAlign: TextAlign.center,
             ),
           ],
@@ -270,7 +271,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
   void _scrollCards(bool forward) {
     if (!_cardsController.hasClients) return;
-    final double cardWidth = 28.w; 
+    final double cardWidth = 28.w;
     const double spacing = 12.0;
     final double delta = cardWidth + spacing;
     final target = forward
@@ -796,7 +797,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               ),
                               child: Text(
                                 'Chat is secured',
-                                style: AppTypography.bodySmall.copyWith(fontSize: 12.sp),
+                                style: AppTypography.bodySmall
+                                    .copyWith(fontSize: 12.sp),
                               ),
                             ),
                             Positioned(

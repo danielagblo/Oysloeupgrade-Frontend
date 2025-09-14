@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:go_router/go_router.dart';
 
 /// A right-side drawer shown when tapping the Profile tab.
 /// Width is set by the parent via a SizedBox; this widget focuses on content.
@@ -68,8 +69,13 @@ class ProfileMenuDrawer extends StatelessWidget {
               _MenuTile(
                 iconPath: 'assets/icons/name.svg',
                 title: 'Edit profile',
-                onTap: () =>
-                    Navigator.of(context).pushNamed('/dashboard/profile'),
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('edit-profile');
+                  });
+                },
               ),
 
               SizedBox(height: 2.h),
@@ -77,12 +83,24 @@ class ProfileMenuDrawer extends StatelessWidget {
               _MenuTile(
                 iconPath: 'assets/icons/ads.svg',
                 title: 'Ads',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('ads');
+                  });
+                },
               ),
               _MenuTile(
                 iconPath: 'assets/icons/bookmark.svg',
                 title: 'Favorite',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('favorites');
+                  });
+                },
               ),
               _MenuTile(
                 iconPath: 'assets/icons/subscription.svg',

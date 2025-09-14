@@ -177,6 +177,8 @@ class AdDropdown<T> extends StatelessWidget {
     this.width,
     this.validator,
     this.enabled = true,
+    this.compact = false,
+    this.prefixIcon,
   });
 
   final List<DropdownMenuItem<T>> items;
@@ -187,6 +189,8 @@ class AdDropdown<T> extends StatelessWidget {
   final double? width;
   final String? Function(T?)? validator;
   final bool enabled;
+  final bool compact;
+  final Widget? prefixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +211,7 @@ class AdDropdown<T> extends StatelessWidget {
         ],
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(compact ? 12 : 16),
             border: Border.all(
               color: isDark ? AppColors.blueGray374957 : AppColors.grayD9,
               width: 1,
@@ -230,15 +234,16 @@ class AdDropdown<T> extends StatelessWidget {
                 color: AppColors.gray8B959E,
                 fontSize: 15.sp,
               ),
+              prefixIcon: prefixIcon,
               filled: false,
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
               errorBorder: InputBorder.none,
               focusedErrorBorder: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 14,
-                vertical: 10,
+                vertical: compact ? 1.3.h : 10,
               ),
             ),
             icon: Padding(
@@ -247,9 +252,9 @@ class AdDropdown<T> extends StatelessWidget {
                 width: 16,
                 height: 16,
                 decoration: BoxDecoration(
-                  color: isDark 
-                    ? AppColors.blueGray374957.withValues(alpha: 0.3) 
-                    : AppColors.grayD9.withValues(alpha: 0.5),
+                  color: isDark
+                      ? AppColors.blueGray374957.withValues(alpha: 0.3)
+                      : AppColors.grayD9.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -370,13 +375,13 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                 maxHeight: 200,
               ),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? AppColors.blueGray374957 
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.blueGray374957
                     : AppColors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Theme.of(context).brightness == Brightness.dark 
-                      ? AppColors.blueGray374957 
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.blueGray374957
                       : AppColors.grayD9,
                   width: 1,
                 ),
@@ -402,8 +407,10 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                         border: index < widget.items.length - 1
                             ? Border(
                                 bottom: BorderSide(
-                                  color: Theme.of(context).brightness == Brightness.dark 
-                                      ? AppColors.blueGray374957.withValues(alpha: 0.3)
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? AppColors.blueGray374957
+                                          .withValues(alpha: 0.3)
                                       : AppColors.grayD9.withValues(alpha: 0.5),
                                   width: 0.5,
                                 ),
@@ -413,8 +420,8 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                       child: Text(
                         item,
                         style: AppTypography.body.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark 
-                              ? AppColors.white 
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.white
                               : AppColors.blueGray374957,
                           fontSize: 15.sp,
                         ),
@@ -468,7 +475,8 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                     onChanged: widget.onChanged,
                     textAlignVertical: TextAlignVertical.center,
                     style: AppTypography.body.copyWith(
-                      color: isDark ? AppColors.white : AppColors.blueGray374957,
+                      color:
+                          isDark ? AppColors.white : AppColors.blueGray374957,
                       fontSize: 15.sp,
                     ),
                     decoration: InputDecoration(
@@ -496,15 +504,20 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                               width: 16,
                               height: 16,
                               decoration: BoxDecoration(
-                                color: isDark 
-                                  ? AppColors.blueGray374957.withValues(alpha: 0.3) 
-                                  : AppColors.grayD9.withValues(alpha: 0.5),
+                                color: isDark
+                                    ? AppColors.blueGray374957
+                                        .withValues(alpha: 0.3)
+                                    : AppColors.grayD9.withValues(alpha: 0.5),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                _isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                _isDropdownOpen
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
                                 size: 16,
-                                color: isDark ? AppColors.white : AppColors.blueGray374957,
+                                color: isDark
+                                    ? AppColors.white
+                                    : AppColors.blueGray374957,
                               ),
                             ),
                           ),
@@ -520,7 +533,8 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                     onChanged: widget.onChanged,
                     textAlignVertical: TextAlignVertical.center,
                     style: AppTypography.body.copyWith(
-                      color: isDark ? AppColors.white : AppColors.blueGray374957,
+                      color:
+                          isDark ? AppColors.white : AppColors.blueGray374957,
                       fontSize: 15.sp,
                     ),
                     decoration: InputDecoration(
@@ -546,15 +560,20 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: isDark 
-                                ? AppColors.blueGray374957.withValues(alpha: 0.3) 
-                                : AppColors.grayD9.withValues(alpha: 0.5),
+                              color: isDark
+                                  ? AppColors.blueGray374957
+                                      .withValues(alpha: 0.3)
+                                  : AppColors.grayD9.withValues(alpha: 0.5),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              _isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                              _isDropdownOpen
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
                               size: 16,
-                              color: isDark ? AppColors.white : AppColors.blueGray374957,
+                              color: isDark
+                                  ? AppColors.white
+                                  : AppColors.blueGray374957,
                             ),
                           ),
                         ),

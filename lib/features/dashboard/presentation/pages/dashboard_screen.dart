@@ -3,7 +3,6 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_scree
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -21,7 +20,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const AlertsScreen(),
     const PostAdUploadImagesScreen(),
     const InboxScreen(),
-    const ProfileScreen(),
   ];
 
   @override

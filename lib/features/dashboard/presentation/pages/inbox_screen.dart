@@ -365,8 +365,8 @@ class _InboxScreenState extends State<InboxScreen> {
                   SizedBox(height: 0.5.h),
                   if (isClosed)
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.3.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 3.w, vertical: 0.3.h),
                       decoration: BoxDecoration(
                         color: AppColors.redFF6B6B,
                       ),

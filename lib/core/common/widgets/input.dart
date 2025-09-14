@@ -22,6 +22,7 @@ class AppTextField extends StatefulWidget {
     this.autofillHints,
     this.autocorrect = true,
     this.obscuringCharacter = '•',
+    this.compact = false,
   });
 
   final TextEditingController? controller;
@@ -39,6 +40,8 @@ class AppTextField extends StatefulWidget {
   final Iterable<String>? autofillHints;
   final bool autocorrect;
   final String obscuringCharacter;
+  // When true, reduces vertical padding to make the field more compact in height.
+  final bool compact;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -78,11 +81,11 @@ class _AppTextFieldState extends State<AppTextField> {
         : (theme.iconTheme.color ??
             theme.colorScheme.onSurface.withValues(alpha: 0.6));
     final baseBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(widget.compact ? 12 : 20),
       borderSide: BorderSide(color: AppColors.grayBFBF, width: 1),
     );
     final focusedBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(widget.compact ? 12 : 20),
       borderSide: BorderSide(color: focusColor, width: 1.5),
     );
 
@@ -112,7 +115,7 @@ class _AppTextFieldState extends State<AppTextField> {
         ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: 2.5.h,
-          vertical: 2.2.h,
+          vertical: widget.compact ? 1.3.h : 2.2.h,
         ),
         prefixIcon: _buildPrefix(iconColor),
         suffixIcon: widget.isPassword

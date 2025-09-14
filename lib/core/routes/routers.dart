@@ -11,9 +11,11 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_scree
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
@@ -173,13 +175,21 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-
         // Profile Tab
         GoRoute(
-          path: '/dashboard/profile',
-          name: 'profile',
-          builder: (context, state) =>
-              const ProfileScreen()
+          path: '/dashboard/profile/edit',
+          name: 'edit-profile',
+          builder: (context, state) => const EditProfileScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/ads',
+          name: 'ads',
+          builder: (context, state) => const AdScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/favorites',
+          name: 'favorites',
+          builder: (context, state) => const FavoriteScreen(),
         ),
       ],
     ),
