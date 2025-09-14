@@ -162,10 +162,10 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
         strokeWidth: 2,
         dashWidth: 5,
         dashSpace: 3,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(30),
         child: SizedBox(
           width: double.infinity,
-          height: 16.h,
+          height: 12.h,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -183,7 +183,7 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 3.h),
+              SizedBox(height: 2.h),
               SvgPicture.asset(
                 'assets/icons/upload.svg',
               ),
@@ -346,7 +346,7 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
           }
           return false;
         },
-        onAccept: (data) {
+        onAcceptWithDetails: (data) {
           // Final positioning is already handled in onWillAccept
         },
         builder: (context, candidateData, rejectedData) {

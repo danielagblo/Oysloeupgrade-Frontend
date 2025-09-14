@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/navigation/navigation_state.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/profile_menu_drawer.dart';
 
 class NavigationShell extends StatefulWidget {
   final Widget child;
@@ -19,6 +20,8 @@ class NavigationShell extends StatefulWidget {
 
 class _NavigationShellState extends State<NavigationShell> {
   late NavigationState _navigationState;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int? _forcedIndex; // When end drawer is open, highlight Profile tab
 
   @override
   void initState() {
@@ -50,7 +53,13 @@ class _NavigationShellState extends State<NavigationShell> {
         context.go('/dashboard/inbox');
         break;
       case 4:
-        context.go('/dashboard/profile');
+        // Open the right drawer for Profile instead of navigating
+        // If drawer is already open, close it.
+        if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
+          Navigator.of(context).maybePop();
+        } else {
+          _scaffoldKey.currentState?.openEndDrawer();
+        }
         break;
     }
   }
@@ -62,6 +71,12 @@ class _NavigationShellState extends State<NavigationShell> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
+        // Close end drawer first if it's open
+        if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
+          Navigator.of(context).maybePop();
+          return;
+        }
+
         if (!_navigationState.handleBackPress()) {
           // If we can't pop within the current tab, handle app exit or go to home tab
           if (_navigationState.currentIndex != 0) {
@@ -70,12 +85,28 @@ class _NavigationShellState extends State<NavigationShell> {
         }
       },
       child: Scaffold(
+        key: _scaffoldKey,
         body: widget.child,
+        endDrawerEnableOpenDragGesture: false,
+        endDrawer: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = MediaQuery.of(context).size.width * 0.8;
+            return SizedBox(
+              width: width,
+              child: const ProfileMenuDrawer(),
+            );
+          },
+        ),
+        onEndDrawerChanged: (isOpened) {
+          setState(() {
+            _forcedIndex = isOpened ? 4 : null;
+          });
+        },
         bottomNavigationBar: ListenableBuilder(
           listenable: _navigationState,
           builder: (context, _) {
             return CustomBottomNavigation(
-              currentIndex: widget.currentIndex,
+              currentIndex: _forcedIndex ?? widget.currentIndex,
               onTap: _onTabTapped,
             );
           },
