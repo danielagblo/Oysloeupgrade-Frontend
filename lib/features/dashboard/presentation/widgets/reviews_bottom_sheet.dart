@@ -316,23 +316,23 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
         ),
         child: Column(
           children: [
-            // Erag handle area
+            // Drag handle area
             Container(
               margin: EdgeInsets.only(bottom: 20),
-              padding: EdgeInsets.symmetric(vertical: 13),
-              decoration: BoxDecoration(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 1.6.h),
+              decoration: const BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(24),
                 ),
               ),
               child: Center(
                 child: Container(
-                  width: 40,
+                  width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[400],
+                    color: AppColors.grayD9,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

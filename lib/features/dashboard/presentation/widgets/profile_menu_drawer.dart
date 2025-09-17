@@ -116,7 +116,13 @@ class ProfileMenuDrawer extends StatelessWidget {
               _MenuTile(
                 iconPath: 'assets/icons/refer_earn.svg',
                 title: 'Refer & Earn',
-                onTap: () {},
+                onTap: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    router.pushNamed('refer-earn');
+                  });
+                },
               ),
 
               SizedBox(height: 2.h),

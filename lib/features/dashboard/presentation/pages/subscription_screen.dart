@@ -22,7 +22,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   SubscriptionStatus _subscriptionStatus = SubscriptionStatus.none;
   SubscriptionPlan? _currentPlan;
   int _daysRemaining = 7;
-  
+
   // Selected plan for purchase
   SubscriptionPlan? _selectedPlan;
 
@@ -47,7 +47,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void _handlePayment() {
-    if (_selectedPlan == null && _subscriptionStatus != SubscriptionStatus.active) {
+    if (_selectedPlan == null &&
+        _subscriptionStatus != SubscriptionStatus.active) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a subscription plan'),
@@ -70,7 +71,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         title: 'Subscription',
         backgroundColor: AppColors.white,
       ),
-      body: _subscriptionStatus == SubscriptionStatus.active && _currentPlan != null
+      body: _subscriptionStatus == SubscriptionStatus.active &&
+              _currentPlan != null
           ? _buildActiveSubscriptionView()
           : _buildNoSubscriptionView(),
     );
@@ -92,7 +94,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 3.h),
-            
+
             // Basic Plan
             _SubscriptionCard(
               plan: SubscriptionPlan.basic,
@@ -109,9 +111,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               hasDiscount: true,
               discountText: 'For you 50% off',
             ),
-            
+
             SizedBox(height: 2.h),
-            
+
             // Business Plan
             _SubscriptionCard(
               plan: SubscriptionPlan.business,
@@ -126,9 +128,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               isSelected: _selectedPlan == SubscriptionPlan.business,
               onTap: () => _selectPlan(SubscriptionPlan.business),
             ),
-            
+
             SizedBox(height: 2.h),
-            
+
             // Platinum Plan
             _SubscriptionCard(
               plan: SubscriptionPlan.platinum,
@@ -143,16 +145,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               isSelected: _selectedPlan == SubscriptionPlan.platinum,
               onTap: () => _selectPlan(SubscriptionPlan.platinum),
             ),
-            
+
             SizedBox(height: 4.h),
-            
+
             // Pay Now Button
             CustomButton.filled(
               label: 'Pay Now',
               onPressed: _handlePayment,
               backgroundColor: AppColors.white,
             ),
-            
+
             SizedBox(height: 2.h),
           ],
         ),
@@ -172,9 +174,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               planName: _getPlanName(_currentPlan!),
               daysRemaining: _daysRemaining,
             ),
-            
+
             SizedBox(height: 3.h),
-            
+
             // Current Plan (highlighted)
             _SubscriptionCard(
               plan: SubscriptionPlan.basic,
@@ -192,9 +194,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               hasDiscount: true,
               discountText: 'For you 50% off',
             ),
-            
+
             SizedBox(height: 2.h),
-            
+
             // Business Plan
             _SubscriptionCard(
               plan: SubscriptionPlan.business,
@@ -209,9 +211,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               isSelected: _selectedPlan == SubscriptionPlan.business,
               onTap: () => _selectPlan(SubscriptionPlan.business),
             ),
-            
+
             SizedBox(height: 2.h),
-            
+
             // Platinum Plan
             _SubscriptionCard(
               plan: SubscriptionPlan.platinum,
@@ -226,16 +228,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               isSelected: _selectedPlan == SubscriptionPlan.platinum,
               onTap: () => _selectPlan(SubscriptionPlan.platinum),
             ),
-            
+
             SizedBox(height: 4.h),
-            
+
             // Pay Now Button
             CustomButton.filled(
               label: 'Pay Now',
               onPressed: _handlePayment,
               backgroundColor: AppColors.white,
             ),
-            
+
             SizedBox(height: 2.h),
           ],
         ),
@@ -432,36 +434,37 @@ class _SubscriptionCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 SizedBox(height: 2.h),
-                
+
                 // Features
                 ...features.map((feature) => Padding(
-                  padding: EdgeInsets.only(bottom: 1.h),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.check,
-                        size: 18,
-                        color: AppColors.blueGray374957,
-                      ),
-                      SizedBox(width: 2.w),
-                      Expanded(
-                        child: Text(
-                          feature,
-                          style: AppTypography.bodySmall.copyWith(
-                            fontSize: 14.sp,
-                            color: AppColors.blueGray374957.withValues(alpha: 0.54),
+                      padding: EdgeInsets.only(bottom: 1.h),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.check,
+                            size: 18,
+                            color: AppColors.blueGray374957,
                           ),
-                        ),
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              feature,
+                              style: AppTypography.bodySmall.copyWith(
+                                fontSize: 14.sp,
+                                color: AppColors.blueGray374957
+                                    .withValues(alpha: 0.54),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )),
-                
+                    )),
+
                 SizedBox(height: 1.h),
-                
+
                 // Price
                 Row(
                   children: [
@@ -488,7 +491,7 @@ class _SubscriptionCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Discount Badge
           if (hasDiscount && discountText != null)
             Positioned(
@@ -506,9 +509,9 @@ class _SubscriptionCard extends StatelessWidget {
                 child: Text(
                   discountText!,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.white,
+                    color: Color(0xFFDEFEED),
                     fontSize: 11.sp,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

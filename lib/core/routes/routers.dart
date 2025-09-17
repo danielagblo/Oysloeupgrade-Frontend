@@ -16,6 +16,7 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.da
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/feedback_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/privacy_policy_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/refer_earn_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/subscription_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/terms_conditions_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/account_screen.dart';
@@ -200,6 +201,11 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/subscription',
           name: 'subscription',
           builder: (context, state) => const SubscriptionScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/refer-earn',
+          name: 'refer-earn',
+          builder: (context, state) => const ReferAndEarnScreen(),
         ),
         GoRoute(
           path: '/dashboard/feedback',
