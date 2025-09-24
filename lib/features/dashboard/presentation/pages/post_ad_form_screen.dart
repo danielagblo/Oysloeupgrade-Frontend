@@ -72,6 +72,7 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
         return Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: AdInput(
@@ -102,6 +103,7 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
             ),
             SizedBox(height: 3.h),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: AdInput(
@@ -132,6 +134,7 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
             ),
             SizedBox(height: 3.h),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: AdInput(
@@ -165,9 +168,10 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
 
       case 'Rent':
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              flex: 2,
+              flex: 3,
               child: AdInput(
                 controller: _priceController,
                 labelText: 'Price',
@@ -177,6 +181,7 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
             ),
             SizedBox(width: 4.w),
             Expanded(
+              flex: 2,
               child: AdEditableDropdown(
                 controller: _durationController,
                 hintText: 'Duration',

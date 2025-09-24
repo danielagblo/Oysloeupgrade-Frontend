@@ -135,7 +135,7 @@ class _BackWithLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double size = 32;
+    const double size = 26;
     const double spacing = 8;
     const String label = 'Back';
 

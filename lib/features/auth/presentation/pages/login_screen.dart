@@ -19,6 +19,20 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.grayF9,
         automaticallyImplyLeading: false,
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.go('/dashboard/home');
+            },
+            child: Text(
+              'Skip',
+              style: AppTypography.body.copyWith(
+                color: AppColors.blueGray374957,
+              ),
+            ),
+          ),
+          SizedBox(width: 2.w),
+        ],
       ),
       body: Padding(
         padding: BodyPaddings.horizontalPage,

@@ -289,7 +289,7 @@ class _SuccessProgressCard extends StatelessWidget {
                     textStyle: AppTypography.body
                         .copyWith(fontWeight: FontWeight.w500),
                     height: 36,
-                    width: 120,
+                    width: 130,
                   ),
                 ],
               ),

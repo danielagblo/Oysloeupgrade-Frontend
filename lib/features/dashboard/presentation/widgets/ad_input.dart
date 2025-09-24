@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/multi_page_bottom_sheet.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class AdInput extends StatefulWidget {
@@ -613,54 +614,227 @@ class AdCategoryDropdown extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool enabled;
 
-  static const List<Map<String, String>> categories = [
-    {'id': 'electronics', 'name': 'Electronics', 'icon': 'electronics.png'},
-    {'id': 'fashion', 'name': 'Fashion', 'icon': 'fashion.png'},
-    {'id': 'furniture', 'name': 'Furniture', 'icon': 'furniture.png'},
-    {'id': 'vehicle', 'name': 'Vehicle', 'icon': 'vehicle.png'},
-    {'id': 'property', 'name': 'Property', 'icon': 'property.png'},
-    {'id': 'services', 'name': 'Services', 'icon': 'services.png'},
-    {'id': 'cosmetics', 'name': 'Cosmetics', 'icon': 'cosmetics.png'},
-    {'id': 'grocery', 'name': 'Grocery', 'icon': 'grocery.png'},
-    {'id': 'games', 'name': 'Games', 'icon': 'games.png'},
-    {'id': 'industrial', 'name': 'Industrial', 'icon': 'industrial.png'},
+  static const List<_CategorySection> _categorySections = [
+    _CategorySection(
+      heading: 'Popular categories',
+      nodes: [
+        _CategoryNode(
+          id: 'electronics',
+          label: 'Electronics',
+          children: [
+            _CategoryNode(id: 'electronics-phones', label: 'Phones'),
+            _CategoryNode(id: 'electronics-computers', label: 'Computers'),
+            _CategoryNode(id: 'electronics-accessories', label: 'Accessories'),
+          ],
+        ),
+        _CategoryNode(id: 'fashion', label: 'Fashion'),
+        _CategoryNode(id: 'furniture', label: 'Furniture'),
+      ],
+    ),
+    _CategorySection(
+      heading: 'Other categories',
+      nodes: [
+        _CategoryNode(id: 'vehicle', label: 'Vehicle'),
+        _CategoryNode(id: 'property', label: 'Property'),
+        _CategoryNode(id: 'services', label: 'Services'),
+        _CategoryNode(id: 'cosmetics', label: 'Cosmetics'),
+        _CategoryNode(id: 'grocery', label: 'Grocery'),
+        _CategoryNode(id: 'games', label: 'Games'),
+        _CategoryNode(id: 'industrial', label: 'Industrial'),
+      ],
+    ),
   ];
+
+  static final Map<String, String> _categoryLabelMap = _buildLabelMap();
+
+  static Map<String, String> _buildLabelMap() {
+    final map = <String, String>{};
+
+    void visit(_CategoryNode node) {
+      map[node.id] = node.label;
+      for (final child in node.children) {
+        visit(child);
+      }
+    }
+
+    for (final section in _categorySections) {
+      for (final node in section.nodes) {
+        visit(node);
+      }
+    }
+
+    return map;
+  }
+
+  Future<String?> _openCategorySheet(BuildContext context) async {
+    if (!enabled) return null;
+
+    final selected = await showMultiPageBottomSheet<String>(
+      context: context,
+      rootPage: MultiPageSheetPage<String>(
+        title: labelText ?? 'Product Category',
+        sections: _categorySections
+            .map((section) => MultiPageSheetSection<String>(
+                  heading: section.heading,
+                  items: section.nodes.map(_buildItem).toList(),
+                ))
+            .toList(),
+      ),
+    );
+
+    return selected;
+  }
+
+  static MultiPageSheetItem<String> _buildItem(_CategoryNode node) {
+    if (node.children.isNotEmpty) {
+      return MultiPageSheetItem<String>(
+        label: node.label,
+        childBuilder: () => MultiPageSheetPage<String>(
+          title: node.label,
+          sections: [
+            MultiPageSheetSection<String>(
+              items: node.children.map(_buildItem).toList(),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return MultiPageSheetItem<String>(
+      label: node.label,
+      value: node.id,
+    );
+  }
+
+  String? _displayLabel(String? id) {
+    if (id == null) return null;
+    return _categoryLabelMap[id];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AdDropdown<String>(
-      value: value,
-      onChanged: onChanged,
-      hintText: hintText ?? 'Select product Category',
-      labelText: labelText,
-      width: width,
+    Widget formField = FormField<String>(
+      initialValue: value,
       validator: validator,
       enabled: enabled,
-      items: categories.map((category) {
-        return DropdownMenuItem<String>(
-          value: category['id'],
-          child: Row(
-            children: [
-              Image.asset(
-                'assets/images/${category['icon']}',
-                width: 24,
-                height: 24,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.category,
-                    size: 24,
-                    color: AppColors.gray8B959E,
-                  );
-                },
+      builder: (state) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = isDark ? AppColors.white : AppColors.blueGray374957;
+        if (value != state.value) {
+          state.didChange(value);
+        }
+        final selectedId = state.value;
+        final effectiveLabel = _displayLabel(selectedId);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (labelText != null) ...[
+              Text(
+                labelText!,
+                style: AppTypography.bodySmall.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(width: 12),
-              Text(category['name']!),
+              const SizedBox(height: 8),
             ],
-          ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: enabled
+                  ? () async {
+                      final selected = await _openCategorySheet(context);
+                      if (selected != null) {
+                        state.didChange(selected);
+                        onChanged(selected);
+                      }
+                    }
+                  : null,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.blueGray374957 : AppColors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? AppColors.blueGray374957 : AppColors.grayD9,
+                    width: 1,
+                  ),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        effectiveLabel ??
+                            (hintText ?? 'Select product category'),
+                        style: AppTypography.body.copyWith(
+                          color: effectiveLabel == null
+                              ? AppColors.gray8B959E
+                              : textColor,
+                          fontSize: 15.sp,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: AppColors.grayD9.withValues(alpha: 0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 16,
+                        color: AppColors.blueGray374957,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (state.hasError)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  state.errorText ?? '',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.redFF6B6B,
+                  ),
+                ),
+              ),
+          ],
         );
-      }).toList(),
+      },
     );
+
+    if (width != null) {
+      return SizedBox(width: width, child: formField);
+    }
+
+    return formField;
   }
+}
+
+class _CategorySection {
+  const _CategorySection({
+    this.heading,
+    required this.nodes,
+  });
+
+  final String? heading;
+  final List<_CategoryNode> nodes;
+}
+
+class _CategoryNode {
+  const _CategoryNode({
+    required this.id,
+    required this.label,
+    this.children = const <_CategoryNode>[],
+  });
+
+  final String id;
+  final String label;
+  final List<_CategoryNode> children;
 }
 
 class AdLocationDropdown extends StatelessWidget {

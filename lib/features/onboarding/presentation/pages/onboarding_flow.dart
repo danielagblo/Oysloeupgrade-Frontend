@@ -65,18 +65,28 @@ class _OnboardingFlowState extends State<OnboardingFlow>
         curve: Curves.easeOut,
       );
     } else {
-      if (mounted) {
-        context.goNamed('login');
+      // Stop all animations before navigating to prevent delays
+      for (final controller in _animationControllers) {
+        controller.stop();
       }
+
+      // Post frame callback to ensure smooth navigation
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go('/login');
+        }
+      });
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    // Stop all animations first
     for (final controller in _animationControllers) {
+      controller.stop();
       controller.dispose();
     }
+    _controller.dispose();
     super.dispose();
   }
 
