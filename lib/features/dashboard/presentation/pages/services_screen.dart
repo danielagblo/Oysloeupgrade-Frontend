@@ -408,6 +408,20 @@ class _ServicesScreenState extends State<ServicesScreen> {
         initialDate: initialDate,
         firstDate: firstDate,
         lastDate: lastDate,
+        // Override only the action button (Cancel/OK) color for Android.
+        builder: (context, child) {
+          final theme = Theme.of(context);
+          return Theme(
+            data: theme.copyWith(
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.blueGray374957,
+                ),
+              ),
+            ),
+            child: child!,
+          );
+        },
       );
 
       if (picked != null) {
