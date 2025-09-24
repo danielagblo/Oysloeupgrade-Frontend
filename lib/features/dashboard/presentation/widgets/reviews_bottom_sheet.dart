@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -59,28 +60,27 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
   Widget _ratingFilterChip(String text, {bool isSelected = false}) {
     return GestureDetector(
       onTap: () {
-        int filterIndex = text == 'All' ? 0 : int.parse(text);
+        final filterIndex = text == 'All' ? 0 : int.parse(text);
         _onFilterChanged(filterIndex);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
         decoration: BoxDecoration(
           color: AppColors.white,
-          border: isSelected
-              ? Border.all(color: AppColors.blueGray374957, width: 2)
-              : null,
+          border:
+              isSelected ? Border.all(color: AppColors.blueGray374957, width: 2) : null,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.star,
               size: 14,
               color: AppColors.blueGray374957,
             ),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Text(
               text,
               style: AppTypography.bodySmall.copyWith(
@@ -96,7 +96,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
 
   Widget _buildReviewItem(ReviewComment review) {
     return Container(
-      margin: EdgeInsets.only(bottom: 24),
+      margin: const EdgeInsets.only(bottom: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -114,7 +114,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                   ),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,8 +126,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                         fontSize: 13.sp,
                       ),
                     ),
-                    SizedBox(height: 2),
-                    // Name
+                    const SizedBox(height: 2),
                     Text(
                       review.userName,
                       style: AppTypography.bodySmall.copyWith(
@@ -135,24 +134,25 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
-                    // Rating stars
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         ...List.generate(
-                            review.rating,
-                            (index) => Icon(
-                                  Icons.star,
-                                  color: AppColors.blueGray374957,
-                                  size: 12,
-                                )),
+                          review.rating,
+                          (index) => const Icon(
+                            Icons.star,
+                            color: AppColors.blueGray374957,
+                            size: 12,
+                          ),
+                        ),
                         ...List.generate(
-                            5 - review.rating,
-                            (index) => Icon(
-                                  Icons.star,
-                                  color: Colors.grey[300],
-                                  size: 12,
-                                )),
+                          5 - review.rating,
+                          (index) => Icon(
+                            Icons.star,
+                            color: Colors.grey[300],
+                            size: 12,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -162,7 +162,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                 children: [
                   if (review.canEdit) ...[
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -175,7 +175,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                             width: 12,
                             height: 12,
                           ),
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
                             'Edit',
                             style: AppTypography.bodySmall.copyWith(
@@ -185,13 +185,13 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                         ],
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                   ],
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16), // Capsule shape
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -201,7 +201,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                           width: 12,
                           height: 12,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
                           'Like',
                           style: AppTypography.bodySmall.copyWith(
@@ -211,7 +211,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                       ],
                     ),
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
                     review.likes.toString(),
                     style: AppTypography.bodySmall.copyWith(
@@ -223,7 +223,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             review.comment,
             style: AppTypography.bodySmall,
@@ -277,20 +277,15 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
         setState(() {
           final deltaY = -details.delta.dy;
           final deltaPercentage = (deltaY / screenHeight) * 200;
-          // Allow dragging below minimum height for closing
-          _currentHeight = (_currentHeight + deltaPercentage)
-              .clamp(_closeThreshold, _maxHeight);
+          _currentHeight = (_currentHeight + deltaPercentage).clamp(_closeThreshold, _maxHeight);
         });
       },
       onPanEnd: (details) {
         final velocity = details.velocity.pixelsPerSecond.dy;
-
-        // Check if modal should be closed
         if (_currentHeight <= _closeThreshold || velocity > 800) {
           Navigator.of(context).pop();
           return;
         }
-
         setState(() {
           if (velocity < -500) {
             _currentHeight = _maxHeight;
@@ -298,16 +293,15 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
             _currentHeight = _minHeight;
           } else {
             final midPoint = (_minHeight + _maxHeight) / 2;
-            _currentHeight =
-                _currentHeight > midPoint ? _maxHeight : _minHeight;
+            _currentHeight = _currentHeight > midPoint ? _maxHeight : _minHeight;
           }
         });
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
         height: modalHeight,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.grayF9,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
@@ -316,9 +310,8 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
         ),
         child: Column(
           children: [
-            // Drag handle area
             Container(
-              margin: EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 20),
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 1.6.h),
               decoration: const BoxDecoration(
@@ -338,9 +331,8 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                 ),
               ),
             ),
-            // Header content (rating overview and filters)
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -360,28 +352,30 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                           Row(
                             children: [
                               ...List.generate(
-                                  widget.rating.floor(),
-                                  (index) => Icon(
-                                        Icons.star,
-                                        color: AppColors.blueGray374957,
-                                        size: 16,
-                                      )),
+                                widget.rating.floor(),
+                                (index) => const Icon(
+                                  Icons.star,
+                                  color: AppColors.blueGray374957,
+                                  size: 16,
+                                ),
+                              ),
                               if (widget.rating % 1 != 0)
-                                Icon(
+                                const Icon(
                                   Icons.star_half,
                                   color: AppColors.blueGray374957,
                                   size: 16,
                                 ),
                               ...List.generate(
-                                  5 - widget.rating.ceil(),
-                                  (index) => Icon(
-                                        Icons.star,
-                                        color: Colors.grey[300],
-                                        size: 16,
-                                      )),
+                                5 - widget.rating.ceil(),
+                                (index) => Icon(
+                                  Icons.star,
+                                  color: Colors.grey[300],
+                                  size: 16,
+                                ),
+                              ),
                             ],
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             '${widget.reviewCount} Reviews',
                             style: AppTypography.bodySmall.copyWith(
@@ -396,22 +390,22 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                           children: [
                             ...widget.ratingBreakdown.map((breakdown) {
                               return Padding(
-                                padding: EdgeInsets.only(bottom: 6),
+                                padding: const EdgeInsets.only(bottom: 6),
                                 child: Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.star,
                                       size: 16,
                                       color: AppColors.blueGray374957,
                                     ),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       '${breakdown.stars}',
                                       style: AppTypography.bodySmall.copyWith(
                                         color: AppColors.blueGray374957,
                                       ),
                                     ),
-                                    SizedBox(width: 12),
+                                    const SizedBox(width: 12),
                                     Expanded(
                                       child: Stack(
                                         children: [
@@ -419,26 +413,23 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                                             height: 6,
                                             decoration: BoxDecoration(
                                               color: Colors.grey[300],
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
+                                              borderRadius: BorderRadius.circular(4),
                                             ),
                                           ),
                                           FractionallySizedBox(
-                                            widthFactor:
-                                                breakdown.percentage / 100,
+                                            widthFactor: breakdown.percentage / 100,
                                             child: Container(
                                               height: 6,
                                               decoration: BoxDecoration(
                                                 color: AppColors.blueGray374957,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
+                                                borderRadius: BorderRadius.circular(4),
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    SizedBox(width: 12),
+                                    const SizedBox(width: 12),
                                     Text(
                                       '${breakdown.percentage.round()}%',
                                       style: AppTypography.bodySmall,
@@ -456,33 +447,27 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                   Row(
                     children: [
                       Expanded(
-                        child: _ratingFilterChip('All',
-                            isSelected: selectedFilter == 0),
+                        child: _ratingFilterChip('All', isSelected: selectedFilter == 0),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('1',
-                            isSelected: selectedFilter == 1),
+                        child: _ratingFilterChip('1', isSelected: selectedFilter == 1),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('2',
-                            isSelected: selectedFilter == 2),
+                        child: _ratingFilterChip('2', isSelected: selectedFilter == 2),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('3',
-                            isSelected: selectedFilter == 3),
+                        child: _ratingFilterChip('3', isSelected: selectedFilter == 3),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('4',
-                            isSelected: selectedFilter == 4),
+                        child: _ratingFilterChip('4', isSelected: selectedFilter == 4),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('5',
-                            isSelected: selectedFilter == 5),
+                        child: _ratingFilterChip('5', isSelected: selectedFilter == 5),
                       ),
                     ],
                   ),
@@ -496,27 +481,32 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/editreview.svg',
-                              width: 14,
-                              height: 14,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Make review',
-                              style: AppTypography.bodySmall,
-                            ),
-                          ],
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          context.pushNamed('reviews');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/editreview.svg',
+                                width: 14,
+                                height: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Make review',
+                                style: AppTypography.bodySmall,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -525,20 +515,18 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                 ],
               ),
             ),
-            // Comments section - takes remaining space
             Expanded(
               child: filteredReviews.isEmpty
                   ? _buildEmptyState()
                   : ListView.builder(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: filteredReviews.length,
                       itemBuilder: (context, index) {
                         return _buildReviewItem(filteredReviews[index]);
                       },
                     ),
             ),
-            SizedBox(height: 1.h), // Small bottom padding
+            SizedBox(height: 1.h),
           ],
         ),
       ),

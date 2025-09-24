@@ -9,6 +9,15 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(const OyesloeMobile());
+
+  SystemChrome.setSystemUIOverlayStyle(
+  SystemUiOverlayStyle(
+    systemNavigationBarColor: AppColors.white,
+    systemNavigationBarIconBrightness:
+        AppColors.white.computeLuminance() > 0.5 ? Brightness.dark : Brightness.light,
+  ),
+);
+
 }
 
 class OyesloeMobile extends StatelessWidget {

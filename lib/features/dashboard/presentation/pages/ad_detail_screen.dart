@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
@@ -316,7 +317,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
           AppBarAction.svg(
             label: '24',
             iconSize: 18,
-            onTap: () {},
+            onTap: () => context.pushNamed('report'),
             svgAsset: 'assets/icons/flag.svg',
           ),
           AppBarAction.svg(
@@ -656,7 +657,9 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               _actionChip(
                                 label: 'Report Seller',
                                 svgAsset: 'assets/icons/flag.svg',
-                                onTap: () {},
+                                onTap: () {
+                                  context.pushNamed('report');
+                                },
                               ),
                               const SizedBox(width: 12),
                               _actionChip(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 
@@ -54,14 +55,26 @@ class CategoriesSection extends StatelessWidget {
           return _CategoryCard(
             label: c.label,
             asset: c.asset,
-            onTap: () => onCategoryTap?.call(c.label),
+            onTap: () {
+              if (onCategoryTap != null) {
+                onCategoryTap!(c.label);
+              } else if (c.label.toLowerCase() == 'services') {
+                context.pushNamed('services');
+              }
+            },
           );
         } else {
           final c = _categories[index];
           return _CategoryCard(
             label: c.label,
             asset: c.asset,
-            onTap: () => onCategoryTap?.call(c.label),
+            onTap: () {
+              if (onCategoryTap != null) {
+                onCategoryTap!(c.label);
+              } else if (c.label.toLowerCase() == 'services') {
+                context.pushNamed('services');
+              }
+            },
           );
         }
       },

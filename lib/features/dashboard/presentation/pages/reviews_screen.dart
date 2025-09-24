@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 
-class FeedbackScreen extends StatefulWidget {
-  const FeedbackScreen({super.key});
+class ReviewsScreen extends StatefulWidget {
+  const ReviewsScreen({super.key});
 
   @override
-  State<FeedbackScreen> createState() => _FeedbackScreenState();
+  State<ReviewsScreen> createState() => _ReviewsScreenState();
 }
 
-class _FeedbackScreenState extends State<FeedbackScreen> {
+class _ReviewsScreenState extends State<ReviewsScreen> {
   int _selectedRating = 0;
   final TextEditingController _commentController = TextEditingController();
 
@@ -59,7 +60,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       children: [
                         SizedBox(height: 5.h),
                         Text(
-                          'Feedback',
+                          'Review',
                           style: AppTypography.bodyLarge.copyWith(
                             color: AppColors.blueGray374957,
                             fontWeight: FontWeight.w600,
@@ -68,7 +69,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         ),
                         SizedBox(height: 1.h),
                         Text(
-                          'Help us improve on our app',
+                          'Make a review',
                           style: AppTypography.body.copyWith(
                             color:
                                 AppColors.blueGray374957.withValues(alpha: 0.7),
@@ -111,6 +112,22 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                               : const SizedBox.shrink(),
                         ),
                         const Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/shield_info.svg',
+                              width: 16,
+                              height: 16,
+                            ),
+                            SizedBox(width: 2.w),
+                            Text(
+                              'Reviews are verified before seen public',
+                              style: AppTypography.bodySmall,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 1.h),
                         Container(
                           decoration: BoxDecoration(
                             color: AppColors.grayF9,
@@ -144,7 +161,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: CustomButton.filled(
-                              label: 'Send Feedback',
+                              label: 'Send Review',
                               backgroundColor: AppColors.white,
                               onPressed: () {
                                 // Handle submit action

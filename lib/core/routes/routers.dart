@@ -15,11 +15,16 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/feedback_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/report_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/reviews_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/privacy_policy_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/refer_earn_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/subscription_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/terms_conditions_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/account_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_additional_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_review_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
@@ -211,6 +216,35 @@ final GoRouter appRouter = GoRouter(
           path: '/dashboard/feedback',
           name: 'feedback',
           builder: (context, state) => const FeedbackScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/reviews',
+          name: 'reviews',
+          builder: (context, state) => const ReviewsScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/services',
+          name: 'services',
+          builder: (context, state) => const ServicesScreen(),
+        ),
+        GoRoute(
+          path: '/dashboard/services/additional',
+          name: 'services-additional',
+          builder: (context, state) => ServicesAdditionalScreen(
+            initial: state.extra as dynamic,
+          ),
+        ),
+        GoRoute(
+          path: '/dashboard/services/review',
+          name: 'services-review',
+          builder: (context, state) => ServicesReviewScreen(
+            initial: state.extra as dynamic,
+          ),
+        ),
+        GoRoute(
+          path: '/dashboard/report',
+          name: 'report',
+          builder: (context, state) => const ReportScreen(),
         ),
         GoRoute(
           path: '/dashboard/privacy-policy',
