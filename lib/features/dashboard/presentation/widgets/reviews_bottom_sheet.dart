@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -67,8 +68,9 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
         decoration: BoxDecoration(
           color: AppColors.white,
-          border:
-              isSelected ? Border.all(color: AppColors.blueGray374957, width: 2) : null,
+          border: isSelected
+              ? Border.all(color: AppColors.blueGray374957, width: 2)
+              : null,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -162,7 +164,8 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                 children: [
                   if (review.canEdit) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -188,7 +191,8 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                     const SizedBox(width: 8),
                   ],
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -277,7 +281,8 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
         setState(() {
           final deltaY = -details.delta.dy;
           final deltaPercentage = (deltaY / screenHeight) * 200;
-          _currentHeight = (_currentHeight + deltaPercentage).clamp(_closeThreshold, _maxHeight);
+          _currentHeight = (_currentHeight + deltaPercentage)
+              .clamp(_closeThreshold, _maxHeight);
         });
       },
       onPanEnd: (details) {
@@ -293,7 +298,8 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
             _currentHeight = _minHeight;
           } else {
             final midPoint = (_minHeight + _maxHeight) / 2;
-            _currentHeight = _currentHeight > midPoint ? _maxHeight : _minHeight;
+            _currentHeight =
+                _currentHeight > midPoint ? _maxHeight : _minHeight;
           }
         });
       },
@@ -413,16 +419,19 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                                             height: 6,
                                             decoration: BoxDecoration(
                                               color: Colors.grey[300],
-                                              borderRadius: BorderRadius.circular(4),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
                                             ),
                                           ),
                                           FractionallySizedBox(
-                                            widthFactor: breakdown.percentage / 100,
+                                            widthFactor:
+                                                breakdown.percentage / 100,
                                             child: Container(
                                               height: 6,
                                               decoration: BoxDecoration(
                                                 color: AppColors.blueGray374957,
-                                                borderRadius: BorderRadius.circular(4),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
                                               ),
                                             ),
                                           ),
@@ -447,27 +456,33 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                   Row(
                     children: [
                       Expanded(
-                        child: _ratingFilterChip('All', isSelected: selectedFilter == 0),
+                        child: _ratingFilterChip('All',
+                            isSelected: selectedFilter == 0),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('1', isSelected: selectedFilter == 1),
+                        child: _ratingFilterChip('1',
+                            isSelected: selectedFilter == 1),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('2', isSelected: selectedFilter == 2),
+                        child: _ratingFilterChip('2',
+                            isSelected: selectedFilter == 2),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('3', isSelected: selectedFilter == 3),
+                        child: _ratingFilterChip('3',
+                            isSelected: selectedFilter == 3),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('4', isSelected: selectedFilter == 4),
+                        child: _ratingFilterChip('4',
+                            isSelected: selectedFilter == 4),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: _ratingFilterChip('5', isSelected: selectedFilter == 5),
+                        child: _ratingFilterChip('5',
+                            isSelected: selectedFilter == 5),
                       ),
                     ],
                   ),
@@ -484,10 +499,11 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).pop();
-                          context.pushNamed('reviews');
+                          context.pushNamed(AppRouteNames.dashboardReviews);
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: AppColors.white,
                             borderRadius: BorderRadius.circular(12),

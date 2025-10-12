@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/common/widgets/input.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -35,7 +36,7 @@ class ReferralCodeScreen extends StatelessWidget {
                 label: 'Submit',
                 isPrimary: true,
                 onPressed: () {
-                  context.go('/dashboard/home');
+                  context.go(AppRoutePaths.dashboardHome);
                 },
               ),
               CustomButton.capsule(
@@ -46,7 +47,7 @@ class ReferralCodeScreen extends StatelessWidget {
                 textStyle: AppTypography.body,
                 trailingSvgAsset: 'assets/icons/arrow_right.svg',
                 onPressed: () {
-                  context.go('/dashboard/home');
+                  context.go(AppRoutePaths.dashboardHome);
                 },
               ),
               SizedBox(height: 3.h),

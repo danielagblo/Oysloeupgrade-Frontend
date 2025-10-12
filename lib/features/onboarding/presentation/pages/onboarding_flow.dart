@@ -6,6 +6,7 @@ import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({super.key});
@@ -73,7 +74,7 @@ class _OnboardingFlowState extends State<OnboardingFlow>
       // Post frame callback to ensure smooth navigation
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          context.go('/login');
+          context.go(AppRoutePaths.login);
         }
       });
     }

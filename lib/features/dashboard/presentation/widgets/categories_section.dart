@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 
 class CategoriesSection extends StatelessWidget {
@@ -28,9 +29,8 @@ class CategoriesSection extends StatelessWidget {
     final int total = _categories.length;
     final int remainder = total % crossAxisCount;
     final int leftPad = remainder == 0 ? 0 : (crossAxisCount - remainder) ~/ 2;
-    final int totalSlots = remainder == 0
-        ? total
-        : total + (crossAxisCount - remainder);
+    final int totalSlots =
+        remainder == 0 ? total : total + (crossAxisCount - remainder);
     final int lastRowStart = totalSlots - crossAxisCount;
 
     return GridView.builder(
@@ -59,7 +59,7 @@ class CategoriesSection extends StatelessWidget {
               if (onCategoryTap != null) {
                 onCategoryTap!(c.label);
               } else if (c.label.toLowerCase() == 'services') {
-                context.pushNamed('services');
+                context.pushNamed(AppRouteNames.dashboardServices);
               }
             },
           );
@@ -72,7 +72,7 @@ class CategoriesSection extends StatelessWidget {
               if (onCategoryTap != null) {
                 onCategoryTap!(c.label);
               } else if (c.label.toLowerCase() == 'services') {
-                context.pushNamed('services');
+                context.pushNamed(AppRouteNames.dashboardServices);
               }
             },
           );

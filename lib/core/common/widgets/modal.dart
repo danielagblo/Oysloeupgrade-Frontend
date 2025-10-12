@@ -28,7 +28,8 @@ class AppModalAction {
 
 
 class AppModal extends StatelessWidget {
-  final String gifAsset;
+  final String? gifAsset;
+  final Widget? visual;
   final String text;
   final List<AppModalAction> actions;
   final EdgeInsetsGeometry contentPadding;
@@ -36,12 +37,17 @@ class AppModal extends StatelessWidget {
 
   const AppModal({
     super.key,
-    required this.gifAsset,
     required this.text,
+    this.gifAsset,
+    this.visual,
     this.actions = const [],
     this.contentPadding = const EdgeInsets.fromLTRB(24, 28, 24, 20),
     this.borderRadius = const BorderRadius.all(Radius.circular(24)),
-  }) : assert(actions.length <= 2, 'Modal supports at most two actions');
+  })  : assert(actions.length <= 2, 'Modal supports at most two actions'),
+        assert(
+          gifAsset != null || visual != null,
+          'Provide either gifAsset or visual',
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +76,14 @@ class AppModal extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(gifAsset, fit: BoxFit.contain, height: 90),
+              SizedBox(
+                height: 90,
+                width: 90,
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: visual ?? Image.asset(gifAsset!, fit: BoxFit.contain),
+                ),
+              ),
               SizedBox(height: 2.5.h),
               DefaultTextStyle(
                 style: textStyle,
@@ -121,11 +134,16 @@ class AppModal extends StatelessWidget {
 /// Helper to show the modal as a dialog.
 Future<T?> showAppModal<T>({
   required BuildContext context,
-  required String gifAsset,
+  String? gifAsset,
+  Widget? visual,
   required String text,
   List<AppModalAction> actions = const [],
   bool barrierDismissible = false,
 }) {
+  assert(
+    gifAsset != null || visual != null,
+    'Provide either gifAsset or visual',
+  );
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
@@ -135,7 +153,12 @@ Future<T?> showAppModal<T>({
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: AppModal(gifAsset: gifAsset, text: text, actions: actions),
+          child: AppModal(
+            gifAsset: gifAsset,
+            visual: visual,
+            text: text,
+            actions: actions,
+          ),
         ),
       ),
     ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/auth/presentation/widgets/otp_code_input.dart';
@@ -56,7 +57,7 @@ class OtpVerificationScreen extends StatelessWidget {
                     label: 'Verify',
                     isPrimary: true,
                     onPressed: () {
-                      context.go('/dashboard/home');
+                      context.go(AppRoutePaths.dashboardHome);
                     },
                   ),
                   SizedBox(height: 2.5.h),
@@ -70,7 +71,7 @@ class OtpVerificationScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.pushNamed('email-password-reset');
+                          context.pushNamed(AppRouteNames.emailPasswordReset);
                         },
                       ),
                       SizedBox(width: 5.w),
@@ -79,7 +80,7 @@ class OtpVerificationScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.goNamed('login');
+                          context.goNamed(AppRouteNames.login);
                         },
                       ),
                     ],
@@ -105,7 +106,7 @@ class OtpVerificationScreen extends StatelessWidget {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        context.goNamed('signup');
+                        context.goNamed(AppRouteNames.signup);
                       },
                   ),
                 ],
@@ -118,4 +119,3 @@ class OtpVerificationScreen extends StatelessWidget {
     );
   }
 }
-

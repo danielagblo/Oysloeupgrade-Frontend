@@ -1,23 +1,39 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
-import 'package:oysloe_mobile/core/routes/routers.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const OyesloeMobile());
+      await initDependencies();
 
-  SystemChrome.setSystemUIOverlayStyle(
-  SystemUiOverlayStyle(
-    systemNavigationBarColor: AppColors.white,
-    systemNavigationBarIconBrightness:
-        AppColors.white.computeLuminance() > 0.5 ? Brightness.dark : Brightness.light,
-  ),
-);
+      await Future.wait([
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+      ]);
 
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          systemNavigationBarColor: AppColors.white,
+          systemNavigationBarIconBrightness:
+              AppColors.white.computeLuminance() > 0.5
+                  ? Brightness.dark
+                  : Brightness.light,
+        ),
+      );
+
+      runApp(const OyesloeMobile());
+    },
+    (error, stackTrace) {
+      debugPrint('Unhandled error: $error');
+    },
+  );
 }
 
 class OyesloeMobile extends StatelessWidget {

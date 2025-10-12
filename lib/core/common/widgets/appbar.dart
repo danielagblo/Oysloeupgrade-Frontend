@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 
@@ -39,7 +40,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       router.pop();
     } else {
       if (currentLocation.startsWith('/dashboard/')) {
-        router.go('/dashboard/home');
+        router.go(AppRoutePaths.dashboardHome);
       } else {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();

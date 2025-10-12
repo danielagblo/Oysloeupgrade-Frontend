@@ -1,274 +1,280 @@
-import 'package:go_router/go_router.dart';
-import 'package:oysloe_mobile/core/navigation/navigation_shell.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/email_password_reset.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/login_screen.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/otp_login_screen.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/otp_verification_screen.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/referral_code_screen.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/feedback_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/report_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/reviews_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/privacy_policy_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/refer_earn_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/subscription_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/terms_conditions_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/account_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_additional_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_review_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
-import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
-import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
+part of "routes.dart";
 
-final GoRouter appRouter = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      name: 'splash',
-      builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/onboarding',
-      name: 'onboarding',
-      builder: (context, state) => const OnboardingFlow(),
-    ),
-    GoRoute(
-      path: '/signup',
-      name: 'signup',
-      builder: (context, state) => const SignupScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/email-password-reset',
-      name: 'email-password-reset',
-      builder: (context, state) => const EmailPasswordResetScreen(),
-    ),
-    GoRoute(
-      path: '/otp-login',
-      name: 'otp-login',
-      builder: (context, state) => const OtpLoginScreen(),
-    ),
-    GoRoute(
-      path: '/referral-code',
-      name: 'referral-code',
-      builder: (context, state) => const ReferralCodeScreen(),
-    ),
-    GoRoute(
-      path: '/otp-verification',
-      name: 'otp-verification',
-      builder: (context, state) => const OtpVerificationScreen(),
-    ),
+final List<RouteBase> routes = <RouteBase>[
+  GoRoute(
+    name: AppRouteNames.splash,
+    path: AppRoutePaths.splash,
+    pageBuilder: defaultPageBuilder(const SplashScreen()),
+  ),
+  GoRoute(
+    name: AppRouteNames.onboarding,
+    path: AppRoutePaths.onboarding,
+    pageBuilder: defaultPageBuilder(const OnboardingFlow()),
+  ),
+  GoRoute(
+    name: AppRouteNames.signup,
+    path: AppRoutePaths.signup,
+    pageBuilder: (context, state) {
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<RegisterCubit>(),
+          child: const SignupScreen(),
+        ),
+      );
+    },
+  ),
+  GoRoute(
+    name: AppRouteNames.login,
+    path: AppRoutePaths.login,
+    pageBuilder: (context, state) {
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<LoginCubit>(),
+          child: const LoginScreen(),
+        ),
+      );
+    },
+  ),
+  GoRoute(
+    name: AppRouteNames.emailPasswordReset,
+    path: AppRoutePaths.emailPasswordReset,
+    pageBuilder: defaultPageBuilder(const EmailPasswordResetScreen()),
+  ),
+  GoRoute(
+    name: AppRouteNames.otpLogin,
+    path: AppRoutePaths.otpLogin,
+    pageBuilder: defaultPageBuilder(const OtpLoginScreen()),
+  ),
+  GoRoute(
+    name: AppRouteNames.referralCode,
+    path: AppRoutePaths.referralCode,
+    pageBuilder: defaultPageBuilder(const ReferralCodeScreen()),
+  ),
+  GoRoute(
+    name: AppRouteNames.otpVerification,
+    path: AppRoutePaths.otpVerification,
+    pageBuilder: defaultPageBuilder(const OtpVerificationScreen()),
+  ),
+  ShellRoute(
+    builder: (context, state, child) {
+      int currentIndex = 0;
+      final String location = state.uri.toString();
 
-    // Dashboard Shell Route
-    ShellRoute(
-      builder: (context, state, child) {
-        int currentIndex = 0;
-        final String location = state.uri.toString();
+      if (location.startsWith(AppRoutePaths.dashboardAlerts)) {
+        currentIndex = 1;
+      } else if (location.startsWith(AppRoutePaths.dashboardPostAd)) {
+        currentIndex = 2;
+      } else if (location.startsWith(AppRoutePaths.dashboardInbox)) {
+        currentIndex = 3;
+      } else if (location.startsWith('/dashboard/profile')) {
+        currentIndex = 4;
+      }
 
-        if (location.startsWith('/dashboard/alerts')) {
-          currentIndex = 1;
-        } else if (location.startsWith('/dashboard/post-ad')) {
-          currentIndex = 2;
-        } else if (location.startsWith('/dashboard/inbox')) {
-          currentIndex = 3;
-        } else if (location.startsWith('/dashboard/profile')) {
-          currentIndex = 4;
-        }
-
-        return NavigationShell(
-          currentIndex: currentIndex,
-          child: child,
-        );
-      },
-      routes: [
-        // Home Tab
-        GoRoute(
-          path: '/dashboard/home',
-          name: 'home',
-          builder: (context, state) => const AnimatedHomeScreen(),
-          routes: [
-            GoRoute(
-              path: 'ad-detail/:adId',
-              name: 'home-ad-detail',
-              builder: (context, state) {
-                final adId = state.pathParameters['adId']!;
-                final extra = state.extra as Map<String, dynamic>?;
-                return AdDetailScreen(
+      return NavigationShell(
+        currentIndex: currentIndex,
+        child: child,
+      );
+    },
+    routes: [
+      GoRoute(
+        name: AppRouteNames.dashboardHome,
+        path: AppRoutePaths.dashboardHome,
+        pageBuilder: defaultPageBuilder(const AnimatedHomeScreen()),
+        routes: [
+          GoRoute(
+            name: AppRouteNames.dashboardHomeAdDetail,
+            path: AppRoutePaths.dashboardHomeAdDetail,
+            pageBuilder: (context, state) {
+              final adId = state.pathParameters['adId']!;
+              final extra = state.extra as Map<String, dynamic>?;
+              return buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: AdDetailScreen(
                   adId: adId,
                   adType: extra?['adType'] as AdDealType?,
                   imageUrl: extra?['imageUrl'] as String?,
                   title: extra?['title'] as String?,
                   location: extra?['location'] as String?,
                   prices: extra?['prices'] as List<String>?,
-                );
-              },
-            ),
-          ],
-        ),
-
-        // Alerts Tab
-        GoRoute(
-          path: '/dashboard/alerts',
-          name: 'alerts',
-          builder: (context, state) => const AlertsScreen(),
-          routes: [
-            GoRoute(
-              path: 'ad-detail/:adId',
-              name: 'alerts-ad-detail',
-              builder: (context, state) {
-                final adId = state.pathParameters['adId']!;
-                final extra = state.extra as Map<String, dynamic>?;
-                return AdDetailScreen(
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardAlerts,
+        path: AppRoutePaths.dashboardAlerts,
+        pageBuilder: defaultPageBuilder(const AlertsScreen()),
+        routes: [
+          GoRoute(
+            name: AppRouteNames.dashboardAlertsAdDetail,
+            path: AppRoutePaths.dashboardAlertsAdDetail,
+            pageBuilder: (context, state) {
+              final adId = state.pathParameters['adId']!;
+              final extra = state.extra as Map<String, dynamic>?;
+              return buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: AdDetailScreen(
                   adId: adId,
                   adType: extra?['adType'] as AdDealType?,
                   imageUrl: extra?['imageUrl'] as String?,
                   title: extra?['title'] as String?,
                   location: extra?['location'] as String?,
                   prices: extra?['prices'] as List<String>?,
-                );
-              },
-            ),
-          ],
-        ),
-
-        // Post Ad Tab
-        GoRoute(
-          path: '/dashboard/post-ad',
-          name: 'post-ad',
-          builder: (context, state) => const PostAdUploadImagesScreen(),
-          routes: [
-            GoRoute(
-              path: 'form',
-              name: 'post-ad-form',
-              builder: (context, state) {
-                final selectedImages = state.extra as List<String>?;
-                return PostAdFormScreen(selectedImages: selectedImages);
-              },
-            ),
-          ],
-        ),
-
-        // Inbox Tab
-        GoRoute(
-          path: '/dashboard/inbox',
-          name: 'inbox',
-          builder: (context, state) => const InboxScreen(),
-          routes: [
-            GoRoute(
-              path: 'chat/:chatId',
-              name: 'chat',
-              builder: (context, state) {
-                final chatId = state.pathParameters['chatId']!;
-                final extra = state.extra as Map<String, dynamic>?;
-                return ChatScreen(
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardPostAd,
+        path: AppRoutePaths.dashboardPostAd,
+        pageBuilder: defaultPageBuilder(const PostAdUploadImagesScreen()),
+        routes: [
+          GoRoute(
+            name: AppRouteNames.dashboardPostAdForm,
+            path: AppRoutePaths.dashboardPostAdForm,
+            pageBuilder: (context, state) {
+              final selectedImages = state.extra as List<String>?;
+              return buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: PostAdFormScreen(selectedImages: selectedImages),
+              );
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardInbox,
+        path: AppRoutePaths.dashboardInbox,
+        pageBuilder: defaultPageBuilder(const InboxScreen()),
+        routes: [
+          GoRoute(
+            name: AppRouteNames.dashboardChat,
+            path: AppRoutePaths.dashboardChat,
+            pageBuilder: (context, state) {
+              final chatId = state.pathParameters['chatId']!;
+              final extra = state.extra as Map<String, dynamic>?;
+              return buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: ChatScreen(
                   chatId: chatId,
                   otherUserName:
                       extra?['otherUserName'] as String? ?? 'Unknown',
                   otherUserAvatar: extra?['otherUserAvatar'] as String? ??
                       'assets/images/man.jpg',
-                );
-              },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardEditProfile,
+        path: AppRoutePaths.dashboardEditProfile,
+        pageBuilder: defaultPageBuilder(const EditProfileScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardAds,
+        path: AppRoutePaths.dashboardAds,
+        pageBuilder: defaultPageBuilder(const AdScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardFavorites,
+        path: AppRoutePaths.dashboardFavorites,
+        pageBuilder: defaultPageBuilder(const FavoriteScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardSubscription,
+        path: AppRoutePaths.dashboardSubscription,
+        pageBuilder: defaultPageBuilder(const SubscriptionScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardReferEarn,
+        path: AppRoutePaths.dashboardReferEarn,
+        pageBuilder: defaultPageBuilder(const ReferAndEarnScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardFeedback,
+        path: AppRoutePaths.dashboardFeedback,
+        pageBuilder: defaultPageBuilder(const FeedbackScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardReviews,
+        path: AppRoutePaths.dashboardReviews,
+        pageBuilder: defaultPageBuilder(const ReviewsScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardServices,
+        path: AppRoutePaths.dashboardServices,
+        pageBuilder: defaultPageBuilder(const ServicesScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardServicesAdditional,
+        path: AppRoutePaths.dashboardServicesAdditional,
+        pageBuilder: (context, state) {
+          return buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: ServicesAdditionalScreen(
+              initial: state.extra as dynamic,
             ),
-          ],
-        ),
-        // Profile Tab
-        GoRoute(
-          path: '/dashboard/profile/edit',
-          name: 'edit-profile',
-          builder: (context, state) => const EditProfileScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/ads',
-          name: 'ads',
-          builder: (context, state) => const AdScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/favorites',
-          name: 'favorites',
-          builder: (context, state) => const FavoriteScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/subscription',
-          name: 'subscription',
-          builder: (context, state) => const SubscriptionScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/refer-earn',
-          name: 'refer-earn',
-          builder: (context, state) => const ReferAndEarnScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/feedback',
-          name: 'feedback',
-          builder: (context, state) => const FeedbackScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/reviews',
-          name: 'reviews',
-          builder: (context, state) => const ReviewsScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/services',
-          name: 'services',
-          builder: (context, state) => const ServicesScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/services/additional',
-          name: 'services-additional',
-          builder: (context, state) => ServicesAdditionalScreen(
-            initial: state.extra as dynamic,
-          ),
-        ),
-        GoRoute(
-          path: '/dashboard/services/review',
-          name: 'services-review',
-          builder: (context, state) => ServicesReviewScreen(
-            initial: state.extra as dynamic,
-          ),
-        ),
-        GoRoute(
-          path: '/dashboard/report',
-          name: 'report',
-          builder: (context, state) => const ReportScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/privacy-policy',
-          name: 'privacy-policy',
-          builder: (context, state) => const PrivacyPolicyScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/terms-conditions',
-          name: 'terms-conditions',
-          builder: (context, state) => const TermsConditionsScreen(),
-        ),
-        GoRoute(
-          path: '/dashboard/account',
-          name: 'account',
-          builder: (context, state) => const AccountScreen(),
-        ),
-      ],
-    ),
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardServicesReview,
+        path: AppRoutePaths.dashboardServicesReview,
+        pageBuilder: (context, state) {
+          return buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: ServicesReviewScreen(
+              initial: state.extra as dynamic,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardReport,
+        path: AppRoutePaths.dashboardReport,
+        pageBuilder: defaultPageBuilder(const ReportScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardPrivacyPolicy,
+        path: AppRoutePaths.dashboardPrivacyPolicy,
+        pageBuilder: defaultPageBuilder(const PrivacyPolicyScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardTermsConditions,
+        path: AppRoutePaths.dashboardTermsConditions,
+        pageBuilder: defaultPageBuilder(const TermsConditionsScreen()),
+      ),
+      GoRoute(
+        name: AppRouteNames.dashboardAccount,
+        path: AppRoutePaths.dashboardAccount,
+        pageBuilder: defaultPageBuilder(const AccountScreen()),
+      ),
+    ],
+  ),
+  GoRoute(
+    name: AppRouteNames.legacyHomeRedirect,
+    path: AppRoutePaths.legacyHomeRedirect,
+    redirect: (_, __) => AppRoutePaths.dashboardHome,
+  ),
+];
 
-    // Redirect from old dashboard route to new one
-    GoRoute(
-      path: '/home-screen',
-      redirect: (_, __) => '/dashboard/home',
-    ),
-  ],
-  initialLocation: '/',
+final GoRouter appRouter = GoRouter(
+  routes: routes,
+  initialLocation: AppRoutePaths.splash,
 );

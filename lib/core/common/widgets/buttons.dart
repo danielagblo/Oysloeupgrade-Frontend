@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:oysloe_mobile/core/common/widgets/adaptive_progress_indicator.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -17,6 +18,7 @@ class CustomButton extends StatelessWidget {
   final String? leadingSvgAsset;
   final Color? filledBackgroundColor;
   final Color? filledTextColor;
+  final bool isLoading;
 
   final bool? capsuleFilled;
   final Color? capsuleFillColor;
@@ -37,6 +39,7 @@ class CustomButton extends StatelessWidget {
     this.leadingSvgAsset,
     this.filledBackgroundColor,
     this.filledTextColor,
+    this.isLoading = false,
     this.capsuleFilled,
     this.capsuleFillColor,
     this.capsuleBorderColor,
@@ -61,6 +64,7 @@ class CustomButton extends StatelessWidget {
       horizontal: 20,
     ),
     double? width,
+    bool isLoading = false,
   }) {
     return CustomButton._(
       key: key,
@@ -74,6 +78,7 @@ class CustomButton extends StatelessWidget {
       textStyle: textStyle,
       padding: padding,
       width: width,
+      isLoading: isLoading,
     );
   }
 
@@ -109,6 +114,7 @@ class CustomButton extends StatelessWidget {
       width: width,
       capsuleWidth: width,
       capsuleHeight: height,
+      isLoading: false,
     );
   }
 
@@ -127,11 +133,11 @@ class CustomButton extends StatelessWidget {
     final bgColor = filledBackgroundColor != null
         ? filledBackgroundColor!
         : (isPrimary ? AppColors.primary : AppColors.grayF9);
-    final bool enabled = onPressed != null;
+    final bool enabled = onPressed != null && !isLoading;
     final disabledTextColor = AppColors.blueGray374957.withValues(alpha: 0.33);
     final computedBaseTextColor = filledTextColor ??
         (isPrimary ? AppColors.gray222222 : AppColors.blueGray374957);
-    final txtColor = enabled
+    final txtColor = enabled || isLoading
         ? computedBaseTextColor
         : (isPrimary
             ? computedBaseTextColor.withValues(alpha: 0.4)
@@ -141,19 +147,24 @@ class CustomButton extends StatelessWidget {
 
     final radius = BorderRadius.circular(20);
 
-    Widget child = Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (leadingSvgAsset != null) ...[
-          SvgPicture.asset(leadingSvgAsset!, width: 20, height: 20),
-          SizedBox(width: 4.w),
+    Widget child;
+    if (isLoading) {
+      child = const AdaptiveProgressIndicator();
+    } else {
+      child = Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (leadingSvgAsset != null) ...[
+            SvgPicture.asset(leadingSvgAsset!, width: 20, height: 20),
+            SizedBox(width: 4.w),
+          ],
+          Flexible(
+            child: Text(label, textAlign: TextAlign.center, style: style),
+          ),
         ],
-        Flexible(
-          child: Text(label, textAlign: TextAlign.center, style: style),
-        ),
-      ],
-    );
+      );
+    }
 
     child = Padding(padding: padding, child: child);
 
@@ -175,7 +186,7 @@ class CustomButton extends StatelessWidget {
             type: MaterialType.transparency,
             child: InkWell(
               borderRadius: radius,
-              onTap: onPressed,
+              onTap: enabled ? onPressed : null,
               child: child,
             ),
           ),

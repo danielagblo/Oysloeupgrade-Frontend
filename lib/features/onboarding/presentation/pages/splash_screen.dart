@@ -1,8 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
+import 'package:oysloe_mobile/core/usecase/usecase.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
+import 'package:oysloe_mobile/features/auth/domain/usecases/get_cached_session_usecase.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'dart:math' as math;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -103,7 +108,17 @@ class _SplashScreenState extends State<SplashScreen>
     await _textController.forward();
 
     await Future.delayed(const Duration(milliseconds: 1000));
-    if (mounted) context.go('/onboarding');
+    if (!mounted) return;
+
+    final GetCachedSessionUseCase getCachedSession =
+        sl<GetCachedSessionUseCase>();
+    final session = await getCachedSession(const NoParams());
+
+    if (!mounted) return;
+    final String destination = session == null
+        ? AppRoutePaths.onboarding
+        : AppRoutePaths.dashboardHome;
+    context.go(destination);
   }
 
   @override
@@ -128,7 +143,6 @@ class _SplashScreenState extends State<SplashScreen>
             fit: StackFit.expand,
             children: [
               Container(color: AppColors.white),
-
               ClipPath(
                 clipper: _CircularRevealClipper(
                   _backgroundRevealAnimation.value,
@@ -139,7 +153,6 @@ class _SplashScreenState extends State<SplashScreen>
                   color: AppColors.primary,
                 ),
               ),
-
               Center(
                 child: SizedBox(
                   width: 55.w,
@@ -164,16 +177,11 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
 
                       Positioned(
-                        left:
-                            6.w +
+                        left: 6.w +
                             20.w -
                             16.w +
-                            (_smallCircleSlideAnimation.value *
-                                3.w), 
-                        top:
-                            9.w +
-                            22.w -
-                            16.w, 
+                            (_smallCircleSlideAnimation.value * 3.w),
+                        top: 9.w + 22.w - 16.w,
                         child: Transform.scale(
                           scale: _smallCircleAnimation.value,
                           child: Container(
@@ -190,7 +198,6 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-
               Positioned(
                 bottom: 10.h,
                 left: 0,

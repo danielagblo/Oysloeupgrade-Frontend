@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -118,7 +119,8 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
   }
 
   void _proceedToNext() {
-    context.pushNamed('post-ad-form', extra: _selectedImages);
+    context.pushNamed(AppRouteNames.dashboardPostAdForm,
+        extra: _selectedImages);
   }
 
   @override

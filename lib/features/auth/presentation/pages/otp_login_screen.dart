@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/common/widgets/input.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -60,7 +61,7 @@ class OtpLoginScreen extends StatelessWidget {
                     label: 'Verify',
                     isPrimary: true,
                     onPressed: () {
-                      context.pushNamed('otp-verification');
+                      context.pushNamed(AppRouteNames.otpVerification);
                     },
                   ),
                   SizedBox(height: 2.5.h),
@@ -74,7 +75,7 @@ class OtpLoginScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.pushNamed('email-password-reset');
+                          context.pushNamed(AppRouteNames.emailPasswordReset);
                         },
                       ),
                       SizedBox(width: 5.w),
@@ -83,7 +84,7 @@ class OtpLoginScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.goNamed('login');
+                          context.goNamed(AppRouteNames.login);
                         },
                       ),
                     ],
@@ -109,7 +110,7 @@ class OtpLoginScreen extends StatelessWidget {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        context.goNamed('signup');
+                        context.goNamed(AppRouteNames.signup);
                       },
                   ),
                 ],

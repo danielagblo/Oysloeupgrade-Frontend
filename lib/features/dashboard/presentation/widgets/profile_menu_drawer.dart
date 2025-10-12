@@ -1,18 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
+import 'package:oysloe_mobile/core/common/widgets/modal.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
-import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/core/usecase/usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:oysloe_mobile/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 /// A right-side drawer shown when tapping the Profile tab.
 /// Width is set by the parent via a SizedBox; this widget focuses on content.
-class ProfileMenuDrawer extends StatelessWidget {
+class ProfileMenuDrawer extends StatefulWidget {
   const ProfileMenuDrawer({super.key});
 
   @override
+  State<ProfileMenuDrawer> createState() => _ProfileMenuDrawerState();
+}
+
+class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
+  bool _hasSession = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hydrateSession();
+  }
+
+  Future<void> _hydrateSession() async {
+    final AuthRepository repository = sl<AuthRepository>();
+    final session = await repository.cachedSession();
+    if (!mounted) return;
+    setState(() {
+      _hasSession = session != null;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final radius = 24.0;
+    final double radius = 24.0;
     return Drawer(
       backgroundColor: AppColors.grayF9,
       surfaceTintColor: Colors.transparent,
@@ -27,22 +56,86 @@ class ProfileMenuDrawer extends StatelessWidget {
           child: ListView(
             children: [
               // Logout Row
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 15.w),
-                decoration: BoxDecoration(
-                  color: AppColors.grayD9.withValues(alpha: 0.20),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: SvgPicture.asset('assets/icons/logout.svg'),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () async {
+                  if (!_hasSession) return;
+
+                  final router = GoRouter.of(context);
+                  final navigator = Navigator.of(context);
+                  final logoutUseCase = sl<LogoutUseCase>();
+
+                  final bool? shouldLogout = await showAppModal<bool>(
+                    context: context,
+                    visual: SvgPicture.asset(
+                      'assets/icons/green_shield.svg',
+                      width: 90,
+                      height: 90,
                     ),
-                    SizedBox(width: 1.w),
-                    Text('Logout', style: AppTypography.body),
-                  ],
+                    text: 'Are you sure?',
+                    actions: [
+                      AppModalAction(
+                        label: 'Yes logout',
+                        filled: true,
+                        fillColor: AppColors.white,
+                        borderColor:
+                            AppColors.grayD9.withValues(alpha: 0.35),
+                        textColor: AppColors.blueGray374957,
+                        onPressed: () => Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop(true),
+                      ),
+                      AppModalAction(
+                        label: 'Close',
+                        textColor: AppColors.blueGray374957,
+                        onPressed: () => Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop(false),
+                      ),
+                    ],
+                  );
+
+                  if (shouldLogout != true) return;
+                  if (!context.mounted) return;
+
+                  final result = await logoutUseCase(const NoParams());
+                  if (!context.mounted) return;
+
+                  result.fold(
+                    (failure) => showErrorSnackBar(
+                      context,
+                      failure.message,
+                    ),
+                    (_) {
+                      navigator.pop();
+                      router.go(AppRoutePaths.login);
+                      setState(() => _hasSession = false);
+                    },
+                  );
+                },
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: _hasSession ? 1 : 0.45,
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 15.w),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: AppColors.grayD9.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset('assets/icons/logout.svg'),
+                        SizedBox(width: 1.w),
+                        Text('Logout', style: AppTypography.body),
+                      ],
+                    ),
+                  ),
                 ),
               ),
 
@@ -73,7 +166,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('edit-profile');
+                    router.pushNamed(AppRouteNames.dashboardEditProfile);
                   });
                 },
               ),
@@ -87,7 +180,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('ads');
+                    router.pushNamed(AppRouteNames.dashboardAds);
                   });
                 },
               ),
@@ -98,7 +191,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('favorites');
+                    router.pushNamed(AppRouteNames.dashboardFavorites);
                   });
                 },
               ),
@@ -109,7 +202,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('subscription');
+                    router.pushNamed(AppRouteNames.dashboardSubscription);
                   });
                 },
               ),
@@ -120,7 +213,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('refer-earn');
+                    router.pushNamed(AppRouteNames.dashboardReferEarn);
                   });
                 },
               ),
@@ -134,7 +227,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('feedback');
+                    router.pushNamed(AppRouteNames.dashboardFeedback);
                   });
                 },
               ),
@@ -145,7 +238,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('account');
+                    router.pushNamed(AppRouteNames.dashboardAccount);
                   });
                 },
               ),
@@ -156,7 +249,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('terms-conditions');
+                    router.pushNamed(AppRouteNames.dashboardTermsConditions);
                   });
                 },
               ),
@@ -167,7 +260,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    router.pushNamed('privacy-policy');
+                    router.pushNamed(AppRouteNames.dashboardPrivacyPolicy);
                   });
                 },
               ),

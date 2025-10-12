@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/common/widgets/input.dart';
 import 'package:oysloe_mobile/core/constants/body_paddings.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/common/widgets/modal.dart';
@@ -86,7 +87,7 @@ class EmailPasswordResetScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.goNamed('login');
+                          context.goNamed(AppRouteNames.login);
                         },
                       ),
                       SizedBox(width: 5.w),
@@ -95,7 +96,7 @@ class EmailPasswordResetScreen extends StatelessWidget {
                         filled: true,
                         fillColor: AppColors.white,
                         onPressed: () {
-                          context.goNamed('otp-login');
+                          context.goNamed(AppRouteNames.otpLogin);
                         },
                       ),
                     ],
@@ -121,7 +122,7 @@ class EmailPasswordResetScreen extends StatelessWidget {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        context.goNamed('signup');
+                        context.goNamed(AppRouteNames.signup);
                       },
                   ),
                 ],

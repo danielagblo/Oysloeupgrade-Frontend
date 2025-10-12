@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
@@ -317,7 +318,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
           AppBarAction.svg(
             label: '24',
             iconSize: 18,
-            onTap: () => context.pushNamed('report'),
+            onTap: () => context.pushNamed(AppRouteNames.dashboardReport),
             svgAsset: 'assets/icons/flag.svg',
           ),
           AppBarAction.svg(
@@ -658,7 +659,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                 label: 'Report Seller',
                                 svgAsset: 'assets/icons/flag.svg',
                                 onTap: () {
-                                  context.pushNamed('report');
+                                  context
+                                      .pushNamed(AppRouteNames.dashboardReport);
                                 },
                               ),
                               const SizedBox(width: 12),

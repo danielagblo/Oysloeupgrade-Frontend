@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/navigation/navigation_state.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/profile_menu_drawer.dart';
 
@@ -41,16 +42,16 @@ class _NavigationShellState extends State<NavigationShell> {
   void _onTabTapped(int index) {
     switch (index) {
       case 0:
-        context.go('/dashboard/home');
+        context.go(AppRoutePaths.dashboardHome);
         break;
       case 1:
-        context.go('/dashboard/alerts');
+        context.go(AppRoutePaths.dashboardAlerts);
         break;
       case 2:
-        context.go('/dashboard/post-ad');
+        context.go(AppRoutePaths.dashboardPostAd);
         break;
       case 3:
-        context.go('/dashboard/inbox');
+        context.go(AppRoutePaths.dashboardInbox);
         break;
       case 4:
         // Open the right drawer for Profile instead of navigating

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_input.dart';
@@ -456,6 +457,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
       gender: _selectedGender,
       dob: _selectedDob,
     );
-    GoRouter.of(context).pushNamed('services-additional', extra: app);
+    GoRouter.of(context)
+        .pushNamed(AppRouteNames.dashboardServicesAdditional, extra: app);
   }
 }

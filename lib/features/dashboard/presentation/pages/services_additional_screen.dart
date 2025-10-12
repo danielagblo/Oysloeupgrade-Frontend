@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_input.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/models/service_application.dart';
-import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_input.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/step_indicator.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -177,7 +178,8 @@ class _ServicesAdditionalScreenState extends State<ServicesAdditionalScreen> {
           : ResumeFileInfo(
               name: _resumeName!, sizeBytes: _resumeSizeBytes ?? 0),
     );
-    GoRouter.of(context).pushNamed('services-review', extra: updated);
+    GoRouter.of(context)
+        .pushNamed(AppRouteNames.dashboardServicesReview, extra: updated);
   }
 }
 
