@@ -46,6 +46,8 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isChecked = !_isChecked);
   }
 
+
+
   void _submit(RegisterState state) {
     final cubit = context.read<RegisterCubit>();
     if (state.isSubmitting) return;
@@ -64,7 +66,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final params = RegisterParams(
       email: _emailController.text.trim(),
-      phone: _phoneController.text.trim(),
+      phone: CustomValidator.getCleanPhoneNumber(_phoneController.text),
       password: _passwordController.text,
       name: _nameController.text.trim(),
     );
@@ -98,8 +100,8 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: BodyPaddings.horizontalPage
-                  .add(EdgeInsets.only(bottom: 4.h)),
+              padding:
+                  BodyPaddings.horizontalPage.add(EdgeInsets.only(bottom: 4.h)),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -113,66 +115,65 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     SizedBox(height: 4.h),
                     AppTextField(
-                          controller: _nameController,
-                          hint: "Name",
-                          leadingSvgAsset: 'assets/icons/name.svg',
-                          keyboardType: TextInputType.name,
-                          validator: (value) =>
-                              CustomValidator.validateName(value ?? ''),
-                        ),
-                    SizedBox(height: 1.5.h),
-        AppTextField(
-                          controller: _emailController,
-                          hint: "Email Address",
-                          leadingSvgAsset: 'assets/icons/email.svg',
-                          keyboardType: TextInputType.emailAddress,
-          validator: (value) {
-            final emptyCheck =
-            CustomValidator.isNotEmpty(value ?? '');
-            if (emptyCheck != null) return emptyCheck;
-            return CustomValidator.validateEmail(value ?? '');
-          },
-                        ),
+                      controller: _nameController,
+                      hint: "Name",
+                      leadingSvgAsset: 'assets/icons/name.svg',
+                      keyboardType: TextInputType.name,
+                      validator: (value) =>
+                          CustomValidator.validateName(value ?? ''),
+                    ),
                     SizedBox(height: 1.5.h),
                     AppTextField(
-                          controller: _phoneController,
-                          hint: "+233",
-                          leadingSvgAsset: 'assets/icons/phone.svg',
-                          keyboardType: TextInputType.phone,
-                          validator: (value) =>
-                              CustomValidator.isNotEmpty(value ?? ''),
-                        ),
+                      controller: _emailController,
+                      hint: "Email Address",
+                      leadingSvgAsset: 'assets/icons/email.svg',
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        final emptyCheck =
+                            CustomValidator.isNotEmpty(value ?? '');
+                        if (emptyCheck != null) return emptyCheck;
+                        return CustomValidator.validateEmail(value ?? '');
+                      },
+                    ),
                     SizedBox(height: 1.5.h),
                     AppTextField(
-                          controller: _passwordController,
-                          hint: "Password",
-                          leadingSvgAsset: 'assets/icons/passwordkey.svg',
-                          isPassword: true,
-                          validator: (value) {
-                            final emptyCheck =
-                                CustomValidator.isNotEmpty(value ?? '');
-                            if (emptyCheck != null) return emptyCheck;
-                            return CustomValidator.validatePassword(
-                              value ?? '',
-                            );
-                          },
-                        ),
+                      controller: _phoneController,
+                      hint: "+233",
+                      leadingSvgAsset: 'assets/icons/phone.svg',
+                      keyboardType: TextInputType.phone,
+                      validator: CustomValidator.validatePhoneNumber,
+                    ),
                     SizedBox(height: 1.5.h),
                     AppTextField(
-                          controller: _confirmPasswordController,
-                          hint: "Retype Password",
-                          leadingSvgAsset: 'assets/icons/passwordkey.svg',
-                          isPassword: true,
-                          validator: (value) {
-                            final emptyCheck =
-                                CustomValidator.isNotEmpty(value ?? '');
-                            if (emptyCheck != null) return emptyCheck;
-                            return CustomValidator.validatePasswordFields(
-                              _passwordController.text,
-                              value,
-                            );
-                          },
-                        ),
+                      controller: _passwordController,
+                      hint: "Password",
+                      leadingSvgAsset: 'assets/icons/passwordkey.svg',
+                      isPassword: true,
+                      validator: (value) {
+                        final emptyCheck =
+                            CustomValidator.isNotEmpty(value ?? '');
+                        if (emptyCheck != null) return emptyCheck;
+                        return CustomValidator.validatePassword(
+                          value ?? '',
+                        );
+                      },
+                    ),
+                    SizedBox(height: 1.5.h),
+                    AppTextField(
+                      controller: _confirmPasswordController,
+                      hint: "Retype Password",
+                      leadingSvgAsset: 'assets/icons/passwordkey.svg',
+                      isPassword: true,
+                      validator: (value) {
+                        final emptyCheck =
+                            CustomValidator.isNotEmpty(value ?? '');
+                        if (emptyCheck != null) return emptyCheck;
+                        return CustomValidator.validatePasswordFields(
+                          _passwordController.text,
+                          value,
+                        );
+                      },
+                    ),
                     SizedBox(height: 2.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

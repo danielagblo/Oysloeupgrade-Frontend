@@ -9,13 +9,17 @@ import 'package:oysloe_mobile/core/network/network_info.dart';
 import 'package:oysloe_mobile/core/usecase/usecase.dart';
 import 'package:oysloe_mobile/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:oysloe_mobile/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:oysloe_mobile/features/auth/data/datasources/otp_remote_data_source.dart';
 import 'package:oysloe_mobile/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/get_cached_session_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/login_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/register_usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/usecases/send_otp_usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/login/login_cubit.dart';
+import 'package:oysloe_mobile/features/auth/presentation/bloc/otp/otp_cubit.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_cubit.dart';
 
 part 'di.dart';

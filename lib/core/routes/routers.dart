@@ -47,7 +47,16 @@ final List<RouteBase> routes = <RouteBase>[
   GoRoute(
     name: AppRouteNames.otpLogin,
     path: AppRoutePaths.otpLogin,
-    pageBuilder: defaultPageBuilder(const OtpLoginScreen()),
+    pageBuilder: (context, state) {
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<OtpCubit>(),
+          child: const OtpLoginScreen(),
+        ),
+      );
+    },
   ),
   GoRoute(
     name: AppRouteNames.referralCode,
@@ -57,7 +66,17 @@ final List<RouteBase> routes = <RouteBase>[
   GoRoute(
     name: AppRouteNames.otpVerification,
     path: AppRoutePaths.otpVerification,
-    pageBuilder: defaultPageBuilder(const OtpVerificationScreen()),
+    pageBuilder: (context, state) {
+      final phone = state.extra as String? ?? '';
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<OtpCubit>(),
+          child: OtpVerificationScreen(phone: phone),
+        ),
+      );
+    },
   ),
   ShellRoute(
     builder: (context, state, child) {

@@ -5,9 +5,10 @@ import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class OtpCodeInput extends StatefulWidget {
-  const OtpCodeInput({super.key, this.length = 6});
+  const OtpCodeInput({super.key, this.length = 6, this.onChanged});
 
   final int length;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<OtpCodeInput> createState() => _OtpCodeInputState();
@@ -51,6 +52,12 @@ class _OtpCodeInputState extends State<OtpCodeInput> {
     } else {
       _focusNodes[widget.length - 1].unfocus();
     }
+    _notifyChange();
+  }
+
+  void _notifyChange() {
+    final code = _controllers.map((c) => c.text).join();
+    widget.onChanged?.call(code);
   }
 
   @override
@@ -104,6 +111,7 @@ class _OtpCodeInputState extends State<OtpCodeInput> {
                 _focusNodes[i - 1].requestFocus();
               }
               setState(() {});
+              _notifyChange();
             },
             decoration: InputDecoration(
               counterText: '',

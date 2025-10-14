@@ -6,6 +6,32 @@ OverlayEntry? _activeErrorSnackBar;
 Timer? _snackBarTimer;
 
 void showErrorSnackBar(BuildContext context, String message) {
+  _showSnackBar(
+    context: context,
+    message: message,
+    backgroundColor: Colors.red.shade600,
+    icon: Icons.error_outline,
+    duration: const Duration(seconds: 4),
+  );
+}
+
+void showSuccessSnackBar(BuildContext context, String message) {
+  _showSnackBar(
+    context: context,
+    message: message,
+    backgroundColor: Colors.green.shade600,
+    icon: Icons.check_circle_outline,
+    duration: const Duration(seconds: 3),
+  );
+}
+
+void _showSnackBar({
+  required BuildContext context,
+  required String message,
+  required Color backgroundColor,
+  required IconData icon,
+  required Duration duration,
+}) {
   final overlay = Overlay.of(context, rootOverlay: true);
 
   ScaffoldMessenger.of(context)
@@ -18,8 +44,10 @@ void showErrorSnackBar(BuildContext context, String message) {
   _activeErrorSnackBar = null;
 
   final entry = OverlayEntry(
-    builder: (overlayContext) => _TopErrorSnackBar(
+    builder: (overlayContext) => _TopSnackBar(
       message: message,
+      backgroundColor: backgroundColor,
+      icon: icon,
       onClose: _removeActiveSnackBar,
     ),
   );
@@ -27,7 +55,7 @@ void showErrorSnackBar(BuildContext context, String message) {
   overlay.insert(entry);
   _activeErrorSnackBar = entry;
 
-  _snackBarTimer = Timer(const Duration(seconds: 4), _removeActiveSnackBar);
+  _snackBarTimer = Timer(duration, _removeActiveSnackBar);
 }
 
 void _removeActiveSnackBar() {
@@ -40,20 +68,24 @@ void _removeActiveSnackBar() {
   _activeErrorSnackBar = null;
 }
 
-class _TopErrorSnackBar extends StatefulWidget {
+class _TopSnackBar extends StatefulWidget {
   final String message;
+  final Color backgroundColor;
+  final IconData icon;
   final VoidCallback onClose;
 
-  const _TopErrorSnackBar({
+  const _TopSnackBar({
     required this.message,
+    required this.backgroundColor,
+    required this.icon,
     required this.onClose,
   });
 
   @override
-  State<_TopErrorSnackBar> createState() => _TopErrorSnackBarState();
+  State<_TopSnackBar> createState() => _TopSnackBarState();
 }
 
-class _TopErrorSnackBarState extends State<_TopErrorSnackBar>
+class _TopSnackBarState extends State<_TopSnackBar>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _offsetAnimation;
@@ -102,6 +134,8 @@ class _TopErrorSnackBarState extends State<_TopErrorSnackBar>
               child: _TopSnackBarBody(
                 message: widget.message,
                 onClose: widget.onClose,
+                backgroundColor: widget.backgroundColor,
+                icon: widget.icon,
               ),
             ),
           ),
@@ -114,10 +148,14 @@ class _TopErrorSnackBarState extends State<_TopErrorSnackBar>
 class _TopSnackBarBody extends StatelessWidget {
   final String message;
   final VoidCallback onClose;
+  final Color backgroundColor;
+  final IconData icon;
 
   const _TopSnackBarBody({
     required this.message,
     required this.onClose,
+    required this.backgroundColor,
+    required this.icon,
   });
 
   @override
@@ -126,7 +164,7 @@ class _TopSnackBarBody extends StatelessWidget {
       color: Colors.transparent,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.red.shade600,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: ConstrainedBox(
@@ -139,8 +177,7 @@ class _TopSnackBarBody extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(width: 16),
-                  const Icon(Icons.error_outline,
-                      color: Colors.white70, size: 18),
+                  Icon(icon, color: Colors.white70, size: 18),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Padding(

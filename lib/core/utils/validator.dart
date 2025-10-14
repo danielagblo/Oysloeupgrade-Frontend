@@ -54,4 +54,46 @@ class CustomValidator {
     }
     return null;
   }
+
+  static String? validatePhoneNumber(String? phone) {
+    if (phone == null || phone.trim().isEmpty) {
+      return 'Phone number is required';
+    }
+
+    final normalized = getCleanPhoneNumber(phone);
+
+    // Local Ghana number: 0 + 9 digits
+    if (!RegExp(r'^0\d{9}$').hasMatch(normalized)) {
+      return 'Invalid phone number';
+    }
+    return null; // valid
+  }
+
+  static String getCleanPhoneNumber(String phone) {
+    // Accept formats like: 0XXXXXXXXX, +233XXXXXXXXX, 233XXXXXXXXX, with spaces/dashes
+    String digits = phone.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.startsWith('233')) {
+      final rest = digits.substring(3);
+      if (rest.length >= 9) {
+        digits =
+            '0${rest.substring(0, 9)}'; 
+      }
+    }
+
+    // If user omitted the leading 0 and only provided 9 digits, prepend it
+    if (digits.length == 9) {
+      digits = '0$digits';
+    }
+
+    // If still longer than 10 digits (e.g., copied with extra), try last 10 starting with 0
+    if (digits.length > 10) {
+      final last10 = digits.substring(digits.length - 10);
+      if (RegExp(r'^0\d{9}$').hasMatch(last10)) {
+        digits = last10;
+      }
+    }
+
+    return digits;
+  }
 }

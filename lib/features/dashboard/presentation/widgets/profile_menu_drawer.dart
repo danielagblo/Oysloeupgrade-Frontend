@@ -55,69 +55,64 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
           child: ListView(
             children: [
-              // Logout Row
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () async {
-                  if (!_hasSession) return;
+              if (_hasSession) ...[
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    final router = GoRouter.of(context);
+                    final navigator = Navigator.of(context);
+                    final logoutUseCase = sl<LogoutUseCase>();
 
-                  final router = GoRouter.of(context);
-                  final navigator = Navigator.of(context);
-                  final logoutUseCase = sl<LogoutUseCase>();
-
-                  final bool? shouldLogout = await showAppModal<bool>(
-                    context: context,
-                    visual: SvgPicture.asset(
-                      'assets/icons/green_shield.svg',
-                      width: 90,
-                      height: 90,
-                    ),
-                    text: 'Are you sure?',
-                    actions: [
-                      AppModalAction(
-                        label: 'Yes logout',
-                        filled: true,
-                        fillColor: AppColors.white,
-                        borderColor:
-                            AppColors.grayD9.withValues(alpha: 0.35),
-                        textColor: AppColors.blueGray374957,
-                        onPressed: () => Navigator.of(
-                          context,
-                          rootNavigator: true,
-                        ).pop(true),
+                    final bool? shouldLogout = await showAppModal<bool>(
+                      context: context,
+                      visual: SvgPicture.asset(
+                        'assets/icons/green_shield.svg',
+                        width: 90,
+                        height: 90,
                       ),
-                      AppModalAction(
-                        label: 'Close',
-                        textColor: AppColors.blueGray374957,
-                        onPressed: () => Navigator.of(
-                          context,
-                          rootNavigator: true,
-                        ).pop(false),
+                      text: 'Are you sure?',
+                      actions: [
+                        AppModalAction(
+                          label: 'Yes logout',
+                          filled: true,
+                          fillColor: AppColors.white,
+                          borderColor:
+                              AppColors.grayD9.withValues(alpha: 0.35),
+                          textColor: AppColors.blueGray374957,
+                          onPressed: () => Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          ).pop(true),
+                        ),
+                        AppModalAction(
+                          label: 'Close',
+                          textColor: AppColors.blueGray374957,
+                          onPressed: () => Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          ).pop(false),
+                        ),
+                      ],
+                    );
+
+                    if (shouldLogout != true) return;
+                    if (!context.mounted) return;
+
+                    final result = await logoutUseCase(const NoParams());
+                    if (!context.mounted) return;
+
+                    result.fold(
+                      (failure) => showErrorSnackBar(
+                        context,
+                        failure.message,
                       ),
-                    ],
-                  );
-
-                  if (shouldLogout != true) return;
-                  if (!context.mounted) return;
-
-                  final result = await logoutUseCase(const NoParams());
-                  if (!context.mounted) return;
-
-                  result.fold(
-                    (failure) => showErrorSnackBar(
-                      context,
-                      failure.message,
-                    ),
-                    (_) {
-                      navigator.pop();
-                      router.go(AppRoutePaths.login);
-                      setState(() => _hasSession = false);
-                    },
-                  );
-                },
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 200),
-                  opacity: _hasSession ? 1 : 0.45,
+                      (_) {
+                        navigator.pop();
+                        router.go(AppRoutePaths.login);
+                        setState(() => _hasSession = false);
+                      },
+                    );
+                  },
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 15.w),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -137,9 +132,9 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
                     ),
                   ),
                 ),
-              ),
 
-              SizedBox(height: 2.h),
+                SizedBox(height: 2.h),
+              ],
 
               // Profile card
               _ProfileHeaderCard(),

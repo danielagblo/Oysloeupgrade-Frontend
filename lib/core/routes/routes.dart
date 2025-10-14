@@ -11,6 +11,7 @@ import 'package:oysloe_mobile/features/auth/presentation/pages/referral_code_scr
 import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_cubit.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/login/login_cubit.dart';
+import 'package:oysloe_mobile/features/auth/presentation/bloc/otp/otp_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';

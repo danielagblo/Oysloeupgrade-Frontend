@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/usecase/login_params.dart';
 import '../../../../core/usecase/register_params.dart';
+import '../../../../core/utils/api_helper.dart';
 import '../models/auth_session_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -38,10 +39,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final Response<dynamic> response =
           await _client.post<dynamic>(endpoint, data: payload);
-      final Map<String, dynamic> data = _extractPayload(response);
+      final Map<String, dynamic> data = ApiHelper.extractPayload(response);
       return AuthSessionModel.fromJson(data);
     } on DioException catch (error) {
-      throw ApiException(_humanReadableMessage(error));
+      throw ApiException(ApiHelper.getHumanReadableMessage(error));
     } on ServerException {
       rethrow;
     } catch (error) {
@@ -49,32 +50,4 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  Map<String, dynamic> _extractPayload(Response<dynamic> response) {
-    if (response.data is Map<String, dynamic>) {
-      return Map<String, dynamic>.from(response.data as Map<String, dynamic>);
-    }
-    if (response.data == null) {
-      throw const ServerException('Empty response');
-    }
-    throw const ServerException('Invalid response structure');
-  }
-
-  String _humanReadableMessage(DioException error) {
-    final Response<dynamic>? response = error.response;
-    if (response?.data is Map<String, dynamic>) {
-      final Map<String, dynamic> map =
-          Map<String, dynamic>.from(response!.data as Map<String, dynamic>);
-      const List<String> keys = <String>['message', 'detail', 'error', 'error_message'];
-      for (final String key in keys) {
-        final dynamic value = map[key];
-        if (value is String && value.isNotEmpty) {
-          return value;
-        }
-      }
-    }
-    if (error.message != null && error.message!.isNotEmpty) {
-      return error.message!;
-    }
-    return 'Unable to complete request';
-  }
 }
