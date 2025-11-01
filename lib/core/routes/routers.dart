@@ -42,7 +42,52 @@ final List<RouteBase> routes = <RouteBase>[
   GoRoute(
     name: AppRouteNames.emailPasswordReset,
     path: AppRoutePaths.emailPasswordReset,
-    pageBuilder: defaultPageBuilder(const EmailPasswordResetScreen()),
+    pageBuilder: (context, state) {
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<PasswordResetCubit>(),
+          child: const EmailPasswordResetScreen(),
+        ),
+      );
+    },
+  ),
+  GoRoute(
+    name: AppRouteNames.passwordResetOtp,
+    path: AppRoutePaths.passwordResetOtp,
+    pageBuilder: (context, state) {
+      final String phone = state.extra as String? ?? '';
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<PasswordResetCubit>(),
+          child: PasswordResetOtpScreen(phone: phone),
+        ),
+      );
+    },
+  ),
+  GoRoute(
+    name: AppRouteNames.passwordResetNewPassword,
+    path: AppRoutePaths.passwordResetNewPassword,
+    pageBuilder: (context, state) {
+      final Map<String, String> data =
+          (state.extra as Map<String, String>?) ?? const <String, String>{};
+      final String phone = data['phone'] ?? '';
+      final String otp = data['otp'] ?? '';
+      return buildPageWithDefaultTransition(
+        context: context,
+        state: state,
+        child: BlocProvider(
+          create: (_) => sl<PasswordResetCubit>(),
+          child: PasswordResetNewPasswordScreen(
+            phone: phone,
+            otp: otp,
+          ),
+        ),
+      );
+    },
   ),
   GoRoute(
     name: AppRouteNames.otpLogin,
@@ -102,7 +147,16 @@ final List<RouteBase> routes = <RouteBase>[
       GoRoute(
         name: AppRouteNames.dashboardHome,
         path: AppRoutePaths.dashboardHome,
-        pageBuilder: defaultPageBuilder(const AnimatedHomeScreen()),
+        pageBuilder: (context, state) {
+          return buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: BlocProvider(
+              create: (_) => sl<ProductsCubit>()..fetch(),
+              child: const AnimatedHomeScreen(),
+            ),
+          );
+        },
         routes: [
           GoRoute(
             name: AppRouteNames.dashboardHomeAdDetail,
@@ -120,6 +174,7 @@ final List<RouteBase> routes = <RouteBase>[
                   title: extra?['title'] as String?,
                   location: extra?['location'] as String?,
                   prices: extra?['prices'] as List<String>?,
+                  product: extra?['product'] as ProductEntity?,
                 ),
               );
             },
@@ -147,6 +202,7 @@ final List<RouteBase> routes = <RouteBase>[
                   title: extra?['title'] as String?,
                   location: extra?['location'] as String?,
                   prices: extra?['prices'] as List<String>?,
+                  product: extra?['product'] as ProductEntity?,
                 ),
               );
             },
@@ -209,6 +265,21 @@ final List<RouteBase> routes = <RouteBase>[
         pageBuilder: defaultPageBuilder(const AdScreen()),
       ),
       GoRoute(
+        name: AppRouteNames.dashboardCategoryAds,
+        path: AppRoutePaths.dashboardCategoryAds,
+        pageBuilder: (context, state) {
+          final String? initialCategory = state.extra as String?;
+          return buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: BlocProvider(
+              create: (_) => sl<ProductsCubit>()..fetch(),
+              child: CategoryAdsScreen(initialCategoryLabel: initialCategory),
+            ),
+          );
+        },
+      ),
+      GoRoute(
         name: AppRouteNames.dashboardFavorites,
         path: AppRoutePaths.dashboardFavorites,
         pageBuilder: defaultPageBuilder(const FavoriteScreen()),
@@ -231,7 +302,14 @@ final List<RouteBase> routes = <RouteBase>[
       GoRoute(
         name: AppRouteNames.dashboardReviews,
         path: AppRoutePaths.dashboardReviews,
-        pageBuilder: defaultPageBuilder(const ReviewsScreen()),
+        pageBuilder: (context, state) {
+          final int productId = (state.extra as int?) ?? 0;
+          return buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: ReviewsScreen(productId: productId),
+          );
+        },
       ),
       GoRoute(
         name: AppRouteNames.dashboardServices,

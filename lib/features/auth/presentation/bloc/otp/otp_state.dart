@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/auth_entity.dart';
 import '../../../domain/entities/otp_entity.dart';
 
 sealed class OtpState extends Equatable {
@@ -31,12 +32,12 @@ class OtpVerifying extends OtpState {
 }
 
 class OtpVerified extends OtpState {
-  final OtpResponseEntity response;
+  final AuthSessionEntity session;
 
-  const OtpVerified(this.response);
+  const OtpVerified(this.session);
 
   @override
-  List<Object?> get props => [response];
+  List<Object?> get props => [session];
 }
 
 class OtpError extends OtpState {

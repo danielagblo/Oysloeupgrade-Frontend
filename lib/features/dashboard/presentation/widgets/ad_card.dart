@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 
@@ -51,6 +53,7 @@ class AdCard extends StatelessWidget {
         margin: EdgeInsets.all(8.sp),
         width: double.infinity,
         decoration: BoxDecoration(
+          color: AppColors.grayE4,
           borderRadius: BorderRadius.circular(16),
         ),
         clipBehavior: Clip.antiAlias,
@@ -79,22 +82,18 @@ class AdCard extends StatelessWidget {
   }
 
   Widget _buildLocationRow() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    final Widget locationContent = Row(
       children: [
         SvgPicture.asset(
           'assets/icons/location.svg',
           height: 10.sp,
           colorFilter: ColorFilter.mode(
-            // AppColors.gray8B959E,
-            // BlendMode.srcIn,
             AppColors.blueGray374957,
             BlendMode.srcIn,
-            
           ),
         ),
         SizedBox(width: 4.sp),
-        Flexible(
+        Expanded(
           child: Text(
             location,
             maxLines: 1,
@@ -106,6 +105,18 @@ class AdCard extends StatelessWidget {
             ),
           ),
         ),
+      ],
+    );
+
+    if (!_hasTypeLabel) {
+      return locationContent;
+    }
+
+    return Row(
+      children: [
+        Expanded(child: locationContent),
+        SizedBox(width: 4.sp),
+        // _buildTypeChip(),
       ],
     );
   }
@@ -163,10 +174,17 @@ class AdCard extends StatelessWidget {
   }
 
   Widget _buildImage(String url) {
+    if (url.trim().isEmpty) {
+      return _buildErrorWidget();
+    }
+
+    final Map<String, String>? headers = _imageHeaders();
+
     if (url.startsWith('http')) {
       return Image.network(
         url,
         fit: BoxFit.cover,
+        headers: headers,
         errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
@@ -182,9 +200,22 @@ class AdCard extends StatelessWidget {
     );
   }
 
+  Map<String, String>? _imageHeaders() {
+    if (!sl.isRegistered<Dio>()) return null;
+    final Map<String, dynamic> rawHeaders = sl<Dio>().options.headers;
+    if (rawHeaders.isEmpty) return null;
+    final Map<String, String> headers = <String, String>{};
+    rawHeaders.forEach((key, value) {
+      if (value != null) {
+        headers[key.toString()] = value.toString();
+      }
+    });
+    return headers.isEmpty ? null : headers;
+  }
+
   Widget _buildErrorWidget() {
     return Container(
-      color: AppColors.grayF9,
+      color: AppColors.grayE4,
       child: Center(
         child: Icon(
           Icons.image_not_supported_outlined,
@@ -197,9 +228,10 @@ class AdCard extends StatelessWidget {
 
   Widget _buildLoadingWidget(ImageChunkEvent loadingProgress) {
     return Container(
-      color: AppColors.grayF9,
+      color: AppColors.grayE4,
       child: Center(
         child: CircularProgressIndicator(
+          color: AppColors.blueGray374957,
           value: loadingProgress.expectedTotalBytes != null
               ? loadingProgress.cumulativeBytesLoaded /
                   loadingProgress.expectedTotalBytes!
@@ -208,4 +240,46 @@ class AdCard extends StatelessWidget {
       ),
     );
   }
+
+  // Widget _buildTypeChip() {
+  //   return Container(
+  //     padding: EdgeInsets.symmetric(horizontal: 6.sp, vertical: 3.sp),
+  //     decoration: BoxDecoration(
+  //       color: _typeColor().withValues(alpha: 0.15),
+  //       borderRadius: BorderRadius.circular(20),
+  //     ),
+  //     child: Text(
+  //       _typeLabel(),
+  //       style: AppTypography.labelSmall.copyWith(
+  //         color: _typeColor(),
+  //         fontSize: 11.sp,
+  //         fontWeight: FontWeight.w600,
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  bool get _hasTypeLabel => _typeLabel().isNotEmpty;
+
+  String _typeLabel() {
+    switch (type) {
+      case AdDealType.rent:
+        return 'Rent';
+      case AdDealType.highPurchase:
+        return 'Hire purchase';
+      case AdDealType.sale:
+        return 'Sale';
+    }
+  }
+
+  // Color _typeColor() {
+  //   switch (type) {
+  //     case AdDealType.rent:
+  //       return const Color(0xFF00FFF2);
+  //     case AdDealType.highPurchase:
+  //       return const Color(0xFF74FFA7);
+  //     case AdDealType.sale:
+  //       return const Color(0xFFFF6B6B);
+  //   }
+  // }
 }

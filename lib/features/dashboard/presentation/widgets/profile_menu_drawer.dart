@@ -10,6 +10,7 @@ import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/usecase/usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/entities/auth_entity.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 /// A right-side drawer shown when tapping the Profile tab.
@@ -23,6 +24,7 @@ class ProfileMenuDrawer extends StatefulWidget {
 
 class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
   bool _hasSession = false;
+  AuthUserEntity? _user;
 
   @override
   void initState() {
@@ -36,6 +38,7 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
     if (!mounted) return;
     setState(() {
       _hasSession = session != null;
+      _user = session?.user;
     });
   }
 
@@ -137,7 +140,7 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
               ],
 
               // Profile card
-              _ProfileHeaderCard(),
+              _ProfileHeaderCard(user: _user),
 
               SizedBox(height: 2.5.h),
 
@@ -269,6 +272,9 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
 }
 
 class _ProfileHeaderCard extends StatelessWidget {
+  const _ProfileHeaderCard({this.user});
+
+  final AuthUserEntity? user;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -289,18 +295,14 @@ class _ProfileHeaderCard extends StatelessWidget {
               border: Border.all(color: AppColors.primary, width: 5),
             ),
             alignment: Alignment.center,
-            child: SvgPicture.asset(
-              'assets/images/default_user.svg',
-              width: 39,
-              height: 39,
-            ),
+            child: _AvatarImage(avatarUrl: user?.avatar),
           ),
           SizedBox(width: 3.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Jeffery Andoff',
+                Text(user?.name.isNotEmpty == true ? user!.name : 'Guest',
                     style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w600,
@@ -308,22 +310,25 @@ class _ProfileHeaderCard extends StatelessWidget {
                 SizedBox(height: 0.5.h),
                 Row(
                   children: [
-                    Container(
-                      width: 15,
-                      height: 15,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primary,
+                    if (user?.adminVerified == true) ...[
+                      Container(
+                        width: 15,
+                        height: 15,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.check,
+                          size: 12,
+                          color: AppColors.blueGray374957,
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: const Icon(
-                        Icons.check,
-                        size: 12,
-                        color: AppColors.blueGray374957,
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Text('High Level', style: AppTypography.bodySmall),
+                      const SizedBox(width: 6),
+                    ],
+                    Text(_formatLevel(user?.level) ?? '—',
+                        style: AppTypography.bodySmall),
                   ],
                 ),
                 SizedBox(height: 0.8.h),
@@ -372,6 +377,51 @@ class _StatCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _AvatarImage extends StatelessWidget {
+  const _AvatarImage({this.avatarUrl});
+  final String? avatarUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? url = (avatarUrl ?? '').trim().isEmpty ? null : avatarUrl;
+    if (url == null) {
+      return SvgPicture.asset(
+        'assets/images/default_user.svg',
+        width: 39,
+        height: 39,
+      );
+    }
+    return ClipOval(
+      child: Image.network(
+        url,
+        width: 39,
+        height: 39,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) {
+          return SvgPicture.asset(
+            'assets/images/default_user.svg',
+            width: 39,
+            height: 39,
+          );
+        },
+      ),
+    );
+  }
+}
+
+String? _formatLevel(String? raw) {
+  if (raw == null || raw.isEmpty) return null;
+  final lower = raw.toLowerCase();
+  switch (lower) {
+    case 'silver':
+    case 'gold':
+    case 'diamond':
+      return lower[0].toUpperCase() + lower.substring(1);
+    default:
+      return raw;
   }
 }
 

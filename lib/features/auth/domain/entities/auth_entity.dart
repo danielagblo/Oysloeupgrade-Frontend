@@ -22,6 +22,7 @@ class AuthUserEntity extends Equatable {
   final bool? emailVerified;
   final String? preferredNotificationEmail;
   final String? preferredNotificationPhone;
+  final bool? adminVerified;
 
   const AuthUserEntity({
     required this.id,
@@ -45,6 +46,7 @@ class AuthUserEntity extends Equatable {
     this.emailVerified,
     this.preferredNotificationEmail,
     this.preferredNotificationPhone,
+    this.adminVerified,
   });
 
   @override
@@ -70,6 +72,7 @@ class AuthUserEntity extends Equatable {
         emailVerified,
         preferredNotificationEmail,
         preferredNotificationPhone,
+        adminVerified,
       ];
 }
 

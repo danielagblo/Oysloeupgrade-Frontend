@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shimmer/shimmer.dart';
 
 class RatingOverview extends StatelessWidget {
   final double rating;
@@ -244,4 +245,146 @@ class RatingBreakdown {
     required this.stars,
     required this.percentage,
   });
+}
+
+class RatingOverviewShimmer extends StatelessWidget {
+  const RatingOverviewShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.grayE4,
+      highlightColor: AppColors.white,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left placeholder
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 48.sp,
+                      height: 28.sp,
+                      decoration: BoxDecoration(
+                        color: AppColors.grayE4,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      width: 80,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: AppColors.grayE4,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: AppColors.grayE4,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(width: 6.w),
+                // Right placeholder - 5 rows of bars
+                Expanded(
+                  child: Column(
+                    children: List.generate(5, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: const BoxDecoration(
+                                color: AppColors.grayE4,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 14,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: AppColors.grayE4,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: AppColors.grayE4,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 28,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: AppColors.grayE4,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 2.h),
+            // Filter chips placeholders
+            Row(
+              children: List.generate(6, (index) {
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: index == 0 ? 0 : 4),
+                    child: Container(
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: AppColors.grayF9,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            SizedBox(height: 3.h),
+            // Button placeholder
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 5.h,
+                decoration: BoxDecoration(
+                  color: AppColors.grayF9,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

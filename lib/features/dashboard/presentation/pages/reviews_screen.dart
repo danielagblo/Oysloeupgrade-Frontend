@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
+import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/create_review_usecase.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ReviewsScreen extends StatefulWidget {
-  const ReviewsScreen({super.key});
+  const ReviewsScreen({super.key, required this.productId});
+
+  final int productId;
 
   @override
   State<ReviewsScreen> createState() => _ReviewsScreenState();
@@ -16,6 +21,7 @@ class ReviewsScreen extends StatefulWidget {
 class _ReviewsScreenState extends State<ReviewsScreen> {
   int _selectedRating = 0;
   final TextEditingController _commentController = TextEditingController();
+  bool _submitting = false;
 
   final List<String> _ratingLabels = [
     'Poor',
@@ -161,11 +167,47 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: CustomButton.filled(
-                              label: 'Send Review',
-                              backgroundColor: AppColors.white,
-                              onPressed: () {
-                                // Handle submit action
-                              }),
+                            label: _submitting ? 'Sending…' : 'Send Review',
+                            backgroundColor: AppColors.white,
+                            onPressed: _submitting
+                                ? null
+                                : () async {
+                                    if (_selectedRating <= 0) {
+                                      showErrorSnackBar(
+                                        context,
+                                        'Please select a rating to submit.',
+                                      );
+                                      return;
+                                    }
+
+                                    setState(() => _submitting = true);
+                                    final result = await sl<CreateReviewUseCase>()(
+                                      CreateReviewParams(
+                                        productId: widget.productId,
+                                        rating: _selectedRating,
+                                        comment:
+                                            _commentController.text.trim(),
+                                      ),
+                                    );
+
+                                    if (!mounted) return;
+
+                                    result.fold(
+                                      (failure) {
+                                        final message = failure.message.isEmpty
+                                            ? 'Unable to submit review.'
+                                            : failure.message;
+                                        showErrorSnackBar(context, message);
+                                        setState(() => _submitting = false);
+                                      },
+                                      (_) async {
+                                        showSuccessSnackBar(
+                                            context, 'Review submitted.');
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    );
+                                  },
+                          ),
                         ),
                         SizedBox(height: 2.h),
                       ],

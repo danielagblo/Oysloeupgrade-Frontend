@@ -9,6 +9,7 @@ class AppColors {
   static const Color primary = Color(0xFF74FFA7);
   static const Color white = Color(0xFFFFFFFF);
   static const Color grayF9 = Color(0xFFF9F9F9);
+  static const Color grayE4 = Color.fromARGB(255, 240, 240, 240);
   static const Color blueGray374957 = Color(0xFF374957);
   static const Color blueGray263238 = Color(0xFF263238);
   static const Color grayD9 = Color(0xFFD9D9D9);

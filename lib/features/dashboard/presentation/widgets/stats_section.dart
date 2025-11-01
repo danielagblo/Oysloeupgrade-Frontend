@@ -2,8 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/core/constants/category_names.dart';
+import 'package:oysloe_mobile/core/utils/category_utils.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_state.dart';
+import 'package:shimmer/shimmer.dart';
 
 class StatsSection extends StatefulWidget {
   const StatsSection({super.key});
@@ -16,14 +22,7 @@ class _StatsSectionState extends State<StatsSection>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _anim;
-
-  static const _items = <_StatItem>[
-    _StatItem(label: 'Electronics', valueText: '45k+', progress: 0.78),
-    _StatItem(label: 'Vehicle', valueText: '200+', progress: 0.42),
-    _StatItem(label: 'Furniture', valueText: '158+', progress: 0.66),
-    _StatItem(label: 'Sporting', valueText: '100+', progress: 0.85),
-    _StatItem(label: 'Fashion', valueText: '35+', progress: 0.28),
-  ];
+  bool _wasShimmer = true;
 
   @override
   void initState() {
@@ -44,42 +43,146 @@ class _StatsSectionState extends State<StatsSection>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (context, _) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            const count = 5;
-            final spacing = 1.5.w; 
-            final avail = constraints.maxWidth;
-            final size = math.min(
-              15.h,
-              (avail - spacing * (count - 1)) / count,
-            );
+    return BlocBuilder<ProductsCubit, ProductsState>(
+      builder: (context, state) {
+        final items = _buildItems(state);
+        final bool showShimmer =
+            state.status == ProductsStatus.initial ||
+                (state.isLoading && !state.hasData);
 
-            final children = <Widget>[];
-            for (var i = 0; i < _items.length; i++) {
-              final it = _items[i];
-              children.add(
-                _StatCircle(
-                  label: it.label,
-                  valueText: it.valueText,
-                  progress: it.progress * _anim.value,
-                  size: size,
-                ),
-              );
-              if (i != _items.length - 1) {
-                children.add(SizedBox(width: spacing));
-              }
-            }
+        if (_wasShimmer && !showShimmer) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _controller
+              ..reset()
+              ..forward();
+          });
+        }
+        _wasShimmer = showShimmer;
+        return AnimatedBuilder(
+          animation: _anim,
+          builder: (context, _) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                const count = 5;
+                final spacing = 1.5.w;
+                final avail = constraints.maxWidth;
+                final size = math.min(
+                  15.h,
+                  (avail - spacing * (count - 1)) / count,
+                );
 
-            return SizedBox(
-              height: size,
-              child: Row(children: children),
+                Widget row;
+                if (showShimmer) {
+                  final children = <Widget>[];
+                  for (var i = 0; i < count; i++) {
+                    children.add(_StatCircleShimmer(size: size));
+                    if (i != count - 1) children.add(SizedBox(width: spacing));
+                  }
+                  row = Shimmer.fromColors(
+                    baseColor: AppColors.grayE4,
+                    highlightColor: AppColors.white,
+                    child: Row(children: children),
+                  );
+                } else {
+                  final children = <Widget>[];
+                  for (var i = 0; i < items.length; i++) {
+                    final it = items[i];
+                    children.add(
+                      _StatCircle(
+                        label: it.label,
+                        valueText: it.valueText,
+                        progress:
+                            (it.progress).clamp(0.0, 1.0) * _anim.value,
+                        size: size,
+                      ),
+                    );
+                    if (i != items.length - 1) {
+                      children.add(SizedBox(width: spacing));
+                    }
+                  }
+                  row = Row(children: children);
+                }
+
+                return SizedBox(height: size, child: row);
+              },
             );
           },
         );
       },
+    );
+  }
+
+  List<_StatItem> _buildItems(ProductsState state) {
+    if (state.hasData) {
+      final stats = computeTopCategories(
+        state.products,
+        topN: 5,
+        resolveName: (id) => kCategoryNames[id],
+      );
+
+      if (stats.isNotEmpty) {
+        return stats
+            .map((s) => _StatItem(
+                  label: s.label,
+                  valueText: formatCountCompact(s.count),
+                  progress: s.ratio,
+                ))
+            .toList(growable: false);
+      }
+    }
+    return const <_StatItem>[];
+  }
+}
+
+class _StatCircleShimmer extends StatelessWidget {
+  const _StatCircleShimmer({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final double stroke = math.max(5.0, size * 0.05);
+    return SizedBox(
+      width: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.grayE4,
+                width: stroke,
+              ),
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: size * 0.6,
+                height: 8.sp,
+                decoration: BoxDecoration(
+                  color: AppColors.grayE4,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              SizedBox(height: 0.3.h),
+              Container(
+                width: size * 0.4,
+                height: 8.sp,
+                decoration: BoxDecoration(
+                  color: AppColors.grayE4,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

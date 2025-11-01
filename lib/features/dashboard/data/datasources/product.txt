@@ -1,0 +1,264 @@
+[
+  {
+    "id": 6,
+    "images": [],
+    "product_features": [],
+    "created_at": "2025-11-01T12:00:00.703683Z",
+    "updated_at": "2025-11-01T12:43:25.790805Z",
+    "pid": "pid_jbsxy4tin5b9bb2",
+    "name": "Fresh veges",
+    "image": "https://api.oysloe.com/assets/product_images/veges.webp",
+    "type": "SALE",
+    "status": "PENDING",
+    "description": "Fresh goods. Tastes good.",
+    "price": "300.00",
+    "category": 5
+  },
+  {
+    "id": 5,
+    "images": [
+      {
+        "id": 6,
+        "product": 5,
+        "image": "https://api.oysloe.com/assets/product_images/dress2.webp",
+        "created_at": "2025-11-01T11:55:43.005130Z"
+      }
+    ],
+    "product_features": [],
+    "created_at": "2025-11-01T11:53:43.430105Z",
+    "updated_at": "2025-11-01T11:53:43.430139Z",
+    "pid": "pid_pf2f4bclxsm77or",
+    "name": "Brown Jacket",
+    "image": "https://api.oysloe.com/assets/product_images/dress.webp",
+    "type": "RENT",
+    "status": "PENDING",
+    "description": "Women fashion",
+    "price": "3000.00",
+    "category": 4
+  },
+  {
+    "id": 4,
+    "images": [],
+    "product_features": [],
+    "created_at": "2025-11-01T11:39:19.728948Z",
+    "updated_at": "2025-11-01T11:39:19.728976Z",
+    "pid": "pid_ylyeauzvuif8hzl",
+    "name": "Office Desk",
+    "image": "https://api.oysloe.com/assets/product_images/desk.jpg",
+    "type": "SALE",
+    "status": "PENDING",
+    "description": "General office desk. Highly durable",
+    "price": "1200.00",
+    "category": 3
+  },
+  {
+    "id": 3,
+    "images": [
+      {
+        "id": 4,
+        "product": 3,
+        "image": "https://api.oysloe.com/assets/product_images/mac2.jpeg",
+        "created_at": "2025-11-01T09:50:47.491548Z"
+      },
+      {
+        "id": 5,
+        "product": 3,
+        "image": "https://api.oysloe.com/assets/product_images/mac3.jpg",
+        "created_at": "2025-11-01T09:50:58.765433Z"
+      }
+    ],
+    "product_features": [
+      {
+        "id": 3,
+        "product": 3,
+        "feature": {
+          "id": 6,
+          "created_at": "2025-11-01T10:20:15.442454Z",
+          "updated_at": "2025-11-01T10:20:47.464240Z",
+          "name": "Brand Color",
+          "description": "The color of the ad",
+          "subcategory": 16
+        },
+        "value": "Space Black"
+      },
+      {
+        "id": 4,
+        "product": 3,
+        "feature": {
+          "id": 5,
+          "created_at": "2025-11-01T10:19:55.416735Z",
+          "updated_at": "2025-11-01T10:19:55.416762Z",
+          "name": "Manufacturer",
+          "description": "Where it was assembled",
+          "subcategory": 16
+        },
+        "value": "Apple"
+      },
+      {
+        "id": 5,
+        "product": 3,
+        "feature": {
+          "id": 7,
+          "created_at": "2025-11-01T10:21:19.159294Z",
+          "updated_at": "2025-11-01T10:21:19.159320Z",
+          "name": "Year Make",
+          "description": "2024",
+          "subcategory": 16
+        },
+        "value": "2024"
+      },
+      {
+        "id": 6,
+        "product": 3,
+        "feature": {
+          "id": 13,
+          "created_at": "2025-11-01T11:07:06.842763Z",
+          "updated_at": "2025-11-01T11:07:06.842788Z",
+          "name": "OS",
+          "description": "Windows/mac/linux",
+          "subcategory": 16
+        },
+        "value": "Mac OS 18"
+      },
+      {
+        "id": 7,
+        "product": 3,
+        "feature": {
+          "id": 11,
+          "created_at": "2025-11-01T11:05:47.508869Z",
+          "updated_at": "2025-11-01T11:05:47.508897Z",
+          "name": "Ports",
+          "description": "Cable ports available",
+          "subcategory": 16
+        },
+        "value": "USB C (4)"
+      },
+      {
+        "id": 8,
+        "product": 3,
+        "feature": {
+          "id": 10,
+          "created_at": "2025-11-01T11:05:13.704839Z",
+          "updated_at": "2025-11-01T11:05:13.704864Z",
+          "name": "RAM",
+          "description": "Size of RAM",
+          "subcategory": 16
+        },
+        "value": "32 GB"
+      },
+      {
+        "id": 9,
+        "product": 3,
+        "feature": {
+          "id": 12,
+          "created_at": "2025-11-01T11:06:20.432856Z",
+          "updated_at": "2025-11-01T11:06:20.432881Z",
+          "name": "Screen Size",
+          "description": "Diagonal Screen measurement",
+          "subcategory": 16
+        },
+        "value": "14.2 HD"
+      },
+      {
+        "id": 10,
+        "product": 3,
+        "feature": {
+          "id": 9,
+          "created_at": "2025-11-01T11:04:56.023481Z",
+          "updated_at": "2025-11-01T11:04:56.023506Z",
+          "name": "Storage",
+          "description": "Size of storage",
+          "subcategory": 16
+        },
+        "value": "512 GB SSD"
+      },
+      {
+        "id": 11,
+        "product": 3,
+        "feature": {
+          "id": 8,
+          "created_at": "2025-11-01T11:04:22.366402Z",
+          "updated_at": "2025-11-01T11:04:22.366427Z",
+          "name": "State",
+          "description": "Brand new or used",
+          "subcategory": 16
+        },
+        "value": "Sealed in box"
+      }
+    ],
+    "created_at": "2025-11-01T09:47:50.945555Z",
+    "updated_at": "2025-11-01T09:47:50.945592Z",
+    "pid": "pid_masb74isa2y0j2n",
+    "name": "Macbook Pro",
+    "image": "https://api.oysloe.com/assets/product_images/mac1.webp",
+    "type": "SALE",
+    "status": "PENDING",
+    "description": "This is a MacBook Pro",
+    "price": "30000.00",
+    "category": 2
+  },
+  {
+    "id": 2,
+    "images": [
+      {
+        "id": 2,
+        "product": 2,
+        "image": "https://api.oysloe.com/assets/product_images/testla_roster.jpg",
+        "created_at": "2025-10-18T13:29:43.737485Z"
+      },
+      {
+        "id": 3,
+        "product": 2,
+        "image": "https://api.oysloe.com/assets/product_images/tesla_black.jpg",
+        "created_at": "2025-10-18T13:30:48.546695Z"
+      }
+    ],
+    "product_features": [],
+    "created_at": "2025-10-18T13:01:05.875697Z",
+    "updated_at": "2025-11-01T09:31:06.865294Z",
+    "pid": "pid_cjsw9qpd3khoeip",
+    "name": "Tesla",
+    "image": "https://api.oysloe.com/assets/product_images/teslaa.jpeg",
+    "type": "SALE",
+    "status": "PENDING",
+    "description": "Electric vehicle",
+    "price": "200000.00",
+    "category": 1
+  },
+  {
+    "id": 1,
+    "images": [
+      {
+        "id": 1,
+        "product": 1,
+        "image": "https://api.oysloe.com/assets/product_images/voxy_ODPtzfm.jpeg",
+        "created_at": "2025-10-18T00:41:56.590877Z"
+      }
+    ],
+    "product_features": [
+      {
+        "id": 1,
+        "product": 1,
+        "feature": {
+          "id": 1,
+          "created_at": "2025-10-18T00:23:45.425739Z",
+          "updated_at": "2025-10-18T00:23:45.425773Z",
+          "name": "State",
+          "description": "Can be brand new or used",
+          "subcategory": 1
+        },
+        "value": "Tear rubber"
+      }
+    ],
+    "created_at": "2025-10-18T00:29:21.137025Z",
+    "updated_at": "2025-10-18T00:29:21.137067Z",
+    "pid": "pid_flup6h49q2fn52e",
+    "name": "Toyota Voxy",
+    "image": "https://api.oysloe.com/assets/product_images/voxy.jpeg",
+    "type": "SALE",
+    "status": "PENDING",
+    "description": "This is a Toyota Voxy",
+    "price": "3000.00",
+    "category": 1
+  }
+]

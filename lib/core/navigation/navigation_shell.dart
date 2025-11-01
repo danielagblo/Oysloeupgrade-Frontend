@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/navigation/navigation_state.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
+import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/profile_menu_drawer.dart';
 
@@ -39,21 +42,38 @@ class _NavigationShellState extends State<NavigationShell> {
     }
   }
 
-  void _onTabTapped(int index) {
+  Future<bool> _ensureAuthenticated() async {
+    final AuthRepository repository = sl<AuthRepository>();
+    final session = await repository.cachedSession();
+    final bool isLoggedIn = session != null;
+
+    if (!isLoggedIn && mounted) {
+      showErrorSnackBar(context, 'Please log in to continue.');
+      context.go(AppRoutePaths.login);
+    }
+
+    return isLoggedIn;
+  }
+
+  Future<void> _onTabTapped(int index) async {
     switch (index) {
       case 0:
         context.go(AppRoutePaths.dashboardHome);
         break;
       case 1:
+        if (!await _ensureAuthenticated()) return;
         context.go(AppRoutePaths.dashboardAlerts);
         break;
       case 2:
+        if (!await _ensureAuthenticated()) return;
         context.go(AppRoutePaths.dashboardPostAd);
         break;
       case 3:
+        if (!await _ensureAuthenticated()) return;
         context.go(AppRoutePaths.dashboardInbox);
         break;
       case 4:
+        if (!await _ensureAuthenticated()) return;
         // Open the right drawer for Profile instead of navigating
         // If drawer is already open, close it.
         if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
@@ -108,7 +128,7 @@ class _NavigationShellState extends State<NavigationShell> {
           builder: (context, _) {
             return CustomBottomNavigation(
               currentIndex: _forcedIndex ?? widget.currentIndex,
-              onTap: _onTabTapped,
+              onTap: (index) => _onTabTapped(index),
             );
           },
         ),

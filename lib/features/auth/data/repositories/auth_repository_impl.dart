@@ -6,15 +6,19 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/network/network_info.dart';
 import '../../../../core/usecase/login_params.dart';
 import '../../../../core/usecase/otp_params.dart';
+import '../../../../core/usecase/reset_password_params.dart';
 import '../../../../core/usecase/register_params.dart';
 import '../../../../core/utils/logger.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/otp_entity.dart';
+import '../../domain/entities/reset_password_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
 import '../datasources/otp_remote_data_source.dart';
 import '../models/auth_session_model.dart';
+import '../models/otp_model.dart';
+import '../models/reset_password_response_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
@@ -45,8 +49,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     try {
-    final AuthSessionModel session =
-      await _remoteDataSource.register(params);
+      final AuthSessionModel session = await _remoteDataSource.register(params);
       return await _persistSession(session);
     } on ApiException catch (error) {
       return left(APIFailure(error.message));
@@ -67,8 +70,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     try {
-    final AuthSessionModel session =
-      await _remoteDataSource.login(params);
+      final AuthSessionModel session = await _remoteDataSource.login(params);
       return await _persistSession(session);
     } on ApiException catch (error) {
       return left(LoginFailure(error.message));
@@ -127,7 +129,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, OtpResponseEntity>> sendOtp(SendOtpParams params) async {
+  Future<Either<Failure, OtpResponseEntity>> sendOtp(
+      SendOtpParams params) async {
     final bool isConnected = await _network.isConnected;
     if (!isConnected) {
       return left(const NetworkFailure('No internet connection'));
@@ -148,21 +151,71 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, OtpResponseEntity>> verifyOtp(VerifyOtpParams params) async {
+  Future<Either<Failure, AuthSessionEntity>> verifyOtp(
+      VerifyOtpParams params) async {
     final bool isConnected = await _network.isConnected;
     if (!isConnected) {
       return left(const NetworkFailure('No internet connection'));
     }
 
     try {
-      final result = await _otpRemoteDataSource.verifyOtp(params);
-      return right(result);
+      final AuthSessionModel session =
+          await _otpRemoteDataSource.verifyOtp(params);
+      return await _persistSession(session);
     } on ApiException catch (error) {
       return left(APIFailure(error.message));
     } on ServerException catch (error) {
       return left(ServerFailure(error.message));
     } catch (error, stackTrace) {
       logError('Unexpected verifyOtp failure',
+          error: error, stackTrace: stackTrace);
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OtpResponseEntity>> verifyResetOtp(
+    VerifyOtpParams params,
+  ) async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final OtpResponseModel response =
+          await _otpRemoteDataSource.validateOtp(params);
+      return right(response);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError('Unexpected verifyResetOtp failure',
+          error: error, stackTrace: stackTrace);
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ResetPasswordResponseEntity>> resetPassword(
+    ResetPasswordParams params,
+  ) async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final ResetPasswordResponseModel response =
+          await _remoteDataSource.resetPassword(params);
+      return right(response);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError('Unexpected resetPassword failure',
           error: error, stackTrace: stackTrace);
       return left(const ServerFailure('Unexpected error occurred'));
     }

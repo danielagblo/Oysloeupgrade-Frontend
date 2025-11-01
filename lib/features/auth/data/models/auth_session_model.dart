@@ -23,6 +23,7 @@ class AuthUserModel extends AuthUserEntity {
     super.emailVerified,
     super.preferredNotificationEmail,
     super.preferredNotificationPhone,
+    super.adminVerified,
   });
 
   factory AuthUserModel.fromJson(Map<String, dynamic> json) {
@@ -52,6 +53,7 @@ class AuthUserModel extends AuthUserEntity {
           json['preferred_notification_email'] as String?,
       preferredNotificationPhone:
           json['preferred_notification_phone'] as String?,
+    adminVerified: json['admin_verified'] as bool?,
     );
   }
 
@@ -78,6 +80,7 @@ class AuthUserModel extends AuthUserEntity {
       emailVerified: entity.emailVerified,
       preferredNotificationEmail: entity.preferredNotificationEmail,
       preferredNotificationPhone: entity.preferredNotificationPhone,
+      adminVerified: entity.adminVerified,
     );
   }
 
@@ -103,6 +106,7 @@ class AuthUserModel extends AuthUserEntity {
         'email_verified': emailVerified,
         'preferred_notification_email': preferredNotificationEmail,
         'preferred_notification_phone': preferredNotificationPhone,
+        'admin_verified': adminVerified,
       }..removeWhere(
           (_, value) => value == null || (value is String && value.isEmpty),
         );

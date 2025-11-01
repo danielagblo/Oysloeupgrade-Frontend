@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
+import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ReviewsBottomSheet extends StatefulWidget {
@@ -12,6 +15,7 @@ class ReviewsBottomSheet extends StatefulWidget {
   final List<RatingBreakdown> ratingBreakdown;
   final List<ReviewComment> reviews;
   final int initialFilter;
+  final int productId;
 
   const ReviewsBottomSheet({
     super.key,
@@ -20,6 +24,7 @@ class ReviewsBottomSheet extends StatefulWidget {
     required this.ratingBreakdown,
     required this.reviews,
     this.initialFilter = 0,
+    required this.productId,
   });
 
   @override
@@ -105,17 +110,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  image: DecorationImage(
-                    image: AssetImage(review.userImage),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+              _buildAvatar(review),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -233,6 +228,78 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
             style: AppTypography.bodySmall,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(ReviewComment review) {
+    final raw = review.userImage?.trim();
+
+    if (raw == null || raw.isEmpty) {
+      return ClipRRect(
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.grayE4,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          width: 48,
+          height: 48,
+          child: SvgPicture.asset(
+            'assets/icons/bk_logo.svg',
+            width: 20,
+            height: 20,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+
+    final isUrl = raw.startsWith('http://') || raw.startsWith('https://');
+    final isSvg = raw.toLowerCase().endsWith('.svg');
+
+    if (isUrl && isSvg) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SvgPicture.network(
+          raw,
+          width: 48,
+          height: 48,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    if (isUrl) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          raw,
+          width: 48,
+          height: 48,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    if (isSvg) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SvgPicture.asset(
+          raw,
+          width: 48,
+          height: 48,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        raw,
+        width: 48,
+        height: 48,
+        fit: BoxFit.cover,
       ),
     );
   }
@@ -497,9 +564,35 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          context.pushNamed(AppRouteNames.dashboardReviews);
+                        onTap: () async {
+                          // Auth gate similar to tabs
+                          final repository = sl<AuthRepository>();
+                          final session = await repository.cachedSession();
+                          final isLoggedIn = session != null;
+                          if (!isLoggedIn && mounted) {
+                            showErrorSnackBar(
+                                context, 'Please log in to continue.');
+                            context.go(AppRoutePaths.login);
+                            return;
+                          }
+
+                          // Navigate to reviews page with productId and await result
+                          if (widget.productId <= 0) {
+                            showErrorSnackBar(
+                                context, 'Unable to identify this product.');
+                            return;
+                          }
+                          final bool? submitted = await context.pushNamed<bool>(
+                            AppRouteNames.dashboardReviews,
+                            extra: widget.productId > 0 ? widget.productId : null,
+                          );
+
+                          if (submitted == true && mounted) {
+                            Navigator.of(context).pop(true);
+                          } else {
+                            // If nothing happened, close as usual
+                            Navigator.of(context).pop();
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -562,7 +655,7 @@ class RatingBreakdown {
 
 class ReviewComment {
   final String userName;
-  final String userImage;
+  final String? userImage;
   final int rating;
   final String comment;
   final String date;
@@ -571,11 +664,11 @@ class ReviewComment {
 
   const ReviewComment({
     required this.userName,
-    required this.userImage,
+    this.userImage,
     required this.rating,
     required this.comment,
     required this.date,
-    required this.likes,
+    this.likes = 0,
     this.canEdit = false,
   });
 }

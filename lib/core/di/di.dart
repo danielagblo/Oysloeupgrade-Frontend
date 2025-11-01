@@ -69,6 +69,12 @@ Future<void> _initAuth() async {
     ..registerLazySingleton<VerifyOtpUseCase>(
       () => VerifyOtpUseCase(sl()),
     )
+    ..registerLazySingleton<VerifyResetOtpUseCase>(
+      () => VerifyResetOtpUseCase(sl()),
+    )
+    ..registerLazySingleton<ResetPasswordUseCase>(
+      () => ResetPasswordUseCase(sl()),
+    )
     ..registerFactory<RegisterCubit>(
       () => RegisterCubit(sl()),
     )
@@ -77,7 +83,38 @@ Future<void> _initAuth() async {
     )
     ..registerFactory<OtpCubit>(
       () => OtpCubit(sl(), sl()),
+    )
+    ..registerFactory<PasswordResetCubit>(
+      () => PasswordResetCubit(sl(), sl(), sl()),
     );
 
   await sl<GetCachedSessionUseCase>()(const NoParams());
+}
+
+Future<void> _initDashboard() async {
+  sl
+    ..registerLazySingleton<ProductsRemoteDataSource>(
+      () => ProductsRemoteDataSourceImpl(client: sl()),
+    )
+    ..registerLazySingleton<DashboardRepository>(
+      () => DashboardRepositoryImpl(
+        remoteDataSource: sl(),
+        network: sl(),
+      ),
+    )
+    ..registerLazySingleton<GetProductsUseCase>(
+      () => GetProductsUseCase(sl()),
+    )
+    ..registerLazySingleton<GetProductReviewsUseCase>(
+      () => GetProductReviewsUseCase(sl()),
+    )
+    ..registerLazySingleton<GetProductDetailUseCase>(
+      () => GetProductDetailUseCase(sl()),
+    )
+    ..registerLazySingleton<CreateReviewUseCase>(
+      () => CreateReviewUseCase(sl()),
+    )
+    ..registerFactory<ProductsCubit>(
+      () => ProductsCubit(sl()),
+    );
 }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/common/widgets/animated_gradient_search_input.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/categories_section.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/stats_section.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ads_section.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class AnimatedHomeScreen extends StatefulWidget {
@@ -131,79 +135,92 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
           ),
           // Body content
           Expanded(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 2.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 2.5.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w),
-                      child: AnimatedBuilder(
-                        animation: _animation,
-                        builder: (context, child) {
-                          return AnimatedOpacity(
-                            opacity:
-                                1.0 - (_animation.value * 1.2).clamp(0.0, 1.0),
-                            duration: const Duration(milliseconds: 200),
-                            child: Transform.translate(
-                              offset: Offset(0, _animation.value * -15),
-                              child: _buildFullSearch(),
-                            ),
-                          );
-                        },
+            child: RefreshIndicator(
+              color: AppColors.blueGray374957,
+              onRefresh: () => context.read<ProductsCubit>().fetch(),
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 2.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 2.5.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: AnimatedBuilder(
+                          animation: _animation,
+                          builder: (context, child) {
+                            return AnimatedOpacity(
+                              opacity:
+                                  1.0 - (_animation.value * 1.2).clamp(0.0, 1.0),
+                              duration: const Duration(milliseconds: 200),
+                              child: Transform.translate(
+                                offset: Offset(0, _animation.value * -15),
+                                child: _buildFullSearch(),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 3.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      child: const CategoriesSection(),
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Explore Ads',
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontSize: 17.sp,
-                          ),
+                      SizedBox(height: 3.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.w),
+                        child: CategoriesSection(
+                          onCategoryTap: (label) {
+                            context.pushNamed(
+                              AppRouteNames.dashboardCategoryAds,
+                              extra: label,
+                            );
+                          },
                         ),
-                        SizedBox(width: 3.w),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFF3F3F3),
-                            foregroundColor: AppColors.grayD9,
-                            elevation: 0,
-                            textStyle: AppTypography.body.copyWith(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Explore Ads',
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontSize: 17.sp,
                             ),
                           ),
-                          child: Text(
-                            'Show All',
-                            style: AppTypography.body.copyWith(
-                              color: AppColors.blueGray374957,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.bold,
+                          SizedBox(width: 3.w),
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF3F3F3),
+                              foregroundColor: AppColors.grayD9,
+                              elevation: 0,
+                              textStyle: AppTypography.body.copyWith(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            child: Text(
+                              'Show All',
+                              style: AppTypography.body.copyWith(
+                                color: AppColors.blueGray374957,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 3.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      child: const StatsSection(),
-                    ),
-                    SizedBox(height: 3.h),
-                    const AdsSection(),
-                    SizedBox(height: 3.h),
-                  ],
+                        ],
+                      ),
+                      SizedBox(height: 3.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.w),
+                        child: const StatsSection(),
+                      ),
+                      SizedBox(height: 3.h),
+                      const AdsSection(),
+                      SizedBox(height: 3.h),
+                    ],
+                  ),
                 ),
               ),
             ),

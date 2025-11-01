@@ -30,7 +30,7 @@ class OtpCubit extends Cubit<OtpState> {
     final result = await _verifyOtpUseCase(VerifyOtpParams(phone: phone, otp: otp));
     result.fold(
       (failure) => emit(OtpError(failure.message)),
-      (response) => emit(OtpVerified(response)),
+      (session) => emit(OtpVerified(session)),
     );
   }
 

@@ -2,13 +2,16 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/usecase/login_params.dart';
+import '../../../../core/usecase/reset_password_params.dart';
 import '../../../../core/usecase/register_params.dart';
 import '../../../../core/utils/api_helper.dart';
 import '../models/auth_session_model.dart';
+import '../models/reset_password_response_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthSessionModel> register(RegisterParams params);
   Future<AuthSessionModel> login(LoginParams params);
+  Future<ResetPasswordResponseModel> resetPassword(ResetPasswordParams params);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -16,11 +19,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required Dio client,
     this.registerEndpoint = 'register/',
     this.loginEndpoint = 'login/',
+    this.resetPasswordEndpoint = 'resetpassword/',
   }) : _client = client;
 
   final Dio _client;
   final String registerEndpoint;
   final String loginEndpoint;
+  final String resetPasswordEndpoint;
 
   @override
   Future<AuthSessionModel> register(RegisterParams params) async {
@@ -30,6 +35,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthSessionModel> login(LoginParams params) async {
     return _post(loginEndpoint, params.toJson());
+  }
+
+  @override
+  Future<ResetPasswordResponseModel> resetPassword(
+    ResetPasswordParams params,
+  ) async {
+    try {
+      final Response<dynamic> response = await _client.post<dynamic>(
+        resetPasswordEndpoint,
+        data: params.toJson(),
+      );
+      final Map<String, dynamic> data = ApiHelper.extractPayload(response);
+      return ResetPasswordResponseModel.fromJson(data);
+    } on DioException catch (error) {
+      throw ApiException(ApiHelper.getHumanReadableMessage(error));
+    } on ServerException {
+      rethrow;
+    } catch (error) {
+      throw ServerException(error.toString());
+    }
   }
 
   Future<AuthSessionModel> _post(
@@ -49,5 +74,4 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw ServerException(error.toString());
     }
   }
-
 }

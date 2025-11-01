@@ -3,15 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/navigation/navigation_shell.dart';
 import 'package:oysloe_mobile/core/di/dependency_injection.dart';
-import 'package:oysloe_mobile/features/auth/presentation/pages/email_password_reset.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/login_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/otp_login_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/otp_verification_screen.dart';
+import 'package:oysloe_mobile/features/auth/presentation/pages/email_password_reset.dart';
+import 'package:oysloe_mobile/features/auth/presentation/pages/password_reset_new_password_screen.dart';
+import 'package:oysloe_mobile/features/auth/presentation/pages/password_reset_otp_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/referral_code_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/pages/signup_screen.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_cubit.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/login/login_cubit.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/otp/otp_cubit.dart';
+import 'package:oysloe_mobile/features/auth/presentation/bloc/password_reset/password_reset_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/entities/product_entity.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_screen.dart';
@@ -19,6 +23,7 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/pages/category_ads.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/feedback_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/report_screen.dart';
@@ -34,6 +39,7 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_rev
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
 
@@ -45,6 +51,8 @@ class AppRouteNames {
   static const signup = 'signup';
   static const login = 'login';
   static const emailPasswordReset = 'email-password-reset';
+  static const passwordResetOtp = 'password-reset-otp';
+  static const passwordResetNewPassword = 'password-reset-new-password';
   static const otpLogin = 'otp-login';
   static const referralCode = 'referral-code';
   static const otpVerification = 'otp-verification';
@@ -72,6 +80,7 @@ class AppRouteNames {
   static const dashboardPrivacyPolicy = 'dashboard-privacy-policy';
   static const dashboardTermsConditions = 'dashboard-terms-conditions';
   static const dashboardAccount = 'dashboard-account';
+  static const dashboardCategoryAds = 'dashboard-category-ads';
 
   static const legacyHomeRedirect = 'legacy-home';
 }
@@ -82,6 +91,8 @@ class AppRoutePaths {
   static const signup = '/signup';
   static const login = '/login';
   static const emailPasswordReset = '/email-password-reset';
+  static const passwordResetOtp = '/password-reset-otp';
+  static const passwordResetNewPassword = '/password-reset-new-password';
   static const otpLogin = '/otp-login';
   static const referralCode = '/referral-code';
   static const otpVerification = '/otp-verification';
@@ -108,6 +119,7 @@ class AppRoutePaths {
   static const dashboardPrivacyPolicy = '/dashboard/privacy-policy';
   static const dashboardTermsConditions = '/dashboard/terms-conditions';
   static const dashboardAccount = '/dashboard/account';
+  static const dashboardCategoryAds = '/dashboard/category-ads';
 
   static const legacyHomeRedirect = '/home-screen';
 }
