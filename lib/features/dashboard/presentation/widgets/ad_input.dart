@@ -220,7 +220,7 @@ class AdDropdown<T> extends StatelessWidget {
             color: isDark ? AppColors.blueGray374957 : AppColors.white,
           ),
           child: DropdownButtonFormField<T>(
-            initialValue: value,
+            // initialValue: value,
             items: items,
             onChanged: enabled ? onChanged : null,
             validator: validator,

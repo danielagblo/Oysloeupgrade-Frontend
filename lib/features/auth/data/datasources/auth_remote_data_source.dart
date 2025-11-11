@@ -42,9 +42,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     ResetPasswordParams params,
   ) async {
     try {
+      final Options? options = params.token.isEmpty
+          ? null
+          : Options(
+              headers: <String, dynamic>{
+                'Authorization': 'Token ${params.token}',
+              },
+            );
       final Response<dynamic> response = await _client.post<dynamic>(
         resetPasswordEndpoint,
         data: params.toJson(),
+        options: options,
       );
       final Map<String, dynamic> data = ApiHelper.extractPayload(response);
       return ResetPasswordResponseModel.fromJson(data);

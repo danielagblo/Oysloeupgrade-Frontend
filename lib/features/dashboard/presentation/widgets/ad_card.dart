@@ -124,7 +124,7 @@ class AdCard extends StatelessWidget {
   Widget _buildTitle() {
     return Text(
       title,
-      maxLines: 2,
+      maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: AppTypography.body.copyWith(
         color: AppColors.blueGray374957,

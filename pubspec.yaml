@@ -19,9 +19,7 @@ dependencies:
   go_router: ^16.1.0
   flutter_svg: ^2.2.0
   lottie: ^3.1.2
-  flutter_chat_ui: ^2.9.0
   uuid: ^4.5.1
-  flutter_chat_types: ^3.6.2
   intl: ^0.20.2
   flutter_bloc: ^9.0.0
   get_it: ^7.7.0
@@ -32,7 +30,6 @@ dependencies:
   equatable: ^2.0.5
   pretty_dio_logger: ^1.4.0
   internet_connection_checker: ^3.0.1
-  validation_pro: ^2.1.0
   shimmer: ^3.0.0
 
 dev_dependencies:

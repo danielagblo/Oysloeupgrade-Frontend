@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:validation_pro/validate.dart';
 
 class CustomValidator {
+  static final _emailRegex = RegExp(
+    r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$',
+    caseSensitive: false,
+  );
+
   static String? isNotEmpty(String value) {
     if (value.trim().isEmpty) {
       return 'This field is required';
@@ -10,7 +14,7 @@ class CustomValidator {
   }
 
   static String? validateEmail(String email) {
-    if (!Validate.isEmail(email.trim())) {
+    if (!_emailRegex.hasMatch(email.trim())) {
       return 'Invalid email address';
     }
     return null;

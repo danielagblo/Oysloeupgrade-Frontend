@@ -44,12 +44,20 @@ class _PasswordResetOtpScreenState extends State<PasswordResetOtpScreen> {
         if (state is PasswordResetError) {
           showErrorSnackBar(context, state.message);
         } else if (state is PasswordResetOtpVerified) {
+          final String token = state.response.token;
           showSuccessSnackBar(context, state.response.message);
+          if (token.isEmpty) {
+            showErrorSnackBar(
+              context,
+              'Unable to continue. Please request a new OTP.',
+            );
+            return;
+          }
           context.pushNamed(
             AppRouteNames.passwordResetNewPassword,
             extra: <String, String>{
               'phone': widget.phone,
-              'otp': _enteredCode,
+              'token': token,
             },
           );
         } else if (state is PasswordResetOtpSent) {

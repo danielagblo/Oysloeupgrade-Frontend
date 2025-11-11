@@ -19,11 +19,11 @@ class PasswordResetNewPasswordScreen extends StatefulWidget {
   const PasswordResetNewPasswordScreen({
     super.key,
     required this.phone,
-    required this.otp,
+    required this.token,
   });
 
   final String phone;
-  final String otp;
+  final String token;
 
   @override
   State<PasswordResetNewPasswordScreen> createState() =>
@@ -33,14 +33,20 @@ class PasswordResetNewPasswordScreen extends StatefulWidget {
 class _PasswordResetNewPasswordScreenState
     extends State<PasswordResetNewPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _phoneController.text = widget.phone;
+  }
+
+  @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -52,12 +58,20 @@ class _PasswordResetNewPasswordScreenState
       return;
     }
 
+    if (widget.token.isEmpty) {
+      showErrorSnackBar(context, 'Session expired. Please request a new OTP.');
+      return;
+    }
+
     FocusScope.of(context).unfocus();
 
+    final String cleanedPhone =
+        CustomValidator.getCleanPhoneNumber(_phoneController.text.trim());
     final ResetPasswordParams params = ResetPasswordParams(
-      email: _emailController.text.trim(),
+      phone: cleanedPhone,
       newPassword: _newPasswordController.text,
       confirmPassword: _confirmPasswordController.text,
+      token: widget.token,
     );
     cubit.resetPassword(params);
   }
@@ -109,24 +123,25 @@ class _PasswordResetNewPasswordScreenState
                         ),
                         SizedBox(height: 4.h),
                         AppTextField(
-                          controller: _emailController,
-                          hint: 'Email Address',
-                          leadingSvgAsset: 'assets/icons/email.svg',
-                          keyboardType: TextInputType.emailAddress,
+                          controller: _phoneController,
+                          hint: '+233',
+                          leadingSvgAsset: 'assets/icons/phone.svg',
+                          keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.next,
                           enabled: !isSubmitting,
                           validator: (String? value) {
                             final String? emptyCheck =
                                 CustomValidator.isNotEmpty(value ?? '');
                             if (emptyCheck != null) return emptyCheck;
-                            return CustomValidator.validateEmail(value ?? '');
+                            return CustomValidator.validatePhoneNumber(
+                                value ?? '');
                           },
                         ),
                         SizedBox(height: 2.h),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Use the email linked to your account.',
+                            'Use the phone number linked to your account.',
                             style: AppTypography.bodySmall.copyWith(
                               color: const Color(0xFF646161),
                             ),

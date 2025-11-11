@@ -75,7 +75,7 @@ final List<RouteBase> routes = <RouteBase>[
       final Map<String, String> data =
           (state.extra as Map<String, String>?) ?? const <String, String>{};
       final String phone = data['phone'] ?? '';
-      final String otp = data['otp'] ?? '';
+      final String token = data['token'] ?? '';
       return buildPageWithDefaultTransition(
         context: context,
         state: state,
@@ -83,7 +83,7 @@ final List<RouteBase> routes = <RouteBase>[
           create: (_) => sl<PasswordResetCubit>(),
           child: PasswordResetNewPasswordScreen(
             phone: phone,
-            otp: otp,
+            token: token,
           ),
         ),
       );
