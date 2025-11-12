@@ -21,11 +21,25 @@ class ApiHelper {
     if (response?.data is Map<String, dynamic>) {
       final Map<String, dynamic> map =
           Map<String, dynamic>.from(response!.data as Map<String, dynamic>);
-      const List<String> keys = <String>['message', 'detail', 'error', 'error_message'];
+      const List<String> keys = <String>[
+        'message',
+        'detail',
+        'error',
+        'error_message',
+        'non_field_errors',
+      ];
       for (final String key in keys) {
+        if (!map.containsKey(key)) continue;
         final dynamic value = map[key];
-        if (value is String && value.isNotEmpty) {
-          return value;
+        if (value is String && value.trim().isNotEmpty) {
+          return value.trim();
+        }
+        if (value is List && value.isNotEmpty) {
+          for (final dynamic item in value) {
+            if (item is String && item.trim().isNotEmpty) {
+              return item.trim();
+            }
+          }
         }
       }
     }

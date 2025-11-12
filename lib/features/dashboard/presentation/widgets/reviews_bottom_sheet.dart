@@ -506,9 +506,13 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                                       ),
                                     ),
                                     const SizedBox(width: 12),
-                                    Text(
-                                      '${breakdown.percentage.round()}%',
-                                      style: AppTypography.bodySmall,
+                                    SizedBox(
+                                      width: 30,
+                                      child: Text(
+                                        '${breakdown.percentage.round()}%',
+                                        style: AppTypography.bodySmall,
+                                        textAlign: TextAlign.right,
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -13,6 +13,7 @@ import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/utils/formatters.dart';
 import 'package:oysloe_mobile/core/utils/rating_utils.dart';
+import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/entities/product_entity.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/entities/review_entity.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_detail_usecase.dart';
@@ -111,6 +112,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
   List<ReviewEntity> _reviews = <ReviewEntity>[];
   RatingSummary _ratingSummary = RatingSummary.empty;
   bool _isReviewsLoading = false;
+  String? _currentUserNameKey;
+  String? _currentUserEmailKey;
 
   ProductEntity? get _product => _productOverride ?? widget.product;
 
@@ -419,15 +422,44 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
           ? '--'
           : formatter.format(createdAt);
       final String comment = review.comment.trim();
+      final bool showAsMe =
+          comment.isNotEmpty && _isCurrentUsersReview(review);
+      final String displayName = showAsMe ? 'Me' : review.userName;
 
       return reviews_widget.ReviewComment(
-        userName: review.userName,
+        userName: displayName,
         userImage: avatar,
         rating: review.rating,
         comment: comment.isNotEmpty ? comment : 'No comment provided.',
         date: dateLabel,
       );
     }).toList();
+  }
+
+  bool _isCurrentUsersReview(ReviewEntity review) {
+    final String? normalizedReviewName =
+        _normalizeIdentifier(review.userName);
+    if (normalizedReviewName == null) {
+      return false;
+    }
+
+    if (_currentUserNameKey != null &&
+        normalizedReviewName == _currentUserNameKey) {
+      return true;
+    }
+
+    if (_currentUserEmailKey != null &&
+        normalizedReviewName == _currentUserEmailKey) {
+      return true;
+    }
+
+    return false;
+  }
+
+  String? _normalizeIdentifier(String? value) {
+    if (value == null) return null;
+    final String trimmed = value.trim().toLowerCase();
+    return trimmed.isEmpty ? null : trimmed;
   }
 
   List<reviews_widget.RatingBreakdown> _buildBottomSheetBreakdown(
@@ -538,6 +570,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshReviews();
     });
+
+    _hydrateCurrentUser();
   }
 
   void _scrollCards(bool forward) {
@@ -661,6 +695,32 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
     if (errorMessage != null && _reviews.isEmpty) {
       showErrorSnackBar(context, errorMessage!);
+    }
+  }
+
+  Future<void> _hydrateCurrentUser() async {
+    try {
+      final AuthRepository authRepository = sl<AuthRepository>();
+      final session = await authRepository.cachedSession();
+      if (!mounted) return;
+      final user = session?.user;
+
+      final String? normalizedName =
+          _normalizeIdentifier(user?.name);
+      final String? normalizedEmail =
+          _normalizeIdentifier(user?.email);
+
+      if (normalizedName == _currentUserNameKey &&
+          normalizedEmail == _currentUserEmailKey) {
+        return;
+      }
+
+      setState(() {
+        _currentUserNameKey = normalizedName;
+        _currentUserEmailKey = normalizedEmail;
+      });
+    } catch (_) {
+      // No-op: session data is optional for reviews rendering.
     }
   }
 

@@ -114,6 +114,7 @@ class RatingOverview extends StatelessWidget {
                                     ),
                                   ),
                                   FractionallySizedBox(
+                                    alignment: Alignment.centerLeft,
                                     widthFactor: breakdown.percentage / 100,
                                     child: Container(
                                       height: 6,
@@ -127,9 +128,13 @@ class RatingOverview extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 12),
-                            Text(
-                              '${breakdown.percentage.round()}%',
-                              style: AppTypography.bodySmall,
+                            SizedBox(
+                              width: 30,
+                              child: Text(
+                                '${breakdown.percentage.round()}%',
+                                style: AppTypography.bodySmall,
+                                textAlign: TextAlign.right,
+                              ),
                             ),
                           ],
                         ),

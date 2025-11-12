@@ -167,8 +167,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: CustomButton.filled(
-                            label: _submitting ? 'Sending…' : 'Send Review',
+                            label: 'Send Review',
                             backgroundColor: AppColors.white,
+                            isLoading: _submitting,
                             onPressed: _submitting
                                 ? null
                                 : () async {
