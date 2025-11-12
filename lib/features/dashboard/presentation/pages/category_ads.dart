@@ -303,12 +303,14 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
 
   Widget _buildBody(String categoryFilterLabel) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: Column(
         children: [
           SafeArea(
             bottom: false,
             child: Container(
               height: 60,
+              color: AppColors.white,
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: AnimatedBuilder(
                 animation: _animation,
@@ -364,175 +366,237 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
             ),
           ),
           Expanded(
-            child: RefreshIndicator(
-              color: AppColors.blueGray374957,
-              onRefresh: () => context.read<ProductsCubit>().fetch(),
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(height: 2.5.h),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        child: AnimatedBuilder(
-                          animation: _animation,
-                          builder: (context, child) {
-                            return AnimatedOpacity(
-                              opacity: 1.0 -
-                                  (_animation.value * 1.2).clamp(0.0, 1.0),
-                              duration: const Duration(milliseconds: 200),
-                              child: Transform.translate(
-                                offset: Offset(0, _animation.value * -15),
-                                child: AnimatedGradientSearchInput.full(
-                                  controller: _searchController,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return RefreshIndicator(
+                  color: AppColors.blueGray374957,
+                  onRefresh: () => context.read<ProductsCubit>().fetch(),
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Container(
+                        color: AppColors.grayF9,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.only(bottom: 2.h),
+                              decoration: const BoxDecoration(
+                                color: AppColors.white,
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 2.w),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    SizedBox(height: 2.5.h),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 8.w),
+                                      child: AnimatedBuilder(
+                                        animation: _animation,
+                                        builder: (context, child) {
+                                          return AnimatedOpacity(
+                                            opacity: 1.0 -
+                                                (_animation.value * 1.2)
+                                                    .clamp(0.0, 1.0),
+                                            duration: const Duration(
+                                                milliseconds: 200),
+                                            child: Transform.translate(
+                                              offset: Offset(
+                                                  0, _animation.value * -15),
+                                              child: AnimatedGradientSearchInput
+                                                  .full(
+                                                controller: _searchController,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 2.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Transform.translate(
+                                    offset: Offset(0, -4.h),
+                                    child: GridView(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 4,
+                                        mainAxisSpacing: 1.0.h,
+                                        crossAxisSpacing: 1.6.w,
+                                        childAspectRatio: 2.6,
+                                      ),
+                                      children: [
+                                        _FilterPill(
+                                          label: categoryFilterLabel,
+                                          icon: Icons.unfold_more,
+                                          onTap: _openCategoryChooser,
+                                        ),
+                                        _FilterPill(
+                                          label:
+                                              _selectedLocation ?? 'Locations',
+                                          icon: Icons.place_outlined,
+                                          onTap: () async {
+                                            final picked = await _pickOne(
+                                                'Locations',
+                                                AdLocationDropdown.locations);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedLocation = picked);
+                                            }
+                                          },
+                                        ),
+                                        _FilterPill(
+                                          label:
+                                              _selectedPurpose ?? 'Ad Purpose',
+                                          icon: Icons.sell_outlined,
+                                          onTap: () async {
+                                            const options = [
+                                              'Sale',
+                                              'Rent',
+                                              'High Purchase'
+                                            ];
+                                            final picked = await _pickOne(
+                                                'Ad Purpose', options);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedPurpose = picked);
+                                            }
+                                          },
+                                        ),
+                                        _FilterPill(
+                                          label:
+                                              _selectedHighlight ?? 'Highlights',
+                                          icon: Icons.collections_outlined,
+                                          onTap: () async {
+                                            const options = [
+                                              'New Arrival',
+                                              'Top Rated',
+                                              'Discount',
+                                              'Trending'
+                                            ];
+                                            final picked = await _pickOne(
+                                                'Highlights', options);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedHighlight = picked);
+                                            }
+                                          },
+                                        ),
+                                        _FilterPill(
+                                          label:
+                                              _selectedPricing ?? 'Pricing',
+                                          icon: Icons.link_outlined,
+                                          onTap: () async {
+                                            const options = [
+                                              'Any',
+                                              'Under GHS 1,000',
+                                              'GHS 1,000 - 5,000',
+                                              'Above GHS 5,000'
+                                            ];
+                                            final picked = await _pickOne(
+                                                'Pricing', options);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedPricing = picked);
+                                            }
+                                          },
+                                        ),
+                                        _FilterPill(
+                                          label: _selectedParam1 ?? 'Parameter 1',
+                                          icon: Icons.more_vert,
+                                          onTap: () async {
+                                            const options = [
+                                              'Option 1',
+                                              'Option 2',
+                                              'Option 3'
+                                            ];
+                                            final picked = await _pickOne(
+                                                'Parameter 1', options);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedParam1 = picked);
+                                            }
+                                          },
+                                        ),
+                                        _FilterPill(
+                                          label: _selectedParam2 ?? 'Parameter 2',
+                                          icon: Icons.more_vert,
+                                          onTap: () async {
+                                            const options = [
+                                              'Option 1',
+                                              'Option 2',
+                                              'Option 3'
+                                            ];
+                                            final picked = await _pickOne(
+                                                'Parameter 2', options);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedParam2 = picked);
+                                            }
+                                          },
+                                        ),
+                                        _FilterPill(
+                                          label: _selectedParam3 ?? 'Parameter 3',
+                                          icon: Icons.more_vert,
+                                          onTap: () async {
+                                            const options = [
+                                              'Option 1',
+                                              'Option 2',
+                                              'Option 3'
+                                            ];
+                                            final picked = await _pickOne(
+                                                'Parameter 3', options);
+                                            if (picked != null) {
+                                              setState(() =>
+                                                  _selectedParam3 = picked);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Transform.translate(
+                                    offset: Offset(0, -2.5.h),
+                                    child: _CategoryProductsGrid(
+                                      selectedCategoryId: _selectedCategoryId,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3.h),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      GridView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          mainAxisSpacing: 1.0.h,
-                          crossAxisSpacing: 1.6.w,
-                          childAspectRatio: 2.6,
-                        ),
-                        children: [
-                          _FilterPill(
-                            label: categoryFilterLabel,
-                            icon: Icons.unfold_more,
-                            onTap: _openCategoryChooser,
-                          ),
-                          _FilterPill(
-                            label: _selectedLocation ?? 'Locations',
-                            icon: Icons.place_outlined,
-                            onTap: () async {
-                              final picked = await _pickOne(
-                                  'Locations', AdLocationDropdown.locations);
-                              if (picked != null) {
-                                setState(() => _selectedLocation = picked);
-                              }
-                            },
-                          ),
-                          _FilterPill(
-                            label: _selectedPurpose ?? 'Ad Purpose',
-                            icon: Icons.sell_outlined,
-                            onTap: () async {
-                              const options = ['Sale', 'Rent', 'High Purchase'];
-                              final picked =
-                                  await _pickOne('Ad Purpose', options);
-                              if (picked != null) {
-                                setState(() => _selectedPurpose = picked);
-                              }
-                            },
-                          ),
-                          _FilterPill(
-                            label: _selectedHighlight ?? 'Highlights',
-                            icon: Icons.collections_outlined,
-                            onTap: () async {
-                              const options = [
-                                'New Arrival',
-                                'Top Rated',
-                                'Discount',
-                                'Trending'
-                              ];
-                              final picked =
-                                  await _pickOne('Highlights', options);
-                              if (picked != null) {
-                                setState(() => _selectedHighlight = picked);
-                              }
-                            },
-                          ),
-                          _FilterPill(
-                            label: _selectedPricing ?? 'Pricing',
-                            icon: Icons.link_outlined,
-                            onTap: () async {
-                              const options = [
-                                'Any',
-                                'Under GHS 1,000',
-                                'GHS 1,000 - 5,000',
-                                'Above GHS 5,000'
-                              ];
-                              final picked = await _pickOne('Pricing', options);
-                              if (picked != null) {
-                                setState(() => _selectedPricing = picked);
-                              }
-                            },
-                          ),
-                          _FilterPill(
-                            label: _selectedParam1 ?? 'Parameter 1',
-                            icon: Icons.more_vert,
-                            onTap: () async {
-                              const options = [
-                                'Option 1',
-                                'Option 2',
-                                'Option 3'
-                              ];
-                              final picked =
-                                  await _pickOne('Parameter 1', options);
-                              if (picked != null) {
-                                setState(() => _selectedParam1 = picked);
-                              }
-                            },
-                          ),
-                          _FilterPill(
-                            label: _selectedParam2 ?? 'Parameter 2',
-                            icon: Icons.more_vert,
-                            onTap: () async {
-                              const options = [
-                                'Option 1',
-                                'Option 2',
-                                'Option 3'
-                              ];
-                              final picked =
-                                  await _pickOne('Parameter 2', options);
-                              if (picked != null) {
-                                setState(() => _selectedParam2 = picked);
-                              }
-                            },
-                          ),
-                          _FilterPill(
-                            label: _selectedParam3 ?? 'Parameter 3',
-                            icon: Icons.more_vert,
-                            onTap: () async {
-                              const options = [
-                                'Option 1',
-                                'Option 2',
-                                'Option 3'
-                              ];
-                              final picked =
-                                  await _pickOne('Parameter 3', options);
-                              if (picked != null) {
-                                setState(() => _selectedParam3 = picked);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 3.h),
-                      _CategoryProductsGrid(
-                        selectedCategoryId: _selectedCategoryId,
-                      ),
-                      SizedBox(height: 3.h),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ],
       ),
     );
   }
+
 }
 
 class _FilterPill extends StatelessWidget {
@@ -550,7 +614,7 @@ class _FilterPill extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.redFF6B6B,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -560,15 +624,14 @@ class _FilterPill extends StatelessWidget {
               child: Text(
                 label,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.blueGray374957,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   fontSize: 12.sp,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 3),
             Icon(
               icon,
               size: 14,

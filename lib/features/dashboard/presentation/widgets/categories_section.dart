@@ -262,8 +262,8 @@ class _CategoriesSkeleton extends StatelessWidget {
             ),
             SizedBox(height: 0.8.h),
             Container(
-              height: 12.sp,
-              width: 48.sp,
+              height: 10.sp,
+              width: 38.sp,
               decoration: BoxDecoration(
                 color: AppColors.grayE4,
                 borderRadius: BorderRadius.circular(8),

@@ -32,7 +32,7 @@ class AdCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.grayF9,
+          color: Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
