@@ -16,6 +16,7 @@ class ProductModel extends ProductEntity {
     required super.category,
     required super.createdAt,
     required super.updatedAt,
+    super.location,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +34,7 @@ class ProductModel extends ProductEntity {
       category: _parseCategory(json['category']),
       createdAt: DateUtilsExt.parseOrEpoch(json['created_at'] as String?),
       updatedAt: DateUtilsExt.parseOrEpoch(json['updated_at'] as String?),
+      location: _parseLocation(json['location']),
     );
   }
 
@@ -109,5 +111,29 @@ class ProductModel extends ProductEntity {
     if (value == null) return null;
     final String result = value.toString().trim();
     return result.isEmpty ? null : result;
+  }
+
+  static ProductLocation? _parseLocation(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return ProductLocation(
+        id: _parseNullableInt(value['id']),
+        name: _resolveString(value['name']),
+        region: _resolveString(value['region']),
+      );
+    }
+
+    final String? resolved = _resolveString(value);
+    if (resolved != null) {
+      return ProductLocation(name: resolved);
+    }
+    return null;
+  }
+
+  static int? _parseNullableInt(dynamic value) {
+    if (value is int) return value;
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    return null;
   }
 }

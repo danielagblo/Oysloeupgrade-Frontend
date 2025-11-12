@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/alerts_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/home_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -15,12 +19,28 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const AnimatedHomeScreen(),
-    const AlertsScreen(),
-    const PostAdUploadImagesScreen(),
-    const InboxScreen(),
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => sl<ProductsCubit>()..fetch(),
+          ),
+          BlocProvider(
+            create: (_) => sl<CategoriesCubit>()..fetch(),
+          ),
+        ],
+        child: const AnimatedHomeScreen(),
+      ),
+      const AlertsScreen(),
+      const PostAdUploadImagesScreen(),
+      const InboxScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

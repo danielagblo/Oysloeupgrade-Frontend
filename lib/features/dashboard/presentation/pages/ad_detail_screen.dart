@@ -170,7 +170,14 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
   String get _resolvedTitle => widget.title ?? _product?.name ?? 'Ad details';
 
-  String get _resolvedLocation => widget.location ?? 'Accra, Ghana';
+  String get _resolvedLocation {
+    final String? extraLocation = widget.location?.trim();
+    if (extraLocation != null && extraLocation.isNotEmpty) {
+      return extraLocation;
+    }
+    final ProductLocation? productLocation = _product?.location;
+    return productLocation?.label ?? 'Accra, Ghana';
+  }
 
   String get _resolvedDescription => _product?.description.trim() ?? '';
 

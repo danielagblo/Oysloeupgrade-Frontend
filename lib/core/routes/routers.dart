@@ -151,8 +151,15 @@ final List<RouteBase> routes = <RouteBase>[
           return buildPageWithDefaultTransition(
             context: context,
             state: state,
-            child: BlocProvider(
-              create: (_) => sl<ProductsCubit>()..fetch(),
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (_) => sl<ProductsCubit>()..fetch(),
+                ),
+                BlocProvider(
+                  create: (_) => sl<CategoriesCubit>()..fetch(),
+                ),
+              ],
               child: const AnimatedHomeScreen(),
             ),
           );
@@ -268,13 +275,38 @@ final List<RouteBase> routes = <RouteBase>[
         name: AppRouteNames.dashboardCategoryAds,
         path: AppRoutePaths.dashboardCategoryAds,
         pageBuilder: (context, state) {
-          final String? initialCategory = state.extra as String?;
+          String? initialCategory;
+          int? initialCategoryId;
+          final Object? extra = state.extra;
+
+          if (extra is Map<String, dynamic>) {
+            initialCategory = extra['label'] as String?;
+            final Object? rawId = extra['categoryId'];
+            if (rawId is int) {
+              initialCategoryId = rawId;
+            } else if (rawId is String) {
+              initialCategoryId = int.tryParse(rawId);
+            }
+          } else if (extra is String) {
+            initialCategory = extra;
+          }
+
           return buildPageWithDefaultTransition(
             context: context,
             state: state,
-            child: BlocProvider(
-              create: (_) => sl<ProductsCubit>()..fetch(),
-              child: CategoryAdsScreen(initialCategoryLabel: initialCategory),
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (_) => sl<ProductsCubit>()..fetch(),
+                ),
+                BlocProvider(
+                  create: (_) => sl<CategoriesCubit>()..fetch(),
+                ),
+              ],
+              child: CategoryAdsScreen(
+                initialCategoryLabel: initialCategory,
+                initialCategoryId: initialCategoryId,
+              ),
             ),
           );
         },

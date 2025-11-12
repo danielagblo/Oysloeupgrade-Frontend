@@ -5,10 +5,10 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
-import 'package:oysloe_mobile/core/constants/category_names.dart';
 import 'package:oysloe_mobile/core/utils/category_utils.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_state.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
 import 'package:shimmer/shimmer.dart';
 
 class StatsSection extends StatefulWidget {
@@ -45,10 +45,20 @@ class _StatsSectionState extends State<StatsSection>
   Widget build(BuildContext context) {
     return BlocBuilder<ProductsCubit, ProductsState>(
       builder: (context, state) {
-        final items = _buildItems(state);
-        final bool showShimmer =
-            state.status == ProductsStatus.initial ||
-                (state.isLoading && !state.hasData);
+        final Map<int, String> categoryNames =
+            context.select<CategoriesCubit, Map<int, String>>(
+          (cubit) {
+            final entries = cubit.state.categories;
+            if (entries.isEmpty) return const <int, String>{};
+            return <int, String>{
+              for (final category in entries) category.id: category.name,
+            };
+          },
+        );
+
+        final items = _buildItems(state, categoryNames);
+        final bool showShimmer = state.status == ProductsStatus.initial ||
+            (state.isLoading && !state.hasData);
 
         if (_wasShimmer && !showShimmer) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -92,8 +102,7 @@ class _StatsSectionState extends State<StatsSection>
                       _StatCircle(
                         label: it.label,
                         valueText: it.valueText,
-                        progress:
-                            (it.progress).clamp(0.0, 1.0) * _anim.value,
+                        progress: (it.progress).clamp(0.0, 1.0) * _anim.value,
                         size: size,
                       ),
                     );
@@ -113,12 +122,15 @@ class _StatsSectionState extends State<StatsSection>
     );
   }
 
-  List<_StatItem> _buildItems(ProductsState state) {
+  List<_StatItem> _buildItems(
+    ProductsState state,
+    Map<int, String> categoryNames,
+  ) {
     if (state.hasData) {
       final stats = computeTopCategories(
         state.products,
         topN: 5,
-        resolveName: (id) => kCategoryNames[id],
+        resolveName: (id) => categoryNames[id],
       );
 
       if (stats.isNotEmpty) {
@@ -213,7 +225,7 @@ class _StatCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double stroke = math.max(5.0, size * 0.05); 
+    final double stroke = math.max(5.0, size * 0.05);
     return SizedBox(
       width: size,
       child: Stack(

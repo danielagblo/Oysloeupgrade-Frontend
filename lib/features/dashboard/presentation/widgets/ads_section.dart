@@ -70,6 +70,10 @@ class AdsSection extends StatelessWidget {
     return <String>[_currencyFormatter.formatRaw(rawPrice)];
   }
 
+  static String _resolveLocation(ProductEntity product) {
+    return product.location?.label ?? _defaultLocation;
+  }
+
   static AdDealType _resolveDealType(ProductEntity product) {
     final String normalizedType = product.type.trim().toLowerCase();
     switch (normalizedType) {
@@ -104,6 +108,7 @@ class AdsSection extends StatelessWidget {
     ProductEntity product,
     String imageUrl,
     List<String> prices,
+    String location,
   ) {
     final AdDealType dealType = _resolveDealType(product);
     final String currentLocation = GoRouterState.of(context).uri.toString();
@@ -122,7 +127,7 @@ class AdsSection extends StatelessWidget {
         'adType': dealType,
         'imageUrl': imageUrl,
         'title': product.name,
-        'location': _defaultLocation,
+        'location': location,
         'prices': prices,
         'product': product,
       },
@@ -241,6 +246,7 @@ class _ProductsGrid extends StatelessWidget {
             final ProductEntity product = products[index];
             final String imageUrl = AdsSection._resolveImage(product);
             final List<String> prices = AdsSection._buildPrices(product);
+            final String location = AdsSection._resolveLocation(product);
 
             return GestureDetector(
               onTap: () => AdsSection._openDetails(
@@ -248,11 +254,12 @@ class _ProductsGrid extends StatelessWidget {
                 product,
                 imageUrl,
                 prices,
+                location,
               ),
               child: AdCard(
                 imageUrl: imageUrl,
                 title: product.name,
-                location: AdsSection._defaultLocation,
+                location: location,
                 prices: prices,
                 type: AdsSection._resolveDealType(product),
               ),

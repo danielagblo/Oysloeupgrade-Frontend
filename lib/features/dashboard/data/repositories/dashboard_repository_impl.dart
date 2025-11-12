@@ -7,16 +7,21 @@ import '../../../../core/utils/logger.dart';
 import '../../domain/entities/product_entity.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 import '../../domain/entities/review_entity.dart';
+import '../../domain/entities/category_entity.dart';
 import '../datasources/products_remote_data_source.dart';
+import '../datasources/categories_remote_data_source.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
   DashboardRepositoryImpl({
     required ProductsRemoteDataSource remoteDataSource,
+    required CategoriesRemoteDataSource categoriesRemoteDataSource,
     required Network network,
   })  : _remoteDataSource = remoteDataSource,
+        _categoriesRemoteDataSource = categoriesRemoteDataSource,
         _network = network;
 
   final ProductsRemoteDataSource _remoteDataSource;
+  final CategoriesRemoteDataSource _categoriesRemoteDataSource;
   final Network _network;
 
   @override
@@ -130,6 +135,32 @@ class DashboardRepositoryImpl implements DashboardRepository {
     } catch (error, stackTrace) {
       logError(
         'Unexpected create review failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CategoryEntity>>> getCategories() async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final List<CategoryEntity> categories =
+          (await _categoriesRemoteDataSource.getCategories())
+              .cast<CategoryEntity>();
+      return right(categories);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError(
+        'Unexpected categories fetch failure',
         error: error,
         stackTrace: stackTrace,
       );

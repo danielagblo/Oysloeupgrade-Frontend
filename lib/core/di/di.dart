@@ -96,9 +96,13 @@ Future<void> _initDashboard() async {
     ..registerLazySingleton<ProductsRemoteDataSource>(
       () => ProductsRemoteDataSourceImpl(client: sl()),
     )
+    ..registerLazySingleton<CategoriesRemoteDataSource>(
+      () => CategoriesRemoteDataSourceImpl(client: sl()),
+    )
     ..registerLazySingleton<DashboardRepository>(
       () => DashboardRepositoryImpl(
         remoteDataSource: sl(),
+        categoriesRemoteDataSource: sl(),
         network: sl(),
       ),
     )
@@ -111,10 +115,16 @@ Future<void> _initDashboard() async {
     ..registerLazySingleton<GetProductDetailUseCase>(
       () => GetProductDetailUseCase(sl()),
     )
+    ..registerLazySingleton<GetCategoriesUseCase>(
+      () => GetCategoriesUseCase(sl()),
+    )
     ..registerLazySingleton<CreateReviewUseCase>(
       () => CreateReviewUseCase(sl()),
     )
     ..registerFactory<ProductsCubit>(
       () => ProductsCubit(sl()),
+    )
+    ..registerFactory<CategoriesCubit>(
+      () => CategoriesCubit(sl()),
     );
 }

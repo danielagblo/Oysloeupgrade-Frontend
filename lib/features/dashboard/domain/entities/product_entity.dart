@@ -15,6 +15,7 @@ class ProductEntity extends Equatable {
     required this.category,
     required this.createdAt,
     required this.updatedAt,
+    this.location,
   });
 
   final int id;
@@ -30,6 +31,7 @@ class ProductEntity extends Equatable {
   final int category;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final ProductLocation? location;
 
   @override
   List<Object?> get props => <Object?>[
@@ -46,5 +48,38 @@ class ProductEntity extends Equatable {
         category,
         createdAt,
         updatedAt,
+        location,
       ];
+}
+
+class ProductLocation extends Equatable {
+  const ProductLocation({
+    this.id,
+    this.name,
+    this.region,
+  });
+
+  final int? id;
+  final String? name;
+  final String? region;
+
+  /// Returns a formatted label like "Kumasi, Ashanti" or the available part.
+  String? get label {
+    final String nameText = name?.trim() ?? '';
+    final String regionText = region?.trim() ?? '';
+
+    if (nameText.isEmpty && regionText.isEmpty) {
+      return null;
+    }
+    if (nameText.isEmpty) {
+      return regionText;
+    }
+    if (regionText.isEmpty) {
+      return nameText;
+    }
+    return '$nameText, $regionText';
+  }
+
+  @override
+  List<Object?> get props => <Object?>[id, name, region];
 }

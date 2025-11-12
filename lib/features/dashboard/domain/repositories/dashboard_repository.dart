@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import '../../../../core/errors/failure.dart';
 import '../entities/product_entity.dart';
 import '../entities/review_entity.dart';
+import '../entities/category_entity.dart';
 
 abstract class DashboardRepository {
   Future<Either<Failure, List<ProductEntity>>> getProducts({
@@ -23,4 +24,6 @@ abstract class DashboardRepository {
     required int rating,
     String? comment,
   });
+
+  Future<Either<Failure, List<CategoryEntity>>> getCategories();
 }

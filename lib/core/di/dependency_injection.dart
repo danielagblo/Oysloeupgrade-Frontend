@@ -25,6 +25,7 @@ import 'package:oysloe_mobile/features/auth/presentation/bloc/otp/otp_cubit.dart
 import 'package:oysloe_mobile/features/auth/presentation/bloc/password_reset/password_reset_cubit.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/products_remote_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_products_usecase.dart';
@@ -32,6 +33,8 @@ import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_rev
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_detail_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/create_review_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_categories_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
 
 part 'di.dart';
 

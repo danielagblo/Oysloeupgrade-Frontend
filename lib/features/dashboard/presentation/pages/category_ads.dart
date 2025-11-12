@@ -7,7 +7,6 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../core/common/widgets/animated_gradient_search_input.dart';
 import '../../../../core/common/widgets/app_empty_state.dart';
 import '../../../../core/constants/api.dart';
-import '../../../../core/constants/category_names.dart';
 import '../../../../core/themes/theme.dart';
 import '../../../../core/themes/typo.dart';
 import '../../../../core/utils/category_utils.dart';
@@ -15,6 +14,9 @@ import 'package:oysloe_mobile/features/dashboard/domain/entities/product_entity.
 import 'package:oysloe_mobile/core/utils/formatters.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
+import '../../domain/entities/category_entity.dart';
+import '../bloc/categories/categories_cubit.dart';
+import '../bloc/categories/categories_state.dart';
 import '../bloc/products/products_cubit.dart';
 import '../bloc/products/products_state.dart';
 import '../widgets/ad_card.dart';
@@ -22,9 +24,11 @@ import '../widgets/multi_page_bottom_sheet.dart';
 import '../widgets/ad_input.dart';
 
 class CategoryAdsScreen extends StatefulWidget {
-  const CategoryAdsScreen({super.key, this.initialCategoryLabel});
+  const CategoryAdsScreen(
+      {super.key, this.initialCategoryLabel, this.initialCategoryId});
 
   final String? initialCategoryLabel;
+  final int? initialCategoryId;
 
   @override
   State<CategoryAdsScreen> createState() => _CategoryAdsScreenState();
@@ -37,10 +41,11 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
 
   late AnimationController _animationController;
   late Animation<double> _animation;
-  
+
   bool _showAppBarSearch = false;
 
   int? _selectedCategoryId;
+  String? _selectedCategoryLabel;
   String? _selectedLocation;
   String? _selectedPurpose;
   String? _selectedHighlight;
@@ -48,6 +53,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
   String? _selectedParam1;
   String? _selectedParam2;
   String? _selectedParam3;
+  String? _pendingCategoryLabel;
 
   static const double _scrollThreshold = 80.0;
 
@@ -66,7 +72,19 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
 
     _scrollController.addListener(_onScroll);
 
-    _selectedCategoryId = _mapLabelToId(widget.initialCategoryLabel);
+    _selectedCategoryLabel = widget.initialCategoryLabel?.trim();
+    _pendingCategoryLabel =
+        widget.initialCategoryId == null ? _selectedCategoryLabel : null;
+
+    final List<CategoryEntity> categories =
+        context.read<CategoriesCubit>().state.categories;
+    _selectedCategoryId = widget.initialCategoryId ??
+        _findCategoryIdByLabel(_pendingCategoryLabel, categories);
+
+    if (_selectedCategoryId != null) {
+      _pendingCategoryLabel = null;
+      _updateLabelFromCategories(_selectedCategoryId, categories);
+    }
   }
 
   @override
@@ -95,34 +113,68 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
     }
   }
 
-  static int? _mapLabelToId(String? label) {
-    if (label == null || label.isEmpty) return null;
-    for (final entry in kCategoryNames.entries) {
-      if (entry.value.toLowerCase() == label.toLowerCase()) {
-        return entry.key;
+  int? _findCategoryIdByLabel(
+    String? label,
+    List<CategoryEntity> categories,
+  ) {
+    if (label == null || label.trim().isEmpty) return null;
+    final String normalized = label.trim().toLowerCase();
+    for (final CategoryEntity category in categories) {
+      if (category.name.trim().toLowerCase() == normalized) {
+        return category.id;
       }
     }
     return null;
   }
 
-  static String? _mapIdToLabel(int? id) {
-    if (id == null) return null;
-    return kCategoryNames[id];
+  Map<int, String> _categoryNameMap(List<CategoryEntity> categories) {
+    if (categories.isEmpty) return const <int, String>{};
+    return <int, String>{
+      for (final CategoryEntity category in categories)
+        category.id: category.name,
+    };
+  }
+
+  String _displayCategoryLabel(
+    int? id,
+    Map<int, String> nameMap, {
+    String fallback = 'Category',
+  }) {
+    if (id == null) {
+      return _selectedCategoryLabel ?? fallback;
+    }
+    return nameMap[id] ?? _selectedCategoryLabel ?? 'Category $id';
+  }
+
+  void _updateLabelFromCategories(
+    int? id,
+    List<CategoryEntity> categories,
+  ) {
+    if (id == null) return;
+    for (final CategoryEntity category in categories) {
+      if (category.id == id) {
+        _selectedCategoryLabel = category.name;
+        return;
+      }
+    }
   }
 
   Future<void> _openCategoryChooser() async {
-    final state = context.read<ProductsCubit>().state;
+    final ProductsState productsState = context.read<ProductsCubit>().state;
+    final CategoriesState categoriesState =
+        context.read<CategoriesCubit>().state;
 
-    // Build dynamic sections: top 5 by product counts, others as remaining
+    final Map<int, String> nameMap =
+        _categoryNameMap(categoriesState.categories);
+
     final List<MultiPageSheetSection<String>> sections =
         <MultiPageSheetSection<String>>[];
 
-    // Popular categories
-    final List<CategoryStat> topStats = state.hasData
+    final List<CategoryStat> topStats = productsState.hasData
         ? computeTopCategories(
-            state.products,
+            productsState.products,
             topN: 5,
-            resolveName: (id) => kCategoryNames[id],
+            resolveName: (id) => nameMap[id],
           )
         : const <CategoryStat>[];
 
@@ -131,27 +183,34 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
         MultiPageSheetSection<String>(
           heading: 'Popular categories',
           items: topStats
-              .map((s) => _buildCategoryItem(s.categoryId, s.label))
+              .map((CategoryStat stat) =>
+                  _buildCategoryItem(stat.categoryId, stat.label))
               .toList(),
         ),
       );
     }
 
-    // Other categories (remaining out of known 10)
-    final Set<int> allIds = kCategoryNames.keys.toSet();
-    final Set<int> topIds = topStats.map((s) => s.categoryId).toSet();
-    final List<int> otherIds = allIds.difference(topIds).take(5).toList();
-    otherIds.sort();
+    final Set<int> topIds = topStats.map((stat) => stat.categoryId).toSet();
+    final List<CategoryEntity> otherCategories = categoriesState.categories
+        .where((category) => !topIds.contains(category.id))
+        .take(5)
+        .toList();
 
-    sections.add(
-      MultiPageSheetSection<String>(
-        heading: 'Other categories',
-        items: otherIds
-            .map((id) =>
-                _buildCategoryItem(id, kCategoryNames[id] ?? 'Category $id'))
-            .toList(),
-      ),
-    );
+    if (otherCategories.isNotEmpty) {
+      sections.add(
+        MultiPageSheetSection<String>(
+          heading: 'Other categories',
+          items: otherCategories
+              .map((CategoryEntity category) =>
+                  _buildCategoryItem(category.id, category.name))
+              .toList(),
+        ),
+      );
+    }
+
+    if (sections.isEmpty) {
+      return;
+    }
 
     final String? picked = await showMultiPageBottomSheet<String>(
       context: context,
@@ -164,6 +223,10 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
     if (picked != null) {
       setState(() {
         _selectedCategoryId = int.tryParse(picked);
+        _updateLabelFromCategories(
+          _selectedCategoryId,
+          categoriesState.categories,
+        );
       });
     }
   }
@@ -213,6 +276,32 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final CategoriesState categoriesState =
+        context.watch<CategoriesCubit>().state;
+    final Map<int, String> categoryNames =
+        _categoryNameMap(categoriesState.categories);
+    final String categoryFilterLabel =
+        _displayCategoryLabel(_selectedCategoryId, categoryNames);
+
+    return BlocListener<CategoriesCubit, CategoriesState>(
+      listenWhen: (_, current) =>
+          _pendingCategoryLabel != null && current.hasData,
+      listener: (_, state) {
+        final int? resolved =
+            _findCategoryIdByLabel(_pendingCategoryLabel, state.categories);
+        if (resolved != null) {
+          setState(() {
+            _selectedCategoryId = resolved;
+            _pendingCategoryLabel = null;
+            _updateLabelFromCategories(resolved, state.categories);
+          });
+        }
+      },
+      child: _buildBody(categoryFilterLabel),
+    );
+  }
+
+  Widget _buildBody(String categoryFilterLabel) {
     return Scaffold(
       body: Column(
         children: [
@@ -311,8 +400,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                       GridView(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           mainAxisSpacing: 1.0.h,
                           crossAxisSpacing: 1.6.w,
@@ -320,8 +408,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                         ),
                         children: [
                           _FilterPill(
-                            label: _mapIdToLabel(_selectedCategoryId) ??
-                                'Category',
+                            label: categoryFilterLabel,
                             icon: Icons.unfold_more,
                             onTap: _openCategoryChooser,
                           ),
@@ -340,11 +427,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                             label: _selectedPurpose ?? 'Ad Purpose',
                             icon: Icons.sell_outlined,
                             onTap: () async {
-                              const options = [
-                                'Sale',
-                                'Rent',
-                                'High Purchase'
-                              ];
+                              const options = ['Sale', 'Rent', 'High Purchase'];
                               final picked =
                                   await _pickOne('Ad Purpose', options);
                               if (picked != null) {
@@ -379,8 +462,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                 'GHS 1,000 - 5,000',
                                 'Above GHS 5,000'
                               ];
-                              final picked =
-                                  await _pickOne('Pricing', options);
+                              final picked = await _pickOne('Pricing', options);
                               if (picked != null) {
                                 setState(() => _selectedPricing = picked);
                               }
@@ -438,7 +520,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                       ),
                       SizedBox(height: 3.h),
                       _CategoryProductsGrid(
-                          selectedCategoryId: _selectedCategoryId),
+                        selectedCategoryId: _selectedCategoryId,
+                      ),
                       SizedBox(height: 3.h),
                     ],
                   ),
@@ -655,6 +738,7 @@ class _ProductsGrid extends StatelessWidget {
             final ProductEntity product = products[index];
             final String imageUrl = _resolveImage(product);
             final List<String> prices = _buildPrices(product);
+            final String location = _resolveLocation(product);
 
             return GestureDetector(
               onTap: () => _openDetails(
@@ -662,11 +746,12 @@ class _ProductsGrid extends StatelessWidget {
                 product,
                 imageUrl,
                 prices,
+                location,
               ),
               child: AdCard(
                 imageUrl: imageUrl,
                 title: product.name,
-                location: _defaultLocation,
+                location: location,
                 prices: prices,
                 type: _resolveDealType(product),
               ),
@@ -703,6 +788,10 @@ class _ProductsGrid extends StatelessWidget {
     return <String>[CurrencyFormatter.ghana.formatRaw(rawPrice)];
   }
 
+  static String _resolveLocation(ProductEntity product) {
+    return product.location?.label ?? _defaultLocation;
+  }
+
   static String _resolveImage(ProductEntity product) {
     if (product.image.isNotEmpty) {
       return _prepareImageUrl(product.image);
@@ -734,6 +823,7 @@ class _ProductsGrid extends StatelessWidget {
     ProductEntity product,
     String imageUrl,
     List<String> prices,
+    String location,
   ) {
     final AdDealType dealType = _resolveDealType(product);
     final String currentLocation = GoRouterState.of(context).uri.toString();
@@ -752,7 +842,7 @@ class _ProductsGrid extends StatelessWidget {
         'adType': dealType,
         'imageUrl': imageUrl,
         'title': product.name,
-        'location': _defaultLocation,
+        'location': location,
         'prices': prices,
         'product': product,
       },

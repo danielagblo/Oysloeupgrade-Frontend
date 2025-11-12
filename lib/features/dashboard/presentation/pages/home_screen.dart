@@ -10,6 +10,7 @@ import 'package:oysloe_mobile/features/dashboard/presentation/widgets/stats_sect
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ads_section.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class AnimatedHomeScreen extends StatefulWidget {
@@ -137,7 +138,12 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
           Expanded(
             child: RefreshIndicator(
               color: AppColors.blueGray374957,
-              onRefresh: () => context.read<ProductsCubit>().fetch(),
+              onRefresh: () async {
+                await Future.wait<void>([
+                  context.read<ProductsCubit>().fetch(),
+                  context.read<CategoriesCubit>().fetch(),
+                ]);
+              },
               child: SingleChildScrollView(
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(
@@ -155,8 +161,8 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                           animation: _animation,
                           builder: (context, child) {
                             return AnimatedOpacity(
-                              opacity:
-                                  1.0 - (_animation.value * 1.2).clamp(0.0, 1.0),
+                              opacity: 1.0 -
+                                  (_animation.value * 1.2).clamp(0.0, 1.0),
                               duration: const Duration(milliseconds: 200),
                               child: Transform.translate(
                                 offset: Offset(0, _animation.value * -15),
@@ -170,10 +176,13 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 4.w),
                         child: CategoriesSection(
-                          onCategoryTap: (label) {
+                          onCategoryTap: (categoryId, label) {
                             context.pushNamed(
                               AppRouteNames.dashboardCategoryAds,
-                              extra: label,
+                              extra: <String, dynamic>{
+                                'label': label,
+                                'categoryId': categoryId,
+                              },
                             );
                           },
                         ),
