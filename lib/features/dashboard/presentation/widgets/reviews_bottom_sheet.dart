@@ -56,6 +56,47 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
     }
   }
 
+  Future<void> _handleReviewAction({ReviewComment? editTarget}) async {
+    final repository = sl<AuthRepository>();
+    final session = await repository.cachedSession();
+    final bool isLoggedIn = session != null;
+    if (!isLoggedIn && mounted) {
+      showErrorSnackBar(context, 'Please log in to continue.');
+      context.go(AppRoutePaths.login);
+      return;
+    }
+
+    if (widget.productId <= 0) {
+      showErrorSnackBar(context, 'Unable to identify this product.');
+      return;
+    }
+
+    final Map<String, dynamic> extras = <String, dynamic>{
+      'productId': widget.productId,
+    };
+
+    if (editTarget != null && editTarget.id > 0) {
+      extras['reviewId'] = editTarget.id;
+      extras['rating'] = editTarget.rating;
+      if (editTarget.rawComment != null) {
+        extras['comment'] = editTarget.rawComment;
+      }
+    }
+
+    final bool? submitted = await context.pushNamed<bool>(
+      AppRouteNames.dashboardReviews,
+      extra: extras,
+    );
+
+    if (!mounted) return;
+
+    if (submitted == true) {
+      Navigator.of(context).pop(true);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   void _onFilterChanged(int filterIndex) {
     setState(() {
       selectedFilter = filterIndex;
@@ -158,29 +199,32 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
               Row(
                 children: [
                   if (review.canEdit) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/editreview.svg',
-                            width: 12,
-                            height: 12,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Edit',
-                            style: AppTypography.bodySmall.copyWith(
-                              fontSize: 13.sp,
+                    GestureDetector(
+                      onTap: () => _handleReviewAction(editTarget: review),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/editreview.svg',
+                              width: 12,
+                              height: 12,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Text(
+                              'Edit',
+                              style: AppTypography.bodySmall.copyWith(
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -568,36 +612,7 @@ class _ReviewsBottomSheetState extends State<ReviewsBottomSheet> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () async {
-                          // Auth gate similar to tabs
-                          final repository = sl<AuthRepository>();
-                          final session = await repository.cachedSession();
-                          final isLoggedIn = session != null;
-                          if (!isLoggedIn && mounted) {
-                            showErrorSnackBar(
-                                context, 'Please log in to continue.');
-                            context.go(AppRoutePaths.login);
-                            return;
-                          }
-
-                          // Navigate to reviews page with productId and await result
-                          if (widget.productId <= 0) {
-                            showErrorSnackBar(
-                                context, 'Unable to identify this product.');
-                            return;
-                          }
-                          final bool? submitted = await context.pushNamed<bool>(
-                            AppRouteNames.dashboardReviews,
-                            extra: widget.productId > 0 ? widget.productId : null,
-                          );
-
-                          if (submitted == true && mounted) {
-                            Navigator.of(context).pop(true);
-                          } else {
-                            // If nothing happened, close as usual
-                            Navigator.of(context).pop();
-                          }
-                        },
+                        onTap: () => _handleReviewAction(),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
@@ -658,19 +673,23 @@ class RatingBreakdown {
 }
 
 class ReviewComment {
+  final int id;
   final String userName;
   final String? userImage;
   final int rating;
   final String comment;
+  final String? rawComment;
   final String date;
   final int likes;
   final bool canEdit;
 
   const ReviewComment({
+    required this.id,
     required this.userName,
     this.userImage,
     required this.rating,
     required this.comment,
+    this.rawComment,
     required this.date,
     this.likes = 0,
     this.canEdit = false,

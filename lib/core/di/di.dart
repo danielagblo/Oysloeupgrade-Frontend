@@ -99,10 +99,16 @@ Future<void> _initDashboard() async {
     ..registerLazySingleton<CategoriesRemoteDataSource>(
       () => CategoriesRemoteDataSourceImpl(client: sl()),
     )
+    ..registerLazySingleton<CategoriesLocalDataSource>(
+      () => CategoriesLocalDataSourceImpl(
+        box: sl(instanceName: 'categories_box'),
+      ),
+    )
     ..registerLazySingleton<DashboardRepository>(
       () => DashboardRepositoryImpl(
         remoteDataSource: sl(),
         categoriesRemoteDataSource: sl(),
+        categoriesLocalDataSource: sl(),
         network: sl(),
       ),
     )
@@ -120,6 +126,9 @@ Future<void> _initDashboard() async {
     )
     ..registerLazySingleton<CreateReviewUseCase>(
       () => CreateReviewUseCase(sl()),
+    )
+    ..registerLazySingleton<UpdateReviewUseCase>(
+      () => UpdateReviewUseCase(sl()),
     )
     ..registerFactory<ProductsCubit>(
       () => ProductsCubit(sl()),

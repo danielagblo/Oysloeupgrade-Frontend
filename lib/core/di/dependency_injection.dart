@@ -26,12 +26,14 @@ import 'package:oysloe_mobile/features/auth/presentation/bloc/password_reset/pas
 import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/products_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_remote_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_local_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_products_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_reviews_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_detail_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/create_review_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/update_review_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_categories_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
@@ -45,6 +47,15 @@ Future<void> initDependencies() async {
   final Box<dynamic> authBox = await Hive.openBox<dynamic>('auth_box');
   if (!sl.isRegistered<Box<dynamic>>(instanceName: 'auth_box')) {
     sl.registerSingleton<Box<dynamic>>(authBox, instanceName: 'auth_box');
+  }
+
+  final Box<dynamic> categoriesBox =
+      await Hive.openBox<dynamic>('categories_box');
+  if (!sl.isRegistered<Box<dynamic>>(instanceName: 'categories_box')) {
+    sl.registerSingleton<Box<dynamic>>(
+      categoriesBox,
+      instanceName: 'categories_box',
+    );
   }
   await _initCore();
   await _initAuth();

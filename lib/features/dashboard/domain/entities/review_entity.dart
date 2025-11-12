@@ -8,6 +8,8 @@ class ReviewEntity extends Equatable {
     required this.rating,
     required this.comment,
     required this.createdAt,
+    this.userId,
+    this.userEmail,
   });
 
   final int id;
@@ -16,6 +18,8 @@ class ReviewEntity extends Equatable {
   final int rating;
   final String comment;
   final DateTime createdAt;
+  final String? userId;
+  final String? userEmail;
 
   @override
   List<Object?> get props => <Object?>[
@@ -25,5 +29,7 @@ class ReviewEntity extends Equatable {
         rating,
         comment,
         createdAt,
+        userId,
+        userEmail,
       ];
 }

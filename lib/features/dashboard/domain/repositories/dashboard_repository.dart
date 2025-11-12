@@ -25,5 +25,13 @@ abstract class DashboardRepository {
     String? comment,
   });
 
-  Future<Either<Failure, List<CategoryEntity>>> getCategories();
+  Future<Either<Failure, ReviewEntity>> updateReview({
+    required int reviewId,
+    required int rating,
+    String? comment,
+  });
+
+  Future<Either<Failure, List<CategoryEntity>>> getCategories({
+    bool forceRefresh = false,
+  });
 }

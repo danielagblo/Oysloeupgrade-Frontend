@@ -141,7 +141,9 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
               onRefresh: () async {
                 await Future.wait<void>([
                   context.read<ProductsCubit>().fetch(),
-                  context.read<CategoriesCubit>().fetch(),
+                  context
+                      .read<CategoriesCubit>()
+                      .fetch(forceRefresh: true),
                 ]);
               },
               child: SingleChildScrollView(
@@ -177,6 +179,16 @@ class _AnimatedHomeScreenState extends State<AnimatedHomeScreen>
                         padding: EdgeInsets.symmetric(horizontal: 4.w),
                         child: CategoriesSection(
                           onCategoryTap: (categoryId, label) {
+                            final String normalizedLabel =
+                                label.trim().toLowerCase();
+
+                            if (normalizedLabel == 'services') {
+                              context.pushNamed(
+                                AppRouteNames.dashboardServices,
+                              );
+                              return;
+                            }
+
                             context.pushNamed(
                               AppRouteNames.dashboardCategoryAds,
                               extra: <String, dynamic>{

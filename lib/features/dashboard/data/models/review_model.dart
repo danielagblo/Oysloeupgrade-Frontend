@@ -9,6 +9,8 @@ class ReviewModel extends ReviewEntity {
     required super.rating,
     required super.comment,
     required super.createdAt,
+    super.userId,
+    super.userEmail,
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,8 @@ class ReviewModel extends ReviewEntity {
       rating: rating,
       comment: _resolveString(json['comment']) ?? '',
       createdAt: DateUtilsExt.parseOrEpoch(json['created_at'] as String?),
+      userId: _resolveString(user?['id']),
+      userEmail: _resolveString(user?['email']),
     );
   }
 

@@ -9,7 +9,12 @@ class CategoriesCubit extends Cubit<CategoriesState> {
 
   final GetCategoriesUseCase _getCategories;
 
-  Future<void> fetch() async {
+  Future<void> fetch({bool forceRefresh = false}) async {
+    if (state.isLoading) return;
+    if (state.hasData && !forceRefresh) {
+      return;
+    }
+
     emit(
       state.copyWith(
         status: CategoriesStatus.loading,
@@ -17,7 +22,7 @@ class CategoriesCubit extends Cubit<CategoriesState> {
       ),
     );
 
-    final result = await _getCategories();
+    final result = await _getCategories(forceRefresh: forceRefresh);
 
     result.fold(
       (failure) => emit(

@@ -10,18 +10,24 @@ import '../../domain/entities/review_entity.dart';
 import '../../domain/entities/category_entity.dart';
 import '../datasources/products_remote_data_source.dart';
 import '../datasources/categories_remote_data_source.dart';
+import '../datasources/categories_local_data_source.dart';
+import '../models/category_model.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
+  static const Duration _categoriesCacheTtl = Duration(hours: 12);
   DashboardRepositoryImpl({
     required ProductsRemoteDataSource remoteDataSource,
     required CategoriesRemoteDataSource categoriesRemoteDataSource,
+    required CategoriesLocalDataSource categoriesLocalDataSource,
     required Network network,
   })  : _remoteDataSource = remoteDataSource,
         _categoriesRemoteDataSource = categoriesRemoteDataSource,
+        _categoriesLocalDataSource = categoriesLocalDataSource,
         _network = network;
 
   final ProductsRemoteDataSource _remoteDataSource;
   final CategoriesRemoteDataSource _categoriesRemoteDataSource;
+  final CategoriesLocalDataSource _categoriesLocalDataSource;
   final Network _network;
 
   @override
@@ -143,20 +149,92 @@ class DashboardRepositoryImpl implements DashboardRepository {
   }
 
   @override
-  Future<Either<Failure, List<CategoryEntity>>> getCategories() async {
+  Future<Either<Failure, ReviewEntity>> updateReview({
+    required int reviewId,
+    required int rating,
+    String? comment,
+  }) async {
     final bool isConnected = await _network.isConnected;
     if (!isConnected) {
       return left(const NetworkFailure('No internet connection'));
     }
 
     try {
-      final List<CategoryEntity> categories =
-          (await _categoriesRemoteDataSource.getCategories())
-              .cast<CategoryEntity>();
-      return right(categories);
+      final ReviewEntity review = await _remoteDataSource.updateReview(
+        reviewId: reviewId,
+        rating: rating,
+        comment: comment,
+      );
+      return right(review);
     } on ApiException catch (error) {
       return left(APIFailure(error.message));
     } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError(
+        'Unexpected update review failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CategoryEntity>>> getCategories({
+    bool forceRefresh = false,
+  }) async {
+    CachedCategories? cache;
+    try {
+      cache = await _categoriesLocalDataSource.readCategories();
+    } on CacheException catch (error, stackTrace) {
+      logError(
+        'Unable to read cached categories',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final bool cacheHasData = cache?.categories.isNotEmpty ?? false;
+    final DateTime? fetchedAt = cache?.fetchedAt;
+    final bool cacheIsFresh = cacheHasData &&
+        fetchedAt != null &&
+        DateTime.now().difference(fetchedAt) < _categoriesCacheTtl;
+
+    if (!forceRefresh && cacheIsFresh && cache != null) {
+      return right(cache.categories.cast<CategoryEntity>());
+    }
+
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      if (cacheHasData && cache != null) {
+        return right(cache.categories.cast<CategoryEntity>());
+      }
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final List<CategoryModel> categories =
+          await _categoriesRemoteDataSource.getCategories();
+      try {
+        await _categoriesLocalDataSource.cacheCategories(categories);
+      } on CacheException catch (error, stackTrace) {
+        logError(
+          'Unable to cache categories',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+      return right(categories.cast<CategoryEntity>());
+    } on ApiException catch (error) {
+      if (cacheHasData && cache != null) {
+        return right(cache.categories.cast<CategoryEntity>());
+      }
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      if (cacheHasData && cache != null) {
+        return right(cache.categories.cast<CategoryEntity>());
+      }
       return left(ServerFailure(error.message));
     } catch (error, stackTrace) {
       logError(
@@ -164,6 +242,9 @@ class DashboardRepositoryImpl implements DashboardRepository {
         error: error,
         stackTrace: stackTrace,
       );
+      if (cacheHasData && cache != null) {
+        return right(cache.categories.cast<CategoryEntity>());
+      }
       return left(const ServerFailure('Unexpected error occurred'));
     }
   }

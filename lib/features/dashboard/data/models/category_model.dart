@@ -15,6 +15,14 @@ class CategoryModel extends CategoryEntity {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      if (description != null) 'description': description,
+    };
+  }
+
   static String? _resolveString(dynamic value) {
     if (value == null) return null;
     final String resolved = value.toString().trim();

@@ -23,6 +23,12 @@ abstract class ProductsRemoteDataSource {
     required int rating,
     String? comment,
   });
+
+  Future<ReviewModel> updateReview({
+    required int reviewId,
+    required int rating,
+    String? comment,
+  });
 }
 
 class ProductsRemoteDataSourceImpl implements ProductsRemoteDataSource {
@@ -133,6 +139,35 @@ class ProductsRemoteDataSourceImpl implements ProductsRemoteDataSource {
         AppStrings.reviewsURL,
         data: <String, dynamic>{
           'product': productId,
+          'rating': rating,
+          if (comment != null && comment.trim().isNotEmpty)
+            'comment': comment.trim(),
+        },
+      );
+
+      final dynamic data = response.data;
+      if (data is Map<String, dynamic>) {
+        return ReviewModel.fromJson(Map<String, dynamic>.from(data));
+      }
+
+      throw const ServerException('Invalid response structure');
+    } on DioException catch (error) {
+      throw ApiException(ApiHelper.getHumanReadableMessage(error));
+    } catch (error) {
+      throw ServerException(error.toString());
+    }
+  }
+
+  @override
+  Future<ReviewModel> updateReview({
+    required int reviewId,
+    required int rating,
+    String? comment,
+  }) async {
+    try {
+      final Response<dynamic> response = await _client.put<dynamic>(
+        AppStrings.reviewDetailURL(reviewId),
+        data: <String, dynamic>{
           'rating': rating,
           if (comment != null && comment.trim().isNotEmpty)
             'comment': comment.trim(),

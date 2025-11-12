@@ -7,19 +7,31 @@ import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/create_review_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/update_review_usecase.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ReviewsScreen extends StatefulWidget {
-  const ReviewsScreen({super.key, required this.productId});
+  const ReviewsScreen({
+    super.key,
+    required this.productId,
+    this.reviewId,
+    this.initialRating,
+    this.initialComment,
+  });
 
   final int productId;
+  final int? reviewId;
+  final int? initialRating;
+  final String? initialComment;
+
+  bool get isEditing => reviewId != null;
 
   @override
   State<ReviewsScreen> createState() => _ReviewsScreenState();
 }
 
 class _ReviewsScreenState extends State<ReviewsScreen> {
-  int _selectedRating = 0;
+  late int _selectedRating;
   final TextEditingController _commentController = TextEditingController();
   bool _submitting = false;
 
@@ -30,6 +42,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     'Very Good',
     'Excellent',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedRating = widget.initialRating ?? 0;
+    _commentController.text = widget.initialComment ?? '';
+  }
 
   @override
   void dispose() {
@@ -45,6 +64,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEditing = widget.isEditing;
+    final String headlineText = isEditing ? 'Edit Review' : 'Review';
+    final String subtitleText =
+        isEditing ? 'Update your review' : 'Make a review';
+    final String buttonLabel = isEditing ? 'Update Review' : 'Send Review';
+
     return Scaffold(
       backgroundColor: AppColors.grayF9,
       appBar: const CustomAppBar(
@@ -66,7 +91,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       children: [
                         SizedBox(height: 5.h),
                         Text(
-                          'Review',
+                          headlineText,
                           style: AppTypography.bodyLarge.copyWith(
                             color: AppColors.blueGray374957,
                             fontWeight: FontWeight.w600,
@@ -75,7 +100,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         ),
                         SizedBox(height: 1.h),
                         Text(
-                          'Make a review',
+                          subtitleText,
                           style: AppTypography.body.copyWith(
                             color:
                                 AppColors.blueGray374957.withValues(alpha: 0.7),
@@ -145,7 +170,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                           ),
                           child: TextField(
                             controller: _commentController,
-                            maxLines: 2,
+                            minLines: 2,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
                             decoration: InputDecoration(
                               hintText: 'Comment',
                               hintStyle: AppTypography.body,
@@ -159,6 +186,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                               fillColor: Colors.transparent,
                             ),
                             style: AppTypography.body.copyWith(
+                              fontSize: 15.sp,
                               color: AppColors.blueGray374957,
                             ),
                           ),
@@ -167,7 +195,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: CustomButton.filled(
-                            label: 'Send Review',
+                            label: buttonLabel,
                             backgroundColor: AppColors.white,
                             isLoading: _submitting,
                             onPressed: _submitting
@@ -181,29 +209,53 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                                       return;
                                     }
 
+                                    final String trimmedComment =
+                                        _commentController.text.trim();
+                                    final String? commentPayload =
+                                        trimmedComment.isNotEmpty
+                                            ? trimmedComment
+                                            : null;
+                                    final bool isEditing = widget.isEditing;
+
                                     setState(() => _submitting = true);
-                                    final result = await sl<CreateReviewUseCase>()(
-                                      CreateReviewParams(
-                                        productId: widget.productId,
-                                        rating: _selectedRating,
-                                        comment:
-                                            _commentController.text.trim(),
-                                      ),
-                                    );
+                                    final result = isEditing &&
+                                            widget.reviewId != null
+                                        ? await sl<UpdateReviewUseCase>()(
+                                            UpdateReviewParams(
+                                              reviewId: widget.reviewId!,
+                                              rating: _selectedRating,
+                                              comment: commentPayload,
+                                            ),
+                                          )
+                                        : await sl<CreateReviewUseCase>()(
+                                            CreateReviewParams(
+                                              productId: widget.productId,
+                                              rating: _selectedRating,
+                                              comment: commentPayload,
+                                            ),
+                                          );
 
                                     if (!mounted) return;
 
                                     result.fold(
                                       (failure) {
+                                        final String fallbackError = isEditing
+                                            ? 'Unable to update review.'
+                                            : 'Unable to submit review.';
                                         final message = failure.message.isEmpty
-                                            ? 'Unable to submit review.'
+                                            ? fallbackError
                                             : failure.message;
                                         showErrorSnackBar(context, message);
                                         setState(() => _submitting = false);
                                       },
                                       (_) async {
+                                        final successMessage = isEditing
+                                            ? 'Review updated.'
+                                            : 'Review submitted.';
                                         showSuccessSnackBar(
-                                            context, 'Review submitted.');
+                                          context,
+                                          successMessage,
+                                        );
                                         Navigator.of(context).pop(true);
                                       },
                                     );

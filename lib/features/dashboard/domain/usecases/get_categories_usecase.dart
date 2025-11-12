@@ -9,7 +9,9 @@ class GetCategoriesUseCase {
 
   final DashboardRepository _repository;
 
-  Future<Either<Failure, List<CategoryEntity>>> call() {
-    return _repository.getCategories();
+  Future<Either<Failure, List<CategoryEntity>>> call({
+    bool forceRefresh = false,
+  }) {
+    return _repository.getCategories(forceRefresh: forceRefresh);
   }
 }

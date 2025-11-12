@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 
@@ -57,7 +58,8 @@ class CategoriesSection extends StatelessWidget {
         if (state.hasError && !state.hasData) {
           return _CategoriesError(
             message: state.message ?? 'Unable to load categories',
-            onRetry: () => context.read<CategoriesCubit>().fetch(),
+            onRetry: () =>
+                context.read<CategoriesCubit>().fetch(forceRefresh: true),
           );
         }
 
@@ -71,7 +73,8 @@ class CategoriesSection extends StatelessWidget {
         if (categories.isEmpty) {
           return _CategoriesError(
             message: 'No categories available',
-            onRetry: () => context.read<CategoriesCubit>().fetch(),
+            onRetry: () =>
+                context.read<CategoriesCubit>().fetch(forceRefresh: true),
           );
         }
 
@@ -232,44 +235,48 @@ class _CategoriesSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.only(top: 1.2.h),
-      itemCount: 8,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 1.2.h,
-        crossAxisSpacing: 2.4.w,
-        childAspectRatio: 0.9,
-      ),
-      itemBuilder: (_, __) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.grayF9,
-          borderRadius: BorderRadius.circular(9),
+    return Shimmer.fromColors(
+      baseColor: AppColors.grayE4,
+      highlightColor: AppColors.white,
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.only(top: 1.2.h),
+        itemCount: 8,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 1.2.h,
+          crossAxisSpacing: 2.4.w,
+          childAspectRatio: 0.9,
         ),
-        padding: EdgeInsets.symmetric(vertical: 1.2.h, horizontal: 2.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: AppColors.white,
-                shape: BoxShape.circle,
+        itemBuilder: (_, __) => Container(
+          decoration: BoxDecoration(
+            color: AppColors.grayF9,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 1.2.h, horizontal: 2.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: AppColors.white,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            SizedBox(height: 0.8.h),
-            Container(
-              height: 10.sp,
-              width: 38.sp,
-              decoration: BoxDecoration(
-                color: AppColors.grayE4,
-                borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 0.8.h),
+              Container(
+                height: 10.sp,
+                width: 38.sp,
+                decoration: BoxDecoration(
+                  color: AppColors.grayE4,
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

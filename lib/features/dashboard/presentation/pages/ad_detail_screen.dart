@@ -114,23 +114,24 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
   bool _isReviewsLoading = false;
   String? _currentUserNameKey;
   String? _currentUserEmailKey;
+  String? _currentUserId;
 
   ProductEntity? get _product => _productOverride ?? widget.product;
 
-  AdDealType get _dealType {
-    if (widget.adType != null) return widget.adType!;
-    final String rawType = _product?.type.trim().toLowerCase() ?? '';
-    switch (rawType) {
-      case 'rent':
-        return AdDealType.rent;
-      case 'high_purchase':
-      case 'hire_purchase':
-      case 'hire-purchase':
-        return AdDealType.highPurchase;
-      default:
-        return AdDealType.sale;
-    }
-  }
+  // AdDealType get _dealType {
+  //   if (widget.adType != null) return widget.adType!;
+  //   final String rawType = _product?.type.trim().toLowerCase() ?? '';
+  //   switch (rawType) {
+  //     case 'rent':
+  //       return AdDealType.rent;
+  //     case 'high_purchase':
+  //     case 'hire_purchase':
+  //     case 'hire-purchase':
+  //       return AdDealType.highPurchase;
+  //     default:
+  //       return AdDealType.sale;
+  //   }
+  // }
 
   List<String> get _galleryImages {
     final Set<String> urls = <String>{};
@@ -184,11 +185,11 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
   String get _resolvedDescription => _product?.description.trim() ?? '';
 
-  Color _getAdTypeColor() => switch (_dealType) {
-        AdDealType.rent => const Color(0xFF00FFF2),
-        AdDealType.sale => const Color(0xFFFF6B6B),
-        AdDealType.highPurchase => const Color(0xFF74FFA7),
-      };
+  // Color _getAdTypeColor() => switch (_dealType) {
+  //       AdDealType.rent => const Color(0xFF00FFF2),
+  //       AdDealType.sale => const Color(0xFFFF6B6B),
+  //       AdDealType.highPurchase => const Color(0xFF74FFA7),
+  //     };
 
   List<Map<String, String>> _getFeatures() {
     final ProductEntity? product = _product;
@@ -422,34 +423,42 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
           ? '--'
           : formatter.format(createdAt);
       final String comment = review.comment.trim();
-      final bool showAsMe =
-          comment.isNotEmpty && _isCurrentUsersReview(review);
-      final String displayName = showAsMe ? 'Me' : review.userName;
+      final bool isMine = _isCurrentUsersReview(review);
+      final String displayName = isMine ? 'Me' : review.userName;
 
       return reviews_widget.ReviewComment(
+        id: review.id,
         userName: displayName,
         userImage: avatar,
         rating: review.rating,
         comment: comment.isNotEmpty ? comment : 'No comment provided.',
         date: dateLabel,
+        rawComment: comment,
+        canEdit: isMine,
       );
     }).toList();
   }
 
   bool _isCurrentUsersReview(ReviewEntity review) {
-    final String? normalizedReviewName =
-        _normalizeIdentifier(review.userName);
-    if (normalizedReviewName == null) {
-      return false;
-    }
-
-    if (_currentUserNameKey != null &&
-        normalizedReviewName == _currentUserNameKey) {
+    final String? reviewIdKey = _normalizeIdentifier(review.userId);
+    if (_currentUserId != null &&
+        reviewIdKey != null &&
+        reviewIdKey == _currentUserId) {
       return true;
     }
 
+    final String? reviewEmailKey = _normalizeIdentifier(review.userEmail);
     if (_currentUserEmailKey != null &&
-        normalizedReviewName == _currentUserEmailKey) {
+        reviewEmailKey != null &&
+        reviewEmailKey == _currentUserEmailKey) {
+      return true;
+    }
+
+    final String? normalizedReviewName =
+        _normalizeIdentifier(review.userName);
+    if (_currentUserNameKey != null &&
+        normalizedReviewName != null &&
+        normalizedReviewName == _currentUserNameKey) {
       return true;
     }
 
@@ -709,15 +718,18 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
           _normalizeIdentifier(user?.name);
       final String? normalizedEmail =
           _normalizeIdentifier(user?.email);
+      final String? normalizedId = _normalizeIdentifier(user?.id);
 
       if (normalizedName == _currentUserNameKey &&
-          normalizedEmail == _currentUserEmailKey) {
+          normalizedEmail == _currentUserEmailKey &&
+          normalizedId == _currentUserId) {
         return;
       }
 
       setState(() {
         _currentUserNameKey = normalizedName;
         _currentUserEmailKey = normalizedEmail;
+        _currentUserId = normalizedId;
       });
     } catch (_) {
       // No-op: session data is optional for reviews rendering.
@@ -793,11 +805,11 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Ad type indicator line
-              Container(
-                width: double.infinity,
-                height: 4,
-                color: _getAdTypeColor(),
-              ),
+              // Container(
+              //   width: double.infinity,
+              //   height: 4,
+              //   color: _getAdTypeColor(),
+              // ),
               _buildImageCarousel(galleryImages),
               // Location, Title and Price container
               Container(

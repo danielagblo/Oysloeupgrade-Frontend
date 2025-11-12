@@ -335,11 +335,42 @@ final List<RouteBase> routes = <RouteBase>[
         name: AppRouteNames.dashboardReviews,
         path: AppRoutePaths.dashboardReviews,
         pageBuilder: (context, state) {
-          final int productId = (state.extra as int?) ?? 0;
+          int? tryParseInt(Object? value) {
+            if (value == null) return null;
+            if (value is int) return value;
+            if (value is num) return value.toInt();
+            return int.tryParse(value.toString());
+          }
+
+          int productId = 0;
+          int? reviewId;
+          int? initialRating;
+          String? initialComment;
+
+          final Object? extra = state.extra;
+          if (extra is int) {
+            productId = extra;
+          } else if (extra is Map<String, dynamic>) {
+            productId = tryParseInt(extra['productId']) ?? 0;
+            reviewId = tryParseInt(extra['reviewId']);
+            initialRating = tryParseInt(extra['rating']);
+            final Object? rawComment = extra['comment'];
+            if (rawComment is String) {
+              initialComment = rawComment;
+            } else if (rawComment != null) {
+              initialComment = rawComment.toString();
+            }
+          }
+
           return buildPageWithDefaultTransition(
             context: context,
             state: state,
-            child: ReviewsScreen(productId: productId),
+            child: ReviewsScreen(
+              productId: productId,
+              reviewId: reviewId,
+              initialRating: initialRating,
+              initialComment: initialComment,
+            ),
           );
         },
       ),
