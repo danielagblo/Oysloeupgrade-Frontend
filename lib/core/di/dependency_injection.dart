@@ -27,6 +27,7 @@ import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_
 import 'package:oysloe_mobile/features/dashboard/data/datasources/products_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_local_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/alerts_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_products_usecase.dart';
@@ -37,6 +38,10 @@ import 'package:oysloe_mobile/features/dashboard/domain/usecases/update_review_u
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_categories_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_alerts_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/mark_alert_read_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/delete_alert_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_cubit.dart';
 
 part 'di.dart';
 

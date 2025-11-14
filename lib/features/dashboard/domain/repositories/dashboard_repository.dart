@@ -4,6 +4,7 @@ import '../../../../core/errors/failure.dart';
 import '../entities/product_entity.dart';
 import '../entities/review_entity.dart';
 import '../entities/category_entity.dart';
+import '../entities/alert_entity.dart';
 
 abstract class DashboardRepository {
   Future<Either<Failure, List<ProductEntity>>> getProducts({
@@ -33,5 +34,15 @@ abstract class DashboardRepository {
 
   Future<Either<Failure, List<CategoryEntity>>> getCategories({
     bool forceRefresh = false,
+  });
+
+  Future<Either<Failure, List<AlertEntity>>> getAlerts();
+
+  Future<Either<Failure, void>> markAlertRead({
+    required AlertEntity alert,
+  });
+
+  Future<Either<Failure, void>> deleteAlert({
+    required int alertId,
   });
 }

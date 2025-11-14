@@ -8,10 +8,13 @@ import '../../domain/entities/product_entity.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 import '../../domain/entities/review_entity.dart';
 import '../../domain/entities/category_entity.dart';
+import '../../domain/entities/alert_entity.dart';
 import '../datasources/products_remote_data_source.dart';
 import '../datasources/categories_remote_data_source.dart';
 import '../datasources/categories_local_data_source.dart';
+import '../datasources/alerts_remote_data_source.dart';
 import '../models/category_model.dart';
+import '../models/alert_model.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
   static const Duration _categoriesCacheTtl = Duration(hours: 12);
@@ -19,15 +22,18 @@ class DashboardRepositoryImpl implements DashboardRepository {
     required ProductsRemoteDataSource remoteDataSource,
     required CategoriesRemoteDataSource categoriesRemoteDataSource,
     required CategoriesLocalDataSource categoriesLocalDataSource,
+    required AlertsRemoteDataSource alertsRemoteDataSource,
     required Network network,
   })  : _remoteDataSource = remoteDataSource,
         _categoriesRemoteDataSource = categoriesRemoteDataSource,
         _categoriesLocalDataSource = categoriesLocalDataSource,
+        _alertsRemoteDataSource = alertsRemoteDataSource,
         _network = network;
 
   final ProductsRemoteDataSource _remoteDataSource;
   final CategoriesRemoteDataSource _categoriesRemoteDataSource;
   final CategoriesLocalDataSource _categoriesLocalDataSource;
+  final AlertsRemoteDataSource _alertsRemoteDataSource;
   final Network _network;
 
   @override
@@ -245,6 +251,90 @@ class DashboardRepositoryImpl implements DashboardRepository {
       if (cacheHasData && cache != null) {
         return right(cache.categories.cast<CategoryEntity>());
       }
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AlertEntity>>> getAlerts() async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final List<AlertModel> models = await _alertsRemoteDataSource.getAlerts();
+      final List<AlertEntity> alerts = models
+          .map<AlertEntity>((AlertModel model) => model)
+          .toList()
+        ..sort(
+          (AlertEntity a, AlertEntity b) => b.createdAt.compareTo(a.createdAt),
+        );
+      return right(alerts);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError(
+        'Unexpected alerts fetch failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> markAlertRead({
+    required AlertEntity alert,
+  }) async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final AlertModel payload =
+          AlertModel.fromEntity(alert.copyWith(isRead: true));
+      await _alertsRemoteDataSource.markAlertRead(payload);
+      return right(null);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError(
+        'Unexpected mark alert read failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAlert({
+    required int alertId,
+  }) async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      await _alertsRemoteDataSource.deleteAlert(alertId);
+      return right(null);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError(
+        'Unexpected delete alert failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return left(const ServerFailure('Unexpected error occurred'));
     }
   }

@@ -1,14 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
+import 'package:oysloe_mobile/core/common/widgets/adaptive_progress_indicator.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/core/utils/alert_time_utils.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/entities/alert_entity.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_state.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/alert_tile.dart';
 
 class AlertsScreen extends StatelessWidget {
   const AlertsScreen({super.key});
 
-  bool get hasAlerts => true;
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<AlertsCubit>()..fetchAlerts(),
+      child: const _AlertsView(),
+    );
+  }
+}
+
+class _AlertsView extends StatelessWidget {
+  const _AlertsView();
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +35,46 @@ class AlertsScreen extends StatelessWidget {
       backgroundColor: AppColors.grayF9,
       appBar: CustomAppBar(
         title: 'Alerts',
-        actions: [
+        actions: const [
           Icon(
             Icons.more_vert,
             color: Color(0xFF817F7F),
             size: 24,
-          )
+          ),
         ],
       ),
-      body: hasAlerts ? _buildAlertsContent() : _buildEmptyState(),
+      body: BlocListener<AlertsCubit, AlertsState>(
+        listenWhen: (previous, current) =>
+            current.message != null && previous.message != current.message,
+        listener: (context, state) {
+          if (state.status != AlertsStatus.failure && state.message != null) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(content: Text(state.message!)),
+              );
+          }
+        },
+        child: BlocBuilder<AlertsCubit, AlertsState>(
+          builder: (context, state) {
+            if (state.isLoading && !state.hasData) {
+              return const Center(child: AdaptiveProgressIndicator());
+            }
+
+            if (state.hasData) {
+              return _buildAlertsContent(context, state);
+            }
+
+            if (state.hasError) {
+              return _buildMessage(
+                state.message ?? 'Unable to load alerts',
+              );
+            }
+
+            return _buildEmptyState();
+          },
+        ),
+      ),
     );
   }
 
@@ -49,7 +99,7 @@ class AlertsScreen extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               'You currently do not have any notification yet.\nwe\'re going to notify you when \nsomething new happens',
               textAlign: TextAlign.center,
@@ -65,87 +115,59 @@ class AlertsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAlertsContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: ListView(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            children: [
-              _AlertGroup(
-                title: 'Today',
-                alerts: [
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message:
-                        'We\'re excited to have you onboard. You\'ve taken the first step toward smarter shopping and selling. Big things await — stay tuned!',
-                    hasCustomProfile: false,
-                  ),
-                ],
-              ),
-              SizedBox(height: 2.5.h),
-              _AlertGroup(
-                title: 'Yesterday',
-                alerts: [
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message: 'Your subscription expires in 7 days',
-                    hasCustomProfile: false,
-                  ),
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message: 'Your subscription expires in 3 days',
-                    hasCustomProfile: false,
-                  ),
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message: 'Your subscription is expired Subscribe',
-                    hasCustomProfile: false,
-                    hasActionText: true,
-                    actionText: 'Subscribe',
-                  ),
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message: 'we hand picked few items for you show listings',
-                    hasCustomProfile: false,
-                    hasActionText: true,
-                    actionText: 'show listings',
-                  ),
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Akosua Amassa',
-                    message: 'Made a review on your ad Open',
-                    profileImagePath: 'assets/images/man.jpg',
-                    hasCustomProfile: true,
-                    hasActionText: true,
-                    actionText: 'Open',
-                  ),
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message:
-                        'We\'ve given you a free coupon,Your code to redeem is GH32432',
-                    hasCustomProfile: false,
-                  ),
-                  _AlertData(
-                    timeAgo: '10 mins ago',
-                    title: 'Oysloe',
-                    message:
-                        'Your ad Samsung s6 ultra.. is reported as taken. Verify and update the status now!. Be informed you\'ll face suspension if there\'s multiple report on this ad.',
-                    hasCustomProfile: false,
-                  ),
-                ],
-              ),
-            ],
-          ),
+  Widget _buildMessage(String message) {
+    return Center(
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: AppTypography.body.copyWith(
+          color: AppColors.blueGray374957,
+          fontSize: 14.sp,
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildAlertsContent(BuildContext context, AlertsState state) {
+    final AlertsCubit cubit = context.read<AlertsCubit>();
+    final DateTime now = DateTime.now();
+    final List<_AlertSection> sections = _groupAlerts(state.alerts, now);
+
+    final List<Widget> groups = <Widget>[];
+    for (int index = 0; index < sections.length; index++) {
+      final _AlertSection section = sections[index];
+      groups.add(
+        _AlertGroup(
+          title: section.title,
+          alerts: section.alerts,
+          expandedAlertIds: state.expandedAlertIds,
+          onToggle: cubit.toggleAlert,
+          onDelete: cubit.deleteAlert,
+          onMarkRead: cubit.markAlertRead,
+        ),
+      );
+      if (index != sections.length - 1) {
+        groups.add(SizedBox(height: 2.5.h));
+      }
+    }
+
+    return RefreshIndicator(
+      color: AppColors.blueGray374957,
+      onRefresh: () => cubit.fetchAlerts(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: SlidableAutoCloseBehavior(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: groups,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -154,10 +176,18 @@ class _AlertGroup extends StatelessWidget {
   const _AlertGroup({
     required this.title,
     required this.alerts,
+    required this.expandedAlertIds,
+    required this.onToggle,
+    required this.onDelete,
+    required this.onMarkRead,
   });
 
   final String title;
-  final List<_AlertData> alerts;
+  final List<AlertEntity> alerts;
+  final Set<int> expandedAlertIds;
+  final void Function(AlertEntity alert) onToggle;
+  final void Function(AlertEntity alert) onDelete;
+  final void Function(AlertEntity alert) onMarkRead;
 
   @override
   Widget build(BuildContext context) {
@@ -165,135 +195,62 @@ class _AlertGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 20, bottom: 16),
+          padding: const EdgeInsets.only(left: 20, bottom: 16),
           child: Text(
             title,
             style: AppTypography.bodySmall.copyWith(
-              color: Color(0xFF646161),
+              color: const Color(0xFF646161),
             ),
           ),
         ),
-        ...alerts.map((alert) => _AlertTile(data: alert)),
+        ...alerts.map(
+          (AlertEntity alert) => AlertTile(
+            alert: alert,
+            timeLabel: AlertTimeUtils.formatAlertTimeLabel(alert.createdAt),
+            isExpanded: expandedAlertIds.contains(alert.id),
+            onTap: () => onToggle(alert),
+            onDelete: () => onDelete(alert),
+            onMarkRead: () => onMarkRead(alert),
+          ),
+        ),
       ],
     );
   }
 }
 
-class _AlertTile extends StatelessWidget {
-  const _AlertTile({
-    required this.data,
+class _AlertSection {
+  const _AlertSection({
+    required this.title,
+    required this.alerts,
   });
 
-  final _AlertData data;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.grayD9.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildAvatar(),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.timeAgo,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.gray8B959E,
-                    fontSize: 12.sp,
-                  ),
-                ),
-                SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '${data.title} ',
-                        style: AppTypography.body.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.blueGray374957,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                      TextSpan(
-                        text: data.hasActionText
-                            ? data.message.replaceAll(data.actionText ?? '', '')
-                            : data.message,
-                        style: AppTypography.body.copyWith(
-                          color: AppColors.blueGray374957,
-                          fontSize: 14.sp,
-                          height: 1.4,
-                        ),
-                      ),
-                      if (data.hasActionText && data.actionText != null)
-                        TextSpan(
-                          text: data.actionText,
-                          style: AppTypography.body.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.blueGray374957,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAvatar() {
-    return data.hasCustomProfile && data.profileImagePath != null
-        ? ClipOval(
-            child: Image.asset(
-              data.profileImagePath!,
-              fit: BoxFit.cover,
-              width: 32,
-              height: 32,
-            ),
-          )
-        : Center(
-            child: SvgPicture.asset(
-              'assets/icons/bk_logo.svg',
-              width: 32,
-              height: 32,
-            ),
-          );
-  }
+  final String title;
+  final List<AlertEntity> alerts;
 }
 
-class _AlertData {
-  const _AlertData({
-    required this.timeAgo,
-    required this.title,
-    required this.message,
-    required this.hasCustomProfile,
-    this.profileImagePath,
-    this.hasActionText = false,
-    this.actionText,
-  });
+List<_AlertSection> _groupAlerts(List<AlertEntity> alerts, DateTime now) {
+  final Map<DateTime, List<AlertEntity>> grouped =
+      <DateTime, List<AlertEntity>>{};
 
-  final String timeAgo;
-  final String title;
-  final String message;
-  final bool hasCustomProfile;
-  final String? profileImagePath;
-  final bool hasActionText;
-  final String? actionText;
+  for (final AlertEntity alert in alerts) {
+    final DateTime local = alert.createdAt.toLocal();
+    final DateTime dayKey = DateTime(local.year, local.month, local.day);
+    grouped.putIfAbsent(dayKey, () => <AlertEntity>[]).add(alert);
+  }
+
+  final List<DateTime> keys = grouped.keys.toList()
+    ..sort((DateTime a, DateTime b) => b.compareTo(a));
+
+  return keys
+      .map(
+        (DateTime date) => _AlertSection(
+          title: AlertTimeUtils.describeAlertDay(date, now),
+          alerts: List<AlertEntity>.from(grouped[date]!)
+            ..sort(
+              (AlertEntity a, AlertEntity b) =>
+                  b.createdAt.compareTo(a.createdAt),
+            ),
+        ),
+      )
+      .toList();
 }

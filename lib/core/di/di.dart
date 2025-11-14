@@ -104,11 +104,15 @@ Future<void> _initDashboard() async {
         box: sl(instanceName: 'categories_box'),
       ),
     )
+    ..registerLazySingleton<AlertsRemoteDataSource>(
+      () => AlertsRemoteDataSourceImpl(client: sl()),
+    )
     ..registerLazySingleton<DashboardRepository>(
       () => DashboardRepositoryImpl(
         remoteDataSource: sl(),
         categoriesRemoteDataSource: sl(),
         categoriesLocalDataSource: sl(),
+        alertsRemoteDataSource: sl(),
         network: sl(),
       ),
     )
@@ -124,6 +128,15 @@ Future<void> _initDashboard() async {
     ..registerLazySingleton<GetCategoriesUseCase>(
       () => GetCategoriesUseCase(sl()),
     )
+    ..registerLazySingleton<GetAlertsUseCase>(
+      () => GetAlertsUseCase(sl()),
+    )
+    ..registerLazySingleton<MarkAlertReadUseCase>(
+      () => MarkAlertReadUseCase(sl()),
+    )
+    ..registerLazySingleton<DeleteAlertUseCase>(
+      () => DeleteAlertUseCase(sl()),
+    )
     ..registerLazySingleton<CreateReviewUseCase>(
       () => CreateReviewUseCase(sl()),
     )
@@ -135,5 +148,8 @@ Future<void> _initDashboard() async {
     )
     ..registerFactory<CategoriesCubit>(
       () => CategoriesCubit(sl()),
+    )
+    ..registerFactory<AlertsCubit>(
+      () => AlertsCubit(sl(), sl(), sl()),
     );
 }
