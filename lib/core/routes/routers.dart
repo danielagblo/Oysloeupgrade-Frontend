@@ -264,7 +264,16 @@ final List<RouteBase> routes = <RouteBase>[
       GoRoute(
         name: AppRouteNames.dashboardEditProfile,
         path: AppRoutePaths.dashboardEditProfile,
-        pageBuilder: defaultPageBuilder(const EditProfileScreen()),
+        pageBuilder: (context, state) {
+          return buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: BlocProvider(
+              create: (_) => sl<ProfileCubit>()..hydrate(),
+              child: const EditProfileScreen(),
+            ),
+          );
+        },
       ),
       GoRoute(
         name: AppRouteNames.dashboardAds,

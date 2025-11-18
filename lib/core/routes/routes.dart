@@ -22,6 +22,7 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_sc
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile_screen.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/category_ads.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';

@@ -8,6 +8,7 @@ import '../../../../core/usecase/login_params.dart';
 import '../../../../core/usecase/otp_params.dart';
 import '../../../../core/usecase/reset_password_params.dart';
 import '../../../../core/usecase/register_params.dart';
+import '../../../../core/usecase/update_profile_params.dart';
 import '../../../../core/utils/logger.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/otp_entity.dart';
@@ -38,6 +39,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final OtpRemoteDataSource _otpRemoteDataSource;
   final Network _network;
   final Dio _client;
+  AuthSessionModel? _currentSession;
 
   @override
   Future<Either<Failure, AuthSessionEntity>> register(
@@ -88,6 +90,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _localDataSource.clearSession();
       _setAuthHeader(null);
+      _currentSession = null;
       return right(null);
     } on CacheException catch (error) {
       return left(CacheFailure(error.message));
@@ -101,8 +104,13 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthSessionEntity?> cachedSession() async {
     try {
+      if (_currentSession != null) {
+        _setAuthHeader(_currentSession!.token);
+        return _currentSession;
+      }
       final AuthSessionModel? session = await _localDataSource.readSession();
       if (session != null) {
+        _currentSession = session;
         _setAuthHeader(session.token);
       }
       return session;
@@ -118,6 +126,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _localDataSource.cacheSession(session);
       _setAuthHeader(session.token);
+      _currentSession = session;
       return right(session);
     } on CacheException catch (error) {
       return left(CacheFailure(error.message));
@@ -221,6 +230,89 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, AuthUserEntity>> getProfile() async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      try {
+        final AuthSessionModel? cached =
+            await _localDataSource.readSession();
+        if (cached != null) {
+          return right(cached.user);
+        }
+      } on CacheException catch (error) {
+        return left(CacheFailure(error.message));
+      }
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final AuthUserModel user = await _remoteDataSource.fetchProfile();
+      await _updateCachedUser(user);
+      return right(user);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError('Unexpected getProfile failure',
+          error: error, stackTrace: stackTrace);
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthUserEntity>> updateProfile(
+    UpdateProfileParams params,
+  ) async {
+    final bool isConnected = await _network.isConnected;
+    if (!isConnected) {
+      return left(const NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final AuthUserModel user =
+          await _remoteDataSource.updateProfile(params);
+      await _updateCachedUser(user);
+      return right(user);
+    } on ApiException catch (error) {
+      return left(APIFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } catch (error, stackTrace) {
+      logError('Unexpected updateProfile failure',
+          error: error, stackTrace: stackTrace);
+      return left(const ServerFailure('Unexpected error occurred'));
+    }
+  }
+
+  Future<void> _updateCachedUser(AuthUserModel user) async {
+    try {
+      final AuthSessionModel? current =
+          await _localDataSource.readSession();
+      if (current == null) return;
+      final AuthSessionModel updated = AuthSessionModel(
+        user: user,
+        token: current.token,
+      );
+      await _localDataSource.cacheSession(updated);
+      _currentSession = updated;
+      _setAuthHeader(updated.token);
+    } on CacheException catch (error, stackTrace) {
+      logError(
+        'Unable to refresh cached session',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    } catch (error, stackTrace) {
+      logError(
+        'Unexpected cache refresh failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   void _setAuthHeader(String? token) {
     if (token == null || token.isEmpty) {
       _client.options.headers.remove('Authorization');
@@ -228,4 +320,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _client.options.headers['Authorization'] = 'Token $token';
     }
   }
+
+  @override
+  AuthSessionEntity? get currentSession => _currentSession;
 }

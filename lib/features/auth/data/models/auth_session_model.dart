@@ -6,11 +6,22 @@ class AuthUserModel extends AuthUserEntity {
     required super.email,
     required super.phone,
     required super.name,
+    super.activeAds,
+    super.takenAds,
     super.lastLogin,
     super.createdAt,
     super.updatedAt,
     super.address,
     super.avatar,
+    super.businessName,
+    super.idNumber,
+    super.secondNumber,
+    super.businessLogo,
+    super.idFrontPage,
+    super.idBackPage,
+    super.accountNumber,
+    super.accountName,
+    super.mobileNetwork,
     super.deleted,
     super.level,
     super.referralPoints,
@@ -32,11 +43,22 @@ class AuthUserModel extends AuthUserEntity {
       email: json['email'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
       name: json['name'] as String? ?? '',
+      activeAds: _parseInt(json['active_ads']),
+      takenAds: _parseInt(json['taken_ads']),
       lastLogin: _parseDate(json['last_login']),
       createdAt: _parseDate(json['created_at']),
       updatedAt: _parseDate(json['updated_at']),
       address: json['address'] as String?,
       avatar: json['avatar'] as String?,
+      businessName: json['business_name'] as String?,
+      idNumber: json['id_number'] as String?,
+      secondNumber: json['second_number'] as String?,
+      businessLogo: json['business_logo'] as String?,
+      idFrontPage: json['id_front_page'] as String?,
+      idBackPage: json['id_back_page'] as String?,
+      accountNumber: json['account_number'] as String?,
+      accountName: json['account_name'] as String?,
+      mobileNetwork: json['mobile_network'] as String?,
       deleted: json['deleted'] as bool?,
       level: json['level'] as String?,
       referralPoints: json['referral_points'] is int
@@ -53,7 +75,7 @@ class AuthUserModel extends AuthUserEntity {
           json['preferred_notification_email'] as String?,
       preferredNotificationPhone:
           json['preferred_notification_phone'] as String?,
-    adminVerified: json['admin_verified'] as bool?,
+      adminVerified: json['admin_verified'] as bool?,
     );
   }
 
@@ -63,11 +85,22 @@ class AuthUserModel extends AuthUserEntity {
       email: entity.email,
       phone: entity.phone,
       name: entity.name,
+      activeAds: entity.activeAds,
+      takenAds: entity.takenAds,
       lastLogin: entity.lastLogin,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       address: entity.address,
       avatar: entity.avatar,
+      businessName: entity.businessName,
+      idNumber: entity.idNumber,
+      secondNumber: entity.secondNumber,
+      businessLogo: entity.businessLogo,
+      idFrontPage: entity.idFrontPage,
+      idBackPage: entity.idBackPage,
+      accountNumber: entity.accountNumber,
+      accountName: entity.accountName,
+      mobileNetwork: entity.mobileNetwork,
       deleted: entity.deleted,
       level: entity.level,
       referralPoints: entity.referralPoints,
@@ -89,11 +122,22 @@ class AuthUserModel extends AuthUserEntity {
         'email': email,
         'phone': phone,
         'name': name,
+        'active_ads': activeAds,
+        'taken_ads': takenAds,
         'last_login': lastLogin?.toIso8601String(),
         'created_at': createdAt?.toIso8601String(),
         'updated_at': updatedAt?.toIso8601String(),
         'address': address,
         'avatar': avatar,
+        'business_name': businessName,
+        'id_number': idNumber,
+        'second_number': secondNumber,
+        'business_logo': businessLogo,
+        'id_front_page': idFrontPage,
+        'id_back_page': idBackPage,
+        'account_number': accountNumber,
+        'account_name': accountName,
+        'mobile_network': mobileNetwork,
         'deleted': deleted,
         'level': level,
         'referral_points': referralPoints,
@@ -145,6 +189,15 @@ DateTime? _parseDate(dynamic raw) {
   if (raw is DateTime) return raw;
   if (raw is String && raw.isNotEmpty) {
     return DateTime.tryParse(raw);
+  }
+  return null;
+}
+
+int? _parseInt(dynamic raw) {
+  if (raw == null) return null;
+  if (raw is int) return raw;
+  if (raw is String) {
+    return int.tryParse(raw);
   }
   return null;
 }

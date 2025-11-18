@@ -23,6 +23,7 @@ class AppTextField extends StatefulWidget {
     this.autocorrect = true,
     this.obscuringCharacter = '•',
     this.compact = false,
+    this.trailingIcon,
   });
 
   final TextEditingController? controller;
@@ -42,6 +43,8 @@ class AppTextField extends StatefulWidget {
   final String obscuringCharacter;
   // When true, reduces vertical padding to make the field more compact in height.
   final bool compact;
+  // Optional trailing icon (e.g. dropdown indicator) for non-password fields.
+  final Widget? trailingIcon;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -129,7 +132,13 @@ class _AppTextFieldState extends State<AppTextField> {
                 ),
                 tooltip: _obscure ? 'Show password' : 'Hide password',
               )
-            : null,
+            : (widget.trailingIcon != null
+                ? Padding(
+                    padding:
+                        const EdgeInsetsDirectional.only(end: 16.0, start: 8.0),
+                    child: widget.trailingIcon,
+                  )
+                : null),
         border: baseBorder,
         enabledBorder: baseBorder,
         focusedBorder: focusedBorder,

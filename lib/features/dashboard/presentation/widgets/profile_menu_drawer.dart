@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/modal.dart';
+import 'package:oysloe_mobile/core/constants/api.dart';
 import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/usecase/usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/entities/auth_entity.dart';
 import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/logout_usecase.dart';
-import 'package:oysloe_mobile/features/auth/domain/entities/auth_entity.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 /// A right-side drawer shown when tapping the Profile tab.
@@ -34,11 +36,17 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
 
   Future<void> _hydrateSession() async {
     final AuthRepository repository = sl<AuthRepository>();
-    final session = await repository.cachedSession();
+    final session = repository.currentSession;
+    if (session != null) {
+      _hasSession = true;
+      _user = session.user;
+    }
+
+    final refreshed = await repository.cachedSession();
     if (!mounted) return;
     setState(() {
-      _hasSession = session != null;
-      _user = session?.user;
+      _hasSession = refreshed != null;
+      _user = refreshed?.user ?? _user;
     });
   }
 
@@ -146,11 +154,20 @@ class _ProfileMenuDrawerState extends State<ProfileMenuDrawer> {
 
               // Stats
               Row(
-                children: const [
+                children: [
                   Expanded(
-                      child: _StatCard(title: 'Active Ads', value: '900k')),
-                  SizedBox(width: 12),
-                  Expanded(child: _StatCard(title: 'Taken Ads', value: '900k')),
+                    child: _StatCard(
+                      title: 'Active Ads',
+                      value: _formatStatValue(_user?.activeAds),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatCard(
+                      title: 'Taken Ads',
+                      value: _formatStatValue(_user?.takenAds),
+                    ),
+                  ),
                 ],
               ),
 
@@ -386,14 +403,23 @@ class _AvatarImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? url = (avatarUrl ?? '').trim().isEmpty ? null : avatarUrl;
-    if (url == null) {
+    final String trimmed = (avatarUrl ?? '').trim();
+    if (trimmed.isEmpty) {
       return SvgPicture.asset(
         'assets/images/default_user.svg',
         width: 39,
         height: 39,
       );
     }
+
+    // Resolve API-relative paths (e.g. "/assets/avatars/xyz.png") to full URLs.
+    String url = trimmed;
+    if (url.startsWith('/')) {
+      final Uri baseUri = Uri.parse(AppStrings.baseUrl);
+      final String origin = '${baseUri.scheme}://${baseUri.host}';
+      url = '$origin$url';
+    }
+
     return ClipOval(
       child: Image.network(
         url,
@@ -423,6 +449,11 @@ String? _formatLevel(String? raw) {
     default:
       return raw;
   }
+}
+
+String _formatStatValue(int? value) {
+  if (value == null) return '—';
+  return NumberFormat.compact().format(value);
 }
 
 class _SectionHeader extends StatelessWidget {

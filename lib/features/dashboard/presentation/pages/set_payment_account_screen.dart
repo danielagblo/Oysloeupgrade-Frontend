@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/input.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/widgets/multi_page_bottom_sheet.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_state.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/models/edit_profile_draft.dart';
+
 import 'edit_profile_final_screen.dart';
 import '../widgets/ad_input.dart';
 
 class SetPaymentAccountScreen extends StatefulWidget {
-  const SetPaymentAccountScreen({super.key});
+  const SetPaymentAccountScreen({super.key, required this.initialDraft});
+
+  final EditProfileDraft initialDraft;
 
   @override
   State<SetPaymentAccountScreen> createState() =>
@@ -20,13 +29,70 @@ class SetPaymentAccountScreen extends StatefulWidget {
 class _SetPaymentAccountScreenState extends State<SetPaymentAccountScreen> {
   final _accountNameCtrl = TextEditingController();
   final _accountNumberCtrl = TextEditingController();
+  final _networkCtrl = TextEditingController();
   String? _selectedNetwork;
+  late EditProfileDraft _draft;
+
+  @override
+  void initState() {
+    super.initState();
+    _draft = widget.initialDraft;
+    _accountNameCtrl.text = _draft.accountName ?? '';
+    _accountNumberCtrl.text = _draft.accountNumber ?? '';
+    _selectedNetwork = _draft.mobileNetwork;
+    _networkCtrl.text = _selectedNetwork ?? '';
+  }
 
   @override
   void dispose() {
     _accountNameCtrl.dispose();
     _accountNumberCtrl.dispose();
+    _networkCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _showNetworkPicker() async {
+    const options = ['MTN', 'Vodafone', 'AirtelTigo', 'Glo'];
+    final String? selected = await showMultiPageBottomSheet<String>(
+      context: context,
+      rootPage: MultiPageSheetPage<String>(
+        title: 'Mobile network',
+        sections: [
+          MultiPageSheetSection<String>(
+            items: options
+                .map(
+                  (e) => MultiPageSheetItem<String>(label: e, value: e),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+
+    if (selected != null && mounted) {
+      setState(() {
+        _selectedNetwork = selected;
+        _networkCtrl.text = selected;
+      });
+    }
+  }
+
+  void _goToFinal(BuildContext context) {
+    final cubit = context.read<ProfileCubit>();
+    final EditProfileDraft updated = _draft.copyWith(
+      accountName: _accountNameCtrl.text.trim(),
+      accountNumber: _accountNumberCtrl.text.trim(),
+      mobileNetwork: _selectedNetwork,
+    );
+    _draft = updated;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: cubit,
+          child: EditProfileFinalScreen(draft: updated),
+        ),
+      ),
+    );
   }
 
   @override
@@ -38,102 +104,103 @@ class _SetPaymentAccountScreenState extends State<SetPaymentAccountScreen> {
         title: 'Set up',
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final maxWidth = constraints.maxWidth;
-            final horizontalPadding =
-                maxWidth > 600 ? (maxWidth - 560) / 2 : 5.w;
-            return SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                  horizontal: horizontalPadding, vertical: 2.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _ProgressCard(percentage: 0.8),
-                  SizedBox(height: 2.2.h),
-                  Center(
-                    child: Text(
-                      'Set payment account',
-                      style: AppTypography.body.copyWith(
-                        color: Colors.black54,
+        child: BlocBuilder<ProfileCubit, ProfileState>(
+          builder: (context, state) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final maxWidth = constraints.maxWidth;
+                final horizontalPadding =
+                    maxWidth > 600 ? (maxWidth - 560) / 2 : 5.w;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding, vertical: 2.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _ProgressCard(percentage: 0.8),
+                      SizedBox(height: 2.2.h),
+                      Center(
+                        child: Text(
+                          'Set payment account',
+                          style: AppTypography.body.copyWith(
+                            color: Colors.black54,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 2.2.h),
-                  const _FieldLabel('Add account name'),
-                  AppTextField(
-                    controller: _accountNameCtrl,
-                    hint: 'Account name',
-                    leadingSvgAsset: 'assets/icons/account_name.svg',
-                    textInputAction: TextInputAction.next,
-                    compact: true,
-                  ),
-                  SizedBox(height: 1.6.h),
-                  const _FieldLabel('Add account number'),
-                  AppTextField(
-                    controller: _accountNumberCtrl,
-                    hint: 'Account number',
-                    leadingSvgAsset: 'assets/icons/referral.svg',
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.next,
-                    compact: true,
-                  ),
-                  SizedBox(height: 1.6.h),
-                  const _FieldLabel('Mobile network'),
-                  AdDropdown<String>(
-                    value: _selectedNetwork,
-                    onChanged: (v) => setState(() => _selectedNetwork = v),
-                    hintText: 'Select mobile network',
-                    compact: true,
-                    prefixIcon: Padding(
-                      padding: EdgeInsetsDirectional.only(start: 24, end: 12),
-                      child: SvgPicture.asset(
-                        'assets/icons/mobile_network.svg',
-                        width: 20,
-                        height: 20,
+                      SizedBox(height: 2.2.h),
+                      const _FieldLabel('Add account name'),
+                      AppTextField(
+                        controller: _accountNameCtrl,
+                        hint: 'Account name',
+                        leadingSvgAsset: 'assets/icons/account_name.svg',
+                        textInputAction: TextInputAction.next,
+                        compact: true,
                       ),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'MTN', child: Text('MTN')),
-                      DropdownMenuItem(
-                          value: 'Vodafone', child: Text('Vodafone')),
-                      DropdownMenuItem(
-                          value: 'AirtelTigo', child: Text('AirtelTigo')),
-                      DropdownMenuItem(value: 'Glo', child: Text('Glo')),
+                      SizedBox(height: 1.6.h),
+                      const _FieldLabel('Add account number'),
+                      AppTextField(
+                        controller: _accountNumberCtrl,
+                        hint: 'Account number',
+                        leadingSvgAsset: 'assets/icons/referral.svg',
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        compact: true,
+                      ),
+                      SizedBox(height: 1.6.h),
+                      const _FieldLabel('Mobile network'),
+                      GestureDetector(
+                        onTap: _showNetworkPicker,
+                        child: AbsorbPointer(
+                          child: AppTextField(
+                            controller: _networkCtrl,
+                            hint: 'Select mobile network',
+                            leadingSvgAsset: 'assets/icons/mobile_network.svg',
+                            textInputAction: TextInputAction.next,
+                            compact: true,
+                            trailingIcon: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.grayD9.withValues(alpha: 0.35),
+                              ),
+                              child: const Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                size: 15,
+                                color: AppColors.blueGray374957,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => _goToFinal(context),
+                          child: Text(
+                            'Skip',
+                            style: AppTypography.body.copyWith(
+                              color: AppColors.blueGray374957,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 1.2.h),
+                      CustomButton.filled(
+                        label: 'Next',
+                        onPressed: () => _goToFinal(context),
+                        isPrimary: false,
+                        backgroundColor: AppColors.white,
+                        textStyle: AppTypography.body.copyWith(
+                          color: AppColors.blueGray374957,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
                     ],
                   ),
-                  SizedBox(height: 6.h),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      child: Text(
-                        'Skip',
-                        style: AppTypography.body.copyWith(
-                          color: AppColors.blueGray374957,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 1.2.h),
-                  CustomButton.filled(
-                    label: 'Next',
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const EditProfileFinalScreen(),
-                        ),
-                      );
-                    },
-                    isPrimary: false,
-                    backgroundColor: AppColors.white,
-                    textStyle: AppTypography.body.copyWith(
-                      color: AppColors.blueGray374957,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                ],
-              ),
+                );
+              },
             );
           },
         ),

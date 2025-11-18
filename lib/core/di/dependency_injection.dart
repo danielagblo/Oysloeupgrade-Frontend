@@ -13,11 +13,13 @@ import 'package:oysloe_mobile/features/auth/data/datasources/otp_remote_data_sou
 import 'package:oysloe_mobile/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/get_cached_session_usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/usecases/get_profile_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/login_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/register_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/send_otp_usecase.dart';
+import 'package:oysloe_mobile/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:oysloe_mobile/features/auth/domain/usecases/verify_reset_otp_usecase.dart';
 import 'package:oysloe_mobile/features/auth/presentation/bloc/login/login_cubit.dart';
@@ -42,6 +44,7 @@ import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_alerts_usec
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/mark_alert_read_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/delete_alert_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_cubit.dart';
 
 part 'di.dart';
 

@@ -5,11 +5,22 @@ class AuthUserEntity extends Equatable {
   final String email;
   final String phone;
   final String name;
+  final int? activeAds;
+  final int? takenAds;
   final DateTime? lastLogin;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final String? address;
   final String? avatar;
+  final String? businessName;
+  final String? idNumber;
+  final String? secondNumber;
+  final String? businessLogo;
+  final String? idFrontPage;
+  final String? idBackPage;
+  final String? accountNumber;
+  final String? accountName;
+  final String? mobileNetwork;
   final bool? deleted;
   final String? level;
   final int? referralPoints;
@@ -29,11 +40,22 @@ class AuthUserEntity extends Equatable {
     required this.email,
     required this.phone,
     required this.name,
+    this.activeAds,
+    this.takenAds,
     this.lastLogin,
     this.createdAt,
     this.updatedAt,
     this.address,
     this.avatar,
+    this.businessName,
+    this.idNumber,
+    this.secondNumber,
+    this.businessLogo,
+    this.idFrontPage,
+    this.idBackPage,
+    this.accountNumber,
+    this.accountName,
+    this.mobileNetwork,
     this.deleted,
     this.level,
     this.referralPoints,
@@ -55,11 +77,22 @@ class AuthUserEntity extends Equatable {
         email,
         phone,
         name,
+        activeAds,
+        takenAds,
         lastLogin,
         createdAt,
         updatedAt,
         address,
         avatar,
+        businessName,
+        idNumber,
+        secondNumber,
+        businessLogo,
+        idFrontPage,
+        idBackPage,
+        accountNumber,
+        accountName,
+        mobileNetwork,
         deleted,
         level,
         referralPoints,

@@ -75,6 +75,12 @@ Future<void> _initAuth() async {
     ..registerLazySingleton<ResetPasswordUseCase>(
       () => ResetPasswordUseCase(sl()),
     )
+    ..registerLazySingleton<GetProfileUseCase>(
+      () => GetProfileUseCase(sl()),
+    )
+    ..registerLazySingleton<UpdateProfileUseCase>(
+      () => UpdateProfileUseCase(sl()),
+    )
     ..registerFactory<RegisterCubit>(
       () => RegisterCubit(sl()),
     )
@@ -151,5 +157,12 @@ Future<void> _initDashboard() async {
     )
     ..registerFactory<AlertsCubit>(
       () => AlertsCubit(sl(), sl(), sl()),
+    )
+    ..registerFactory<ProfileCubit>(
+      () => ProfileCubit(
+        sl<GetCachedSessionUseCase>(),
+        sl<GetProfileUseCase>(),
+        sl<UpdateProfileUseCase>(),
+      ),
     );
 }

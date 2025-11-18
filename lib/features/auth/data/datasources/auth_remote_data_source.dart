@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/constants/api.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/usecase/login_params.dart';
 import '../../../../core/usecase/reset_password_params.dart';
 import '../../../../core/usecase/register_params.dart';
+import '../../../../core/usecase/update_profile_params.dart';
 import '../../../../core/utils/api_helper.dart';
 import '../models/auth_session_model.dart';
 import '../models/reset_password_response_model.dart';
@@ -12,6 +14,8 @@ abstract class AuthRemoteDataSource {
   Future<AuthSessionModel> register(RegisterParams params);
   Future<AuthSessionModel> login(LoginParams params);
   Future<ResetPasswordResponseModel> resetPassword(ResetPasswordParams params);
+  Future<AuthUserModel> fetchProfile();
+  Future<AuthUserModel> updateProfile(UpdateProfileParams params);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -20,12 +24,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     this.registerEndpoint = 'register/',
     this.loginEndpoint = 'login/',
     this.resetPasswordEndpoint = 'resetpassword/',
+    this.userProfileEndpoint = AppStrings.userProfileURL,
   }) : _client = client;
 
   final Dio _client;
   final String registerEndpoint;
   final String loginEndpoint;
   final String resetPasswordEndpoint;
+  final String userProfileEndpoint;
 
   @override
   Future<AuthSessionModel> register(RegisterParams params) async {
@@ -56,6 +62,60 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       final Map<String, dynamic> data = ApiHelper.extractPayload(response);
       return ResetPasswordResponseModel.fromJson(data);
+    } on DioException catch (error) {
+      throw ApiException(ApiHelper.getHumanReadableMessage(error));
+    } on ServerException {
+      rethrow;
+    } catch (error) {
+      throw ServerException(error.toString());
+    }
+  }
+
+  @override
+  Future<AuthUserModel> fetchProfile() async {
+    try {
+      final Response<dynamic> response =
+          await _client.get<dynamic>(userProfileEndpoint);
+      final Map<String, dynamic> data = ApiHelper.extractPayload(response);
+      return AuthUserModel.fromJson(data);
+    } on DioException catch (error) {
+      throw ApiException(ApiHelper.getHumanReadableMessage(error));
+    } on ServerException {
+      rethrow;
+    } catch (error) {
+      throw ServerException(error.toString());
+    }
+  }
+
+  @override
+  Future<AuthUserModel> updateProfile(UpdateProfileParams params) async {
+    try {
+      final FormData formData = FormData.fromMap(params.toJson());
+
+      Future<void> addFile(String field, String? path) async {
+        if (path == null || path.isEmpty) return;
+        formData.files.add(
+          MapEntry(
+            field,
+            await MultipartFile.fromFile(
+              path,
+              filename: path.split('/').last,
+            ),
+          ),
+        );
+      }
+
+      await addFile('avatar', params.avatarFilePath);
+      await addFile('business_logo', params.businessLogoFilePath);
+      await addFile('id_front_page', params.idFrontFilePath);
+      await addFile('id_back_page', params.idBackFilePath);
+
+      final Response<dynamic> response = await _client.put<dynamic>(
+        userProfileEndpoint,
+        data: formData,
+      );
+      final Map<String, dynamic> data = ApiHelper.extractPayload(response);
+      return AuthUserModel.fromJson(data);
     } on DioException catch (error) {
       throw ApiException(ApiHelper.getHumanReadableMessage(error));
     } on ServerException {
