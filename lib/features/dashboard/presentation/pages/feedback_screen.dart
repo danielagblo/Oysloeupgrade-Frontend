@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
+import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
+import 'package:oysloe_mobile/core/di/dependency_injection.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/submit_feedback_usecase.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -14,6 +20,7 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   int _selectedRating = 0;
+  bool _submitting = false;
   final TextEditingController _commentController = TextEditingController();
 
   final List<String> _ratingLabels = [
@@ -34,6 +41,54 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     setState(() {
       _selectedRating = rating;
     });
+  }
+
+  Future<void> _submitFeedback() async {
+    if (_selectedRating <= 0) {
+      showErrorSnackBar(context, 'Please select a rating to submit.');
+      return;
+    }
+
+    final String message = _commentController.text.trim();
+    if (message.isEmpty) {
+      showErrorSnackBar(context, 'Please enter your feedback.');
+      return;
+    }
+
+    final AuthRepository authRepository = sl<AuthRepository>();
+    final session = await authRepository.cachedSession();
+    if (session == null) {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'Please log in to continue.');
+      context.go(AppRoutePaths.login);
+      return;
+    }
+
+    setState(() => _submitting = true);
+
+    final result = await sl<SubmitFeedbackUseCase>()(
+      SubmitFeedbackParams(
+        rating: _selectedRating,
+        message: message,
+      ),
+    );
+
+    if (!mounted) return;
+
+    result.fold(
+      (failure) {
+        final String fallbackError = 'Unable to submit feedback.';
+        final String errorMessage =
+            failure.message.isEmpty ? fallbackError : failure.message;
+        showErrorSnackBar(context, errorMessage);
+        setState(() => _submitting = false);
+      },
+      (_) {
+        showSuccessSnackBar(context, 'Feedback submitted. Thank you!');
+        setState(() => _submitting = false);
+        context.go(AppRoutePaths.dashboardHome);
+      },
+    );
   }
 
   @override
@@ -144,11 +199,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: CustomButton.filled(
-                              label: 'Send Feedback',
-                              backgroundColor: AppColors.white,
-                              onPressed: () {
-                                // Handle submit action
-                              }),
+                            label: 'Send Feedback',
+                            backgroundColor: AppColors.white,
+                            isLoading: _submitting,
+                            onPressed: _submitting ? null : _submitFeedback,
+                          ),
                         ),
                         SizedBox(height: 2.h),
                       ],

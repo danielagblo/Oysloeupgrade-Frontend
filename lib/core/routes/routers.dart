@@ -229,7 +229,20 @@ final List<RouteBase> routes = <RouteBase>[
               return buildPageWithDefaultTransition(
                 context: context,
                 state: state,
-                child: PostAdFormScreen(selectedImages: selectedImages),
+                child: MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (_) => sl<CategoriesCubit>()..fetch(),
+                    ),
+                    BlocProvider(
+                      create: (_) => sl<SubcategoriesCubit>(),
+                    ),
+                    BlocProvider(
+                      create: (_) => sl<LocationsCubit>()..fetch(),
+                    ),
+                  ],
+                  child: PostAdFormScreen(selectedImages: selectedImages),
+                ),
               );
             },
           ),
@@ -303,19 +316,25 @@ final List<RouteBase> routes = <RouteBase>[
           return buildPageWithDefaultTransition(
             context: context,
             state: state,
-            child: MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (_) => sl<ProductsCubit>()..fetch(),
+              child: MultiBlocProvider(
+                providers: [
+                  BlocProvider(
+                    create: (_) => sl<ProductsCubit>()..fetch(),
+                  ),
+                  BlocProvider(
+                    create: (_) => sl<CategoriesCubit>()..fetch(),
+                  ),
+                  BlocProvider(
+                    create: (_) => sl<SubcategoriesCubit>(),
+                  ),
+                  BlocProvider(
+                    create: (_) => sl<LocationsCubit>()..fetch(),
+                  ),
+                ],
+                child: CategoryAdsScreen(
+                  initialCategoryLabel: initialCategory,
+                  initialCategoryId: initialCategoryId,
                 ),
-                BlocProvider(
-                  create: (_) => sl<CategoriesCubit>()..fetch(),
-                ),
-              ],
-              child: CategoryAdsScreen(
-                initialCategoryLabel: initialCategory,
-                initialCategoryId: initialCategoryId,
-              ),
             ),
           );
         },

@@ -4,7 +4,11 @@ import '../../../../core/errors/failure.dart';
 import '../entities/product_entity.dart';
 import '../entities/review_entity.dart';
 import '../entities/category_entity.dart';
+import '../entities/subcategory_entity.dart';
 import '../entities/alert_entity.dart';
+import '../entities/location_entity.dart';
+import '../entities/privacy_policy_entity.dart';
+import '../entities/terms_condition_entity.dart';
 
 abstract class DashboardRepository {
   Future<Either<Failure, List<ProductEntity>>> getProducts({
@@ -32,8 +36,23 @@ abstract class DashboardRepository {
     String? comment,
   });
 
+  Future<Either<Failure, void>> submitFeedback({
+    required int rating,
+    required String message,
+  });
+
   Future<Either<Failure, List<CategoryEntity>>> getCategories({
     bool forceRefresh = false,
+  });
+
+  Future<Either<Failure, List<SubcategoryEntity>>> getSubcategories({
+    required int categoryId,
+  });
+
+  Future<Either<Failure, List<LocationEntity>>> getLocations({
+    String? ordering,
+    String? region,
+    String? search,
   });
 
   Future<Either<Failure, List<AlertEntity>>> getAlerts();
@@ -45,4 +64,8 @@ abstract class DashboardRepository {
   Future<Either<Failure, void>> deleteAlert({
     required int alertId,
   });
+
+  Future<Either<Failure, List<PrivacyPolicyEntity>>> getPrivacyPolicies();
+
+  Future<Either<Failure, List<TermsConditionEntity>>> getTermsConditions();
 }

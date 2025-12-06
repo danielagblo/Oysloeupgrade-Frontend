@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
 import 'package:oysloe_mobile/core/common/widgets/buttons.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/entities/location_entity.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_input.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_state.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/subcategories/subcategories_cubit.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class PostAdFormScreen extends StatefulWidget {
@@ -34,10 +39,9 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
   final _weeklyDurationController = TextEditingController();
   final _monthlyDurationController = TextEditingController();
 
-  String? _selectedCategory;
+  CategorySelection? _selectedCategory;
   String _selectedPurpose = 'Sale';
-  String? _selectedAreaLocation;
-  String? _selectedMapLocation;
+  LocationEntity? _selectedAreaLocation;
 
   @override
   void dispose() {
@@ -201,181 +205,170 @@ class _PostAdFormScreenState extends State<PostAdFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.grayF9,
-      appBar: CustomAppBar(
-        title: 'Post Ad',
-        backgroundColor: AppColors.white,
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(4.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AdCategoryDropdown(
-                labelText: 'Product Category',
-                value: _selectedCategory,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                },
-              ),
-              SizedBox(height: 3.h),
-              AdInput(
-                controller: _titleController,
-                labelText: 'Title',
-                hintText: 'Add a title',
-              ),
-              SizedBox(height: 3.h),
-              Text(
-                'Declare ad purpose?',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.blueGray374957,
-                  fontWeight: FontWeight.w500,
+    return BlocListener<CategoriesCubit, CategoriesState>(
+      listenWhen: (previous, current) =>
+          current.hasData && current.categories != previous.categories,
+      listener: (context, state) {
+        context
+            .read<SubcategoriesCubit>()
+            .prefetchForCategories(state.categories.map((c) => c.id));
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.grayF9,
+        appBar: CustomAppBar(
+          title: 'Post Ad',
+          backgroundColor: AppColors.white,
+        ),
+        body: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(4.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AdCategoryDropdown(
+                  labelText: 'Product Category',
+                  value: _selectedCategory,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  },
                 ),
-              ),
-              SizedBox(height: 2.w),
-              Row(
-                children: [
-                  _buildPurposeOption('Sale'),
-                  SizedBox(width: 4.w),
-                  _buildPurposeOption('PayLater'),
-                  SizedBox(width: 4.w),
-                  _buildPurposeOption('Rent'),
-                ],
-              ),
-              SizedBox(height: 3.h),
-              _buildPriceSection(),
-              SizedBox(height: 3.h),
-              AdLocationDropdown(
-                labelText: 'Ad Area Location',
-                value: _selectedAreaLocation,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedAreaLocation = value;
-                  });
-                },
-              ),
-              SizedBox(height: 2.w),
-              Wrap(
-                spacing: 2.w,
-                runSpacing: 1.w,
-                children: [
-                  'Home Spintex',
-                  'Shop Accra',
-                  'Shop East Legon',
-                  'Shop Kumasi'
-                ].map((location) => _buildLocationChip(location)).toList(),
-              ),
-              SizedBox(height: 3.w),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/shield_info.svg',
+                SizedBox(height: 3.h),
+                AdInput(
+                  controller: _titleController,
+                  labelText: 'Title',
+                  hintText: 'Add a title',
+                ),
+                SizedBox(height: 3.h),
+                Text(
+                  'Declare ad purpose?',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.blueGray374957,
+                    fontWeight: FontWeight.w500,
                   ),
-                  SizedBox(width: 2.w),
-                  Expanded(
-                    child: Text(
-                      ' This is required only for verification and safety purposes.',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.gray8B959E,
-                        fontSize: 13.sp,
+                ),
+                SizedBox(height: 2.w),
+                Row(
+                  children: [
+                    _buildPurposeOption('Sale'),
+                    SizedBox(width: 4.w),
+                    _buildPurposeOption('PayLater'),
+                    SizedBox(width: 4.w),
+                    _buildPurposeOption('Rent'),
+                  ],
+                ),
+                SizedBox(height: 3.h),
+                _buildPriceSection(),
+                SizedBox(height: 3.h),
+                AdLocationDropdown(
+                  labelText: 'Ad Area Location',
+                  value: _selectedAreaLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedAreaLocation = value;
+                    });
+                  },
+                ),
+                SizedBox(height: 2.w),
+                Wrap(
+                  spacing: 2.w,
+                  runSpacing: 1.w,
+                  children: [
+                    'Home Spintex',
+                    'Shop Accra',
+                    'Shop East Legon',
+                    'Shop Kumasi'
+                  ].map((location) => _buildLocationChip(location)).toList(),
+                ),
+                SizedBox(height: 3.w),
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/shield_info.svg',
+                    ),
+                    SizedBox(width: 2.w),
+                    Expanded(
+                      child: Text(
+                        ' This is required only for verification and safety purposes.',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.gray8B959E,
+                          fontSize: 13.sp,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 3.h),
-              AdLocationDropdown(
-                labelText: 'Ad Actual Map Location',
-                value: _selectedMapLocation,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedMapLocation = value;
-                  });
-                },
-              ),
-              SizedBox(height: 2.w),
-              Wrap(
-                spacing: 2.w,
-                runSpacing: 1.w,
-                children: [
-                  'Home Spintex',
-                  'Shop Accra',
-                  'Shop East Legon',
-                  'Shop Kumasi'
-                ].map((location) => _buildLocationChip(location)).toList(),
-              ),
-              SizedBox(height: 3.h),
-              Text(
-                'Key Features',
-                style: AppTypography.bodySmall.copyWith(
-                  fontWeight: FontWeight.w500,
+                  ],
                 ),
-              ),
-              SizedBox(height: 2.w),
-              AdEditableDropdown(
-                controller: _brandController,
-                hintText: 'Brand',
-                items: [
-                  'Apple',
-                  'Samsung',
-                  'Nike',
-                  'Sony',
-                  'LG',
-                  'HP',
-                  'Dell',
-                  'Other'
-                ],
-                onChanged: (value) {
-                  // Value is already set in the controller
-                },
-              ),
-              SizedBox(height: 3.w),
-              AdEditableDropdown(
-                controller: _key1Controller,
-                hintText: 'Key 1',
-                items: ['New', 'Used', 'Refurbished', 'Like New'],
-                onChanged: (value) {
-                  // Value is already set in the controller
-                },
-              ),
-              SizedBox(height: 3.w),
-              AdEditableDropdown(
-                controller: _key2Controller,
-                hintText: 'Key 2',
-                items: ['Original', 'Copy', 'Generic'],
-                onChanged: (value) {
-                  // Value is already set in the controller
-                },
-              ),
-              SizedBox(height: 3.w),
-              AdEditableDropdown(
-                controller: _key3Controller,
-                hintText: 'Key 3',
-                items: ['Warranty', 'No Warranty', '1 Year', '2 Years'],
-                onChanged: (value) {
-                  // Value is already set in the controller
-                },
-              ),
-              SizedBox(height: 3.h),
-              AdInput(
-                controller: _descriptionController,
-                labelText: 'Description',
-                hintText: 'Type more',
-                maxLines: 4,
-                maxLength: 500,
-              ),
-              SizedBox(height: 6.w),
-              CustomButton.filled(
+                SizedBox(height: 3.h),
+                Text(
+                  'Key Features',
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 2.w),
+                AdEditableDropdown(
+                  controller: _brandController,
+                  hintText: 'Brand',
+                  items: [
+                    'Apple',
+                    'Samsung',
+                    'Nike',
+                    'Sony',
+                    'LG',
+                    'HP',
+                    'Dell',
+                    'Other'
+                  ],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
+                ),
+                SizedBox(height: 3.w),
+                AdEditableDropdown(
+                  controller: _key1Controller,
+                  hintText: 'Key 1',
+                  items: ['New', 'Used', 'Refurbished', 'Like New'],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
+                ),
+                SizedBox(height: 3.w),
+                AdEditableDropdown(
+                  controller: _key2Controller,
+                  hintText: 'Key 2',
+                  items: ['Original', 'Copy', 'Generic'],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
+                ),
+                SizedBox(height: 3.w),
+                AdEditableDropdown(
+                  controller: _key3Controller,
+                  hintText: 'Key 3',
+                  items: ['Warranty', 'No Warranty', '1 Year', '2 Years'],
+                  onChanged: (value) {
+                    // Value is already set in the controller
+                  },
+                ),
+                SizedBox(height: 3.h),
+                AdInput(
+                  controller: _descriptionController,
+                  labelText: 'Description',
+                  hintText: 'Type more',
+                  maxLines: 4,
+                  maxLength: 500,
+                ),
+                SizedBox(height: 6.w),
+                CustomButton.filled(
                   label: 'Finish',
                   backgroundColor: AppColors.white,
-                  onPressed: () {}),
-              SizedBox(height: 3.h),
-            ],
+                  onPressed: () {},
+                ),
+                SizedBox(height: 3.h),
+              ],
+            ),
           ),
         ),
       ),

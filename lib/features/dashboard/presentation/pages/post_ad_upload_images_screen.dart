@@ -90,9 +90,16 @@ class PostAdUploadImagesScreen extends StatefulWidget {
       _PostAdUploadImagesScreenState();
 }
 
+class _ImageItem {
+  const _ImageItem({required this.id, required this.path});
+  final int id;
+  final String path;
+}
+
 class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
-  List<String> _selectedImages = [];
+  final List<_ImageItem> _selectedImages = [];
   static const int maxImages = 6;
+  int _nextImageId = 0;
 
   final List<String> _sampleImages = [
     'assets/images/ad1.jpg',
@@ -106,8 +113,11 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
   Future<void> _pickImages() async {
     setState(() {
       if (_selectedImages.length < maxImages) {
-        _selectedImages
-            .add(_sampleImages[_selectedImages.length % _sampleImages.length]);
+        final String path =
+            _sampleImages[_selectedImages.length % _sampleImages.length];
+        _selectedImages.add(
+          _ImageItem(id: _nextImageId++, path: path),
+        );
       }
     });
   }
@@ -120,7 +130,7 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
 
   void _proceedToNext() {
     context.pushNamed(AppRouteNames.dashboardPostAdForm,
-        extra: _selectedImages);
+        extra: _selectedImages.map((item) => item.path).toList());
   }
 
   @override
@@ -291,14 +301,19 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
       ),
       itemCount: _selectedImages.length,
       itemBuilder: (context, index) {
-        return _buildFluidDraggableImageTile(index);
+        final _ImageItem item = _selectedImages[index];
+        return KeyedSubtree(
+          key: ValueKey('grid-${item.id}'),
+          child: _buildFluidDraggableImageTile(index, item),
+        );
       },
     );
   }
 
-  Widget _buildFluidDraggableImageTile(int index) {
+  Widget _buildFluidDraggableImageTile(int index, _ImageItem item) {
     return Draggable<int>(
-      data: index,
+      key: ValueKey('draggable-${item.id}'),
+      data: item.id,
       feedback: Material(
         color: Colors.transparent,
         child: Transform.scale(
@@ -318,7 +333,7 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
             ),
             clipBehavior: Clip.antiAlias,
             child: Image.asset(
-              _selectedImages[index],
+              item.path,
               fit: BoxFit.cover,
             ),
           ),
@@ -332,37 +347,38 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
       ),
       child: DragTarget<int>(
         onWillAccept: (data) {
-          if (data != null && data != index) {
-            // Immediately rearrange items for fluid feedback
-            setState(() {
-              final draggedIndex = data;
-              final String draggedItem = _selectedImages[draggedIndex];
-              _selectedImages.removeAt(draggedIndex);
-              int targetIndex = index;
-              if (draggedIndex < index) {
-                targetIndex = index - 1;
-              }
-              _selectedImages.insert(targetIndex, draggedItem);
-            });
-            return true;
-          }
-          return false;
+          return data != null && data != item.id;
         },
-        onAcceptWithDetails: (data) {
-          // Final positioning is already handled in onWillAccept
+        onAccept: (data) {
+          final int fromIndex = _selectedImages
+              .indexWhere((element) => element.id == data);
+          if (fromIndex == -1) return;
+
+          setState(() {
+            final _ImageItem moved = _selectedImages.removeAt(fromIndex);
+            int toIndex = index;
+            if (fromIndex < index) {
+              toIndex = index - 1;
+            }
+            if (toIndex < 0) toIndex = 0;
+            if (toIndex > _selectedImages.length) {
+              toIndex = _selectedImages.length;
+            }
+            _selectedImages.insert(toIndex, moved);
+          });
         },
         builder: (context, candidateData, rejectedData) {
           return AnimatedContainer(
             duration: Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            child: _buildImageTile(index),
+            child: _buildImageTile(index, item),
           );
         },
       ),
     );
   }
 
-  Widget _buildImageTile(int index) {
+  Widget _buildImageTile(int index, _ImageItem item) {
     return GestureDetector(
       onDoubleTap: () => _removeImage(index),
       child: Container(
@@ -376,7 +392,7 @@ class _PostAdUploadImagesScreenState extends State<PostAdUploadImagesScreen> {
         child: Stack(
           children: [
             Image.asset(
-              _selectedImages[index],
+              item.path,
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,

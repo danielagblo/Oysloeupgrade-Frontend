@@ -15,13 +15,18 @@ import 'package:oysloe_mobile/core/utils/formatters.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
 import '../../domain/entities/category_entity.dart';
+import '../../domain/entities/subcategory_entity.dart';
+import '../../domain/entities/location_entity.dart';
 import '../bloc/categories/categories_cubit.dart';
 import '../bloc/categories/categories_state.dart';
+import '../bloc/subcategories/subcategories_cubit.dart';
+import '../bloc/subcategories/subcategories_state.dart';
 import '../bloc/products/products_cubit.dart';
 import '../bloc/products/products_state.dart';
+import '../bloc/locations/locations_cubit.dart';
+import '../bloc/locations/locations_state.dart';
 import '../widgets/ad_card.dart';
 import '../widgets/multi_page_bottom_sheet.dart';
-import '../widgets/ad_input.dart';
 
 class CategoryAdsScreen extends StatefulWidget {
   const CategoryAdsScreen(
@@ -46,7 +51,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
 
   int? _selectedCategoryId;
   String? _selectedCategoryLabel;
-  String? _selectedLocation;
+  LocationEntity? _selectedLocation;
   String? _selectedPurpose;
   String? _selectedHighlight;
   String? _selectedPricing;
@@ -143,6 +148,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
     if (id == null) {
       return _selectedCategoryLabel ?? fallback;
     }
+    if (_selectedCategoryLabel != null && _selectedCategoryId == id) {
+      return _selectedCategoryLabel!;
+    }
     return nameMap[id] ?? _selectedCategoryLabel ?? 'Category $id';
   }
 
@@ -159,10 +167,39 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
     }
   }
 
+  String? _resolveSelectionLabel(
+    int? categoryId,
+    int? subcategoryId,
+    List<CategoryEntity> categories,
+    Map<int, List<SubcategoryEntity>> subcategories,
+  ) {
+    if (categoryId == null) return null;
+
+    if (subcategoryId != null) {
+      final List<SubcategoryEntity> subs =
+          subcategories[categoryId] ?? const <SubcategoryEntity>[];
+      for (final SubcategoryEntity sub in subs) {
+        if (sub.id == subcategoryId) {
+          return sub.name;
+        }
+      }
+    }
+
+    for (final CategoryEntity category in categories) {
+      if (category.id == categoryId) {
+        return category.name;
+      }
+    }
+
+    return null;
+  }
+
   Future<void> _openCategoryChooser() async {
     final ProductsState productsState = context.read<ProductsCubit>().state;
     final CategoriesState categoriesState =
         context.read<CategoriesCubit>().state;
+    final SubcategoriesState subcategoriesState =
+        context.read<SubcategoriesCubit>().state;
 
     final Map<int, String> nameMap =
         _categoryNameMap(categoriesState.categories);
@@ -183,8 +220,13 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
         MultiPageSheetSection<String>(
           heading: 'Popular categories',
           items: topStats
-              .map((CategoryStat stat) =>
-                  _buildCategoryItem(stat.categoryId, stat.label))
+              .map(
+                (CategoryStat stat) => _buildCategoryItem(
+                  stat.categoryId,
+                  stat.label,
+                  subcategoriesState.cache,
+                ),
+              )
               .toList(),
         ),
       );
@@ -201,8 +243,13 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
         MultiPageSheetSection<String>(
           heading: 'Other categories',
           items: otherCategories
-              .map((CategoryEntity category) =>
-                  _buildCategoryItem(category.id, category.name))
+              .map(
+                (CategoryEntity category) => _buildCategoryItem(
+                  category.id,
+                  category.name,
+                  subcategoriesState.cache,
+                ),
+              )
               .toList(),
         ),
       );
@@ -222,10 +269,15 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
 
     if (picked != null) {
       setState(() {
-        _selectedCategoryId = int.tryParse(picked);
-        _updateLabelFromCategories(
+        final List<String> parts = picked.split(':');
+        _selectedCategoryId = int.tryParse(parts.first);
+        final int? subcategoryId =
+            parts.length > 1 ? int.tryParse(parts[1]) : null;
+        _selectedCategoryLabel = _resolveSelectionLabel(
           _selectedCategoryId,
+          subcategoryId,
           categoriesState.categories,
+          subcategoriesState.cache,
         );
       });
     }
@@ -248,60 +300,194 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
     return picked;
   }
 
-  static MultiPageSheetItem<String> _buildCategoryItem(int id, String label) {
-    if (label.toLowerCase() == 'electronics') {
-      // Provide a nested sheet like the post-ad flow; children all map back to the same category id
+  void _clearFilters() {
+    setState(() {
+      _selectedCategoryId = null;
+      _selectedCategoryLabel = null;
+      _pendingCategoryLabel = null;
+      _selectedLocation = null;
+      _selectedPurpose = null;
+      _selectedHighlight = null;
+      _selectedPricing = null;
+      _selectedParam1 = null;
+      _selectedParam2 = null;
+      _selectedParam3 = null;
+    });
+  }
+
+  static MultiPageSheetItem<String> _buildCategoryItem(
+    int id,
+    String label,
+    Map<int, List<SubcategoryEntity>> subcategories,
+  ) {
+    final List<SubcategoryEntity> children =
+        subcategories[id] ?? const <SubcategoryEntity>[];
+    if (children.isEmpty) {
       return MultiPageSheetItem<String>(
         label: label,
-        childBuilder: () => MultiPageSheetPage<String>(
-          title: label,
+        value: id.toString(),
+      );
+    }
+
+    return MultiPageSheetItem<String>(
+      label: label,
+      childBuilder: () => MultiPageSheetPage<String>(
+        title: label,
+        sections: [
+          MultiPageSheetSection<String>(
+            items: children
+                .map(
+                  (SubcategoryEntity subcategory) => MultiPageSheetItem<String>(
+                    label: subcategory.name,
+                    value: '$id:${subcategory.id}',
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openLocationChooser() async {
+    final LocationsCubit locationsCubit = context.read<LocationsCubit>();
+    LocationsState state = locationsCubit.state;
+
+    if (!state.hasData && !state.isLoading) {
+      await locationsCubit.fetch(forceRefresh: true);
+      if (!mounted) return;
+      state = locationsCubit.state;
+    }
+
+    if (!state.hasData) {
+      return;
+    }
+
+    final List<MultiPageSheetSection<LocationEntity>> sections =
+        _buildLocationSections(state.locations);
+
+    if (sections.isEmpty) {
+      return;
+    }
+
+    final LocationEntity? picked =
+        await showMultiPageBottomSheet<LocationEntity>(
+      context: context,
+      rootPage: MultiPageSheetPage<LocationEntity>(
+        title: 'Locations',
+        sections: sections,
+      ),
+    );
+
+    if (picked != null) {
+      setState(() => _selectedLocation = picked);
+    }
+  }
+
+  List<MultiPageSheetSection<LocationEntity>> _buildLocationSections(
+    List<LocationEntity> locations,
+  ) {
+    if (locations.isEmpty) {
+      return const <MultiPageSheetSection<LocationEntity>>[];
+    }
+
+    final Map<String, List<LocationEntity>> grouped =
+        <String, List<LocationEntity>>{};
+
+    for (final LocationEntity location in locations) {
+      final String regionKey = (location.region?.trim().isNotEmpty ?? false)
+          ? location.region!.trim()
+          : 'Other';
+      grouped.putIfAbsent(regionKey, () => <LocationEntity>[]);
+      grouped[regionKey]!.add(location);
+    }
+
+    final List<String> sortedRegions = grouped.keys.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+    final List<MultiPageSheetItem<LocationEntity>> regionItems =
+        sortedRegions.map((String region) {
+      final List<LocationEntity> regionLocations =
+          List<LocationEntity>.from(grouped[region]!)
+            ..sort(
+              (LocationEntity a, LocationEntity b) =>
+                  a.displayName.compareTo(b.displayName),
+            );
+
+      return MultiPageSheetItem<LocationEntity>(
+        label: region,
+        childBuilder: () => MultiPageSheetPage<LocationEntity>(
+          title: region,
           sections: [
-            MultiPageSheetSection<String>(
-              items: [
-                MultiPageSheetItem<String>(
-                    label: 'Phones', value: id.toString()),
-                MultiPageSheetItem<String>(
-                    label: 'Computers', value: id.toString()),
-                MultiPageSheetItem<String>(
-                    label: 'Accessories', value: id.toString()),
-              ],
+            MultiPageSheetSection<LocationEntity>(
+              items: regionLocations
+                  .map(
+                    (LocationEntity location) =>
+                        MultiPageSheetItem<LocationEntity>(
+                      label: location.displayName,
+                      value: location,
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ),
       );
-    }
+    }).toList();
 
-    return MultiPageSheetItem<String>(label: label, value: id.toString());
+    return <MultiPageSheetSection<LocationEntity>>[
+      MultiPageSheetSection<LocationEntity>(items: regionItems),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     final CategoriesState categoriesState =
         context.watch<CategoriesCubit>().state;
+    final LocationsState locationsState =
+        context.watch<LocationsCubit>().state;
     final Map<int, String> categoryNames =
         _categoryNameMap(categoriesState.categories);
     final String categoryFilterLabel =
         _displayCategoryLabel(_selectedCategoryId, categoryNames);
+    final String locationFilterLabel = _selectedLocation?.displayName ??
+        (locationsState.isLoading ? 'Loading...' : 'Locations');
 
-    return BlocListener<CategoriesCubit, CategoriesState>(
-      listenWhen: (_, current) =>
-          _pendingCategoryLabel != null && current.hasData,
-      listener: (_, state) {
-        final int? resolved =
-            _findCategoryIdByLabel(_pendingCategoryLabel, state.categories);
-        if (resolved != null) {
-          setState(() {
-            _selectedCategoryId = resolved;
-            _pendingCategoryLabel = null;
-            _updateLabelFromCategories(resolved, state.categories);
-          });
-        }
-      },
-      child: _buildBody(categoryFilterLabel),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<CategoriesCubit, CategoriesState>(
+          listenWhen: (_, current) =>
+              _pendingCategoryLabel != null && current.hasData,
+          listener: (_, state) {
+            final int? resolved =
+                _findCategoryIdByLabel(_pendingCategoryLabel, state.categories);
+            if (resolved != null) {
+              setState(() {
+                _selectedCategoryId = resolved;
+                _pendingCategoryLabel = null;
+                _updateLabelFromCategories(resolved, state.categories);
+              });
+            }
+          },
+        ),
+        BlocListener<CategoriesCubit, CategoriesState>(
+          listenWhen: (previous, current) =>
+              current.hasData && current.categories != previous.categories,
+          listener: (context, state) {
+            context.read<SubcategoriesCubit>().prefetchForCategories(
+                  state.categories.map((category) => category.id),
+                );
+          },
+        ),
+      ],
+      child: _buildBody(categoryFilterLabel, locationFilterLabel),
     );
   }
 
-  Widget _buildBody(String categoryFilterLabel) {
+  Widget _buildBody(
+    String categoryFilterLabel,
+    String locationFilterLabel,
+  ) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Column(
@@ -394,7 +580,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 2.w),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     SizedBox(height: 2.5.h),
                                     Padding(
@@ -450,18 +637,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           onTap: _openCategoryChooser,
                                         ),
                                         _FilterPill(
-                                          label:
-                                              _selectedLocation ?? 'Locations',
+                                          label: locationFilterLabel,
                                           icon: Icons.place_outlined,
-                                          onTap: () async {
-                                            final picked = await _pickOne(
-                                                'Locations',
-                                                AdLocationDropdown.locations);
-                                            if (picked != null) {
-                                              setState(() =>
-                                                  _selectedLocation = picked);
-                                            }
-                                          },
+                                          onTap: _openLocationChooser,
                                         ),
                                         _FilterPill(
                                           label:
@@ -482,15 +660,14 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           },
                                         ),
                                         _FilterPill(
-                                          label:
-                                              _selectedHighlight ?? 'Highlights',
+                                          label: _selectedHighlight ??
+                                              'Highlights',
                                           icon: Icons.collections_outlined,
                                           onTap: () async {
                                             const options = [
-                                              'New Arrival',
-                                              'Top Rated',
-                                              'Discount',
-                                              'Trending'
+                                              'Top Rank',
+                                              'Mid Level',
+                                              'Entry',
                                             ];
                                             final picked = await _pickOne(
                                                 'Highlights', options);
@@ -501,8 +678,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           },
                                         ),
                                         _FilterPill(
-                                          label:
-                                              _selectedPricing ?? 'Pricing',
+                                          label: _selectedPricing ?? 'Pricing',
                                           icon: Icons.link_outlined,
                                           onTap: () async {
                                             const options = [
@@ -520,7 +696,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           },
                                         ),
                                         _FilterPill(
-                                          label: _selectedParam1 ?? 'Parameter 1',
+                                          label:
+                                              _selectedParam1 ?? 'Parameter 1',
                                           icon: Icons.more_vert,
                                           onTap: () async {
                                             const options = [
@@ -537,7 +714,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           },
                                         ),
                                         _FilterPill(
-                                          label: _selectedParam2 ?? 'Parameter 2',
+                                          label:
+                                              _selectedParam2 ?? 'Parameter 2',
                                           icon: Icons.more_vert,
                                           onTap: () async {
                                             const options = [
@@ -554,7 +732,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           },
                                         ),
                                         _FilterPill(
-                                          label: _selectedParam3 ?? 'Parameter 3',
+                                          label:
+                                              _selectedParam3 ?? 'Parameter 3',
                                           icon: Icons.more_vert,
                                           onTap: () async {
                                             const options = [
@@ -571,6 +750,18 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
                                           },
                                         ),
                                       ],
+                                    ),
+                                  ),
+                                  Transform.translate(
+                                    offset: Offset(18.h, -4.h),
+                                    child: Align(
+                                      child: TextButton(
+                                        onPressed: _clearFilters,
+                                        child: Text(
+                                          'Clear filters',
+                                          style: AppTypography.bodySmall,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   Transform.translate(
@@ -596,7 +787,6 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen>
       ),
     );
   }
-
 }
 
 class _FilterPill extends StatelessWidget {

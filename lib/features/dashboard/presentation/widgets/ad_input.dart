@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/entities/category_entity.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/entities/subcategory_entity.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/entities/location_entity.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_state.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/subcategories/subcategories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/subcategories/subcategories_state.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/locations/locations_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/locations/locations_state.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/multi_page_bottom_sheet.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -594,6 +605,21 @@ class _AdEditableDropdownState extends State<AdEditableDropdown> {
   }
 }
 
+class CategorySelection extends Equatable {
+  const CategorySelection({
+    required this.categoryId,
+    required this.label,
+    this.subcategoryId,
+  });
+
+  final int categoryId;
+  final int? subcategoryId;
+  final String label;
+
+  @override
+  List<Object?> get props => <Object?>[categoryId, subcategoryId, label];
+}
+
 class AdCategoryDropdown extends StatelessWidget {
   const AdCategoryDropdown({
     super.key,
@@ -606,203 +632,225 @@ class AdCategoryDropdown extends StatelessWidget {
     this.enabled = true,
   });
 
-  final ValueChanged<String?> onChanged;
-  final String? value;
+  final ValueChanged<CategorySelection?> onChanged;
+  final CategorySelection? value;
   final String? hintText;
   final String? labelText;
   final double? width;
-  final String? Function(String?)? validator;
+  final String? Function(CategorySelection?)? validator;
   final bool enabled;
 
-  static const List<_CategorySection> _categorySections = [
-    _CategorySection(
-      heading: 'Popular categories',
-      nodes: [
-        _CategoryNode(
-          id: 'electronics',
-          label: 'Electronics',
-          children: [
-            _CategoryNode(id: 'electronics-phones', label: 'Phones'),
-            _CategoryNode(id: 'electronics-computers', label: 'Computers'),
-            _CategoryNode(id: 'electronics-accessories', label: 'Accessories'),
-          ],
-        ),
-        _CategoryNode(id: 'fashion', label: 'Fashion'),
-        _CategoryNode(id: 'furniture', label: 'Furniture'),
-      ],
-    ),
-    _CategorySection(
-      heading: 'Other categories',
-      nodes: [
-        _CategoryNode(id: 'vehicle', label: 'Vehicle'),
-        _CategoryNode(id: 'property', label: 'Property'),
-        _CategoryNode(id: 'services', label: 'Services'),
-        _CategoryNode(id: 'cosmetics', label: 'Cosmetics'),
-        _CategoryNode(id: 'grocery', label: 'Grocery'),
-        _CategoryNode(id: 'games', label: 'Games'),
-        _CategoryNode(id: 'industrial', label: 'Industrial'),
-      ],
-    ),
-  ];
-
-  static final Map<String, String> _categoryLabelMap = _buildLabelMap();
-
-  static Map<String, String> _buildLabelMap() {
-    final map = <String, String>{};
-
-    void visit(_CategoryNode node) {
-      map[node.id] = node.label;
-      for (final child in node.children) {
-        visit(child);
-      }
-    }
-
-    for (final section in _categorySections) {
-      for (final node in section.nodes) {
-        visit(node);
-      }
-    }
-
-    return map;
-  }
-
-  Future<String?> _openCategorySheet(BuildContext context) async {
+  Future<CategorySelection?> _openCategorySheet(
+    BuildContext context,
+    CategoriesState categoriesState,
+  ) async {
     if (!enabled) return null;
+    if (!categoriesState.hasData) {
+      await context.read<CategoriesCubit>().fetch(forceRefresh: true);
+      if (!context.mounted) return null;
+      return null;
+    }
 
-    final selected = await showMultiPageBottomSheet<String>(
+    final SubcategoriesCubit subcategoriesCubit =
+        context.read<SubcategoriesCubit>();
+
+    // Ensure subcategories are loaded so the sheet can render children immediately.
+    await subcategoriesCubit
+        .prefetchForCategories(categoriesState.categories.map((c) => c.id));
+
+    if (!context.mounted) return null;
+
+    final SubcategoriesState subcategoriesState =
+        subcategoriesCubit.state;
+
+    final sections = _buildSections(
+      categoriesState.categories,
+      subcategoriesState.cache,
+    );
+
+    if (sections.isEmpty) return null;
+
+    final CategorySelection? selected = await showMultiPageBottomSheet<
+        CategorySelection>(
       context: context,
-      rootPage: MultiPageSheetPage<String>(
+      rootPage: MultiPageSheetPage<CategorySelection>(
         title: labelText ?? 'Product Category',
-        sections: _categorySections
-            .map((section) => MultiPageSheetSection<String>(
-                  heading: section.heading,
-                  items: section.nodes.map(_buildItem).toList(),
-                ))
-            .toList(),
+        sections: sections,
       ),
     );
 
     return selected;
   }
 
-  static MultiPageSheetItem<String> _buildItem(_CategoryNode node) {
-    if (node.children.isNotEmpty) {
-      return MultiPageSheetItem<String>(
-        label: node.label,
-        childBuilder: () => MultiPageSheetPage<String>(
-          title: node.label,
+  List<MultiPageSheetSection<CategorySelection>> _buildSections(
+    List<CategoryEntity> categories,
+    Map<int, List<SubcategoryEntity>> subcategories,
+  ) {
+    if (categories.isEmpty) return const <MultiPageSheetSection<CategorySelection>>[];
+
+    final List<MultiPageSheetItem<CategorySelection>> items =
+        categories.map((CategoryEntity category) {
+      final List<SubcategoryEntity> children =
+          subcategories[category.id] ?? const <SubcategoryEntity>[];
+
+      if (children.isEmpty) {
+        return MultiPageSheetItem<CategorySelection>(
+          label: category.name,
+          value: CategorySelection(
+            categoryId: category.id,
+            label: category.name,
+          ),
+        );
+      }
+
+      return MultiPageSheetItem<CategorySelection>(
+        label: category.name,
+        childBuilder: () => MultiPageSheetPage<CategorySelection>(
+          title: category.name,
           sections: [
-            MultiPageSheetSection<String>(
-              items: node.children.map(_buildItem).toList(),
+            MultiPageSheetSection<CategorySelection>(
+              items: children
+                  .map(
+                    (SubcategoryEntity subcategory) =>
+                        MultiPageSheetItem<CategorySelection>(
+                      label: subcategory.name,
+                      value: CategorySelection(
+                        categoryId: category.id,
+                        subcategoryId: subcategory.id,
+                        label: subcategory.name,
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ),
       );
-    }
+    }).toList();
 
-    return MultiPageSheetItem<String>(
-      label: node.label,
-      value: node.id,
-    );
-  }
-
-  String? _displayLabel(String? id) {
-    if (id == null) return null;
-    return _categoryLabelMap[id];
+    return <MultiPageSheetSection<CategorySelection>>[
+      MultiPageSheetSection<CategorySelection>(
+        items: items,
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget formField = FormField<String>(
-      initialValue: value,
-      validator: validator,
-      enabled: enabled,
-      builder: (state) {
+    Widget formField = BlocBuilder<CategoriesCubit, CategoriesState>(
+      builder: (context, categoriesState) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final textColor = isDark ? AppColors.white : AppColors.blueGray374957;
-        if (value != state.value) {
-          state.didChange(value);
-        }
-        final selectedId = state.value;
-        final effectiveLabel = _displayLabel(selectedId);
+        final bool isLoading =
+            categoriesState.isLoading && !categoriesState.hasData;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (labelText != null) ...[
-              Text(
-                labelText!,
-                style: AppTypography.bodySmall.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: enabled
-                  ? () async {
-                      final selected = await _openCategorySheet(context);
-                      if (selected != null) {
-                        state.didChange(selected);
-                        onChanged(selected);
-                      }
-                    }
-                  : null,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.blueGray374957 : AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark ? AppColors.blueGray374957 : AppColors.grayD9,
-                    width: 1,
+        return FormField<CategorySelection>(
+          initialValue: value,
+          validator: validator,
+          enabled: enabled,
+          builder: (state) {
+            if (value != state.value) {
+              state.didChange(value);
+            }
+            final CategorySelection? selection = state.value;
+            final String? effectiveLabel = selection?.label;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (labelText != null) ...[
+                  Text(
+                    labelText!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        effectiveLabel ??
-                            (hintText ?? 'Select product category'),
-                        style: AppTypography.body.copyWith(
-                          color: effectiveLabel == null
-                              ? AppColors.gray8B959E
-                              : textColor,
-                          fontSize: 15.sp,
+                  const SizedBox(height: 8),
+                ],
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: enabled
+                      ? () async {
+                          final CategorySelection? selected =
+                              await _openCategorySheet(
+                                  context, categoriesState);
+                          if (selected != null) {
+                            state.didChange(selected);
+                            onChanged(selected);
+                          }
+                        }
+                      : null,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.blueGray374957 : AppColors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color:
+                            isDark ? AppColors.blueGray374957 : AppColors.grayD9,
+                        width: 1,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 14),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            effectiveLabel ??
+                                (isLoading
+                                    ? 'Loading categories...'
+                                    : (hintText ?? 'Select product category')),
+                            style: AppTypography.body.copyWith(
+                              color: effectiveLabel == null
+                                  ? AppColors.gray8B959E
+                                  : textColor,
+                              fontSize: 15.sp,
+                            ),
+                          ),
                         ),
-                      ),
+                        if (isLoading)
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.blueGray374957,
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: AppColors.grayD9.withValues(alpha: 0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: AppColors.blueGray374957,
+                            ),
+                          ),
+                      ],
                     ),
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: AppColors.grayD9.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.keyboard_arrow_down,
-                        size: 16,
-                        color: AppColors.blueGray374957,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (state.hasError)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  state.errorText ?? '',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.redFF6B6B,
                   ),
                 ),
-              ),
-          ],
+                if (state.hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      state.errorText ?? '',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.redFF6B6B,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         );
       },
     );
@@ -813,28 +861,6 @@ class AdCategoryDropdown extends StatelessWidget {
 
     return formField;
   }
-}
-
-class _CategorySection {
-  const _CategorySection({
-    this.heading,
-    required this.nodes,
-  });
-
-  final String? heading;
-  final List<_CategoryNode> nodes;
-}
-
-class _CategoryNode {
-  const _CategoryNode({
-    required this.id,
-    required this.label,
-    this.children = const <_CategoryNode>[],
-  });
-
-  final String id;
-  final String label;
-  final List<_CategoryNode> children;
 }
 
 class AdLocationDropdown extends StatelessWidget {
@@ -849,43 +875,143 @@ class AdLocationDropdown extends StatelessWidget {
     this.enabled = true,
   });
 
-  final ValueChanged<String?> onChanged;
-  final String? value;
+  final ValueChanged<LocationEntity?> onChanged;
+  final LocationEntity? value;
   final String? hintText;
   final String? labelText;
   final double? width;
-  final String? Function(String?)? validator;
+  final String? Function(LocationEntity?)? validator;
   final bool enabled;
-
-  static const List<String> locations = [
-    'Home Spintex',
-    'Shop Accra',
-    'Shop East Legon',
-    'Shop Kumasi',
-    'Tema',
-    'Takoradi',
-    'Ashanti Region',
-    'Western Region',
-    'Central Region',
-    'Greater Accra',
-  ];
 
   @override
   Widget build(BuildContext context) {
-    return AdDropdown<String>(
-      value: value,
-      onChanged: onChanged,
-      hintText: hintText ?? 'Ad Area Location',
-      labelText: labelText,
-      width: width,
-      validator: validator,
-      enabled: enabled,
-      items: locations.map((location) {
-        return DropdownMenuItem<String>(
-          value: location,
-          child: Text(location),
+    return BlocBuilder<LocationsCubit, LocationsState>(
+      builder: (context, state) {
+        if (state.isLoading && !state.hasData) {
+          return _buildStatusField(
+            context,
+            message: 'Loading locations...',
+            trailing: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppColors.blueGray374957,
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (state.hasError && !state.hasData) {
+          return _buildStatusField(
+            context,
+            message: state.message ?? 'Unable to load locations',
+            onRetry: () => context.read<LocationsCubit>().fetch(forceRefresh: true),
+          );
+        }
+
+        final List<LocationEntity> locations = state.locations;
+        if (locations.isEmpty) {
+          return _buildStatusField(
+            context,
+            message: 'No locations available',
+            onRetry: () => context.read<LocationsCubit>().fetch(forceRefresh: true),
+          );
+        }
+
+        return AdDropdown<LocationEntity>(
+          value: value,
+          onChanged: onChanged,
+          hintText: hintText ?? 'Ad Area Location',
+          labelText: labelText,
+          width: width,
+          validator: validator,
+          enabled: enabled,
+          items: locations
+              .map(
+                (LocationEntity location) =>
+                    DropdownMenuItem<LocationEntity>(
+                  value: location,
+                  child: Text(location.displayName),
+                ),
+              )
+              .toList(),
         );
-      }).toList(),
+      },
     );
+  }
+
+  Widget _buildStatusField(
+    BuildContext context, {
+    required String message,
+    Widget? trailing,
+    VoidCallback? onRetry,
+  }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Widget field = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (labelText != null) ...[
+          Text(
+            labelText!,
+            style: AppTypography.bodySmall.copyWith(
+              color: isDark ? AppColors.white : AppColors.blueGray374957,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.blueGray374957 : AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? AppColors.blueGray374957 : AppColors.grayD9,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  message,
+                  style: AppTypography.body.copyWith(
+                    color: AppColors.gray8B959E,
+                    fontSize: 15.sp,
+                  ),
+                ),
+              ),
+              if (trailing != null) ...[
+                SizedBox(width: 8),
+                trailing,
+              ],
+              if (onRetry != null) ...[
+                SizedBox(width: 8),
+                TextButton(
+                  onPressed: onRetry,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    foregroundColor: AppColors.blueGray374957,
+                  ),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (width != null) {
+      return SizedBox(width: width, child: field);
+    }
+
+    return field;
   }
 }

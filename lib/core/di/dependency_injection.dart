@@ -29,7 +29,12 @@ import 'package:oysloe_mobile/features/auth/presentation/bloc/register/register_
 import 'package:oysloe_mobile/features/dashboard/data/datasources/products_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/categories_local_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/subcategories_remote_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/locations_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/datasources/alerts_remote_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/feedback_remote_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/privacy_policies_remote_data_source.dart';
+import 'package:oysloe_mobile/features/dashboard/data/datasources/terms_conditions_remote_data_source.dart';
 import 'package:oysloe_mobile/features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_products_usecase.dart';
@@ -37,14 +42,23 @@ import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_rev
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_detail_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/create_review_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/update_review_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/submit_feedback_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_categories_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_subcategories_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/subcategories/subcategories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/locations/locations_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_alerts_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/mark_alert_read_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/delete_alert_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_locations_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_privacy_policies_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/privacy_policies/privacy_policies_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_terms_conditions_usecase.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/terms_conditions/terms_conditions_cubit.dart';
 
 part 'di.dart';
 
