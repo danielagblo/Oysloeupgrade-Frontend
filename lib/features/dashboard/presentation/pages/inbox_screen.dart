@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
+import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 
@@ -314,7 +315,7 @@ class _InboxScreenState extends State<InboxScreen> {
         // Only navigate if the chat is not closed
         if (!isClosed) {
           context.pushNamed(
-            'chat',
+            AppRouteNames.dashboardChat,
             pathParameters: {'chatId': chatId},
             extra: {
               'otherUserName': name,

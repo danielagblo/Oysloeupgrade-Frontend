@@ -5,7 +5,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'package:oysloe_mobile/core/common/widgets/adaptive_progress_indicator.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
-import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/entities/terms_condition_entity.dart';
@@ -17,10 +16,8 @@ class TermsConditionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<TermsConditionsCubit>(
-      create: (_) => sl<TermsConditionsCubit>()..fetch(),
-      child: const _TermsConditionsView(),
-    );
+    // TermsConditionsCubit is provided at NavigationShell level
+    return const _TermsConditionsView();
   }
 }
 
