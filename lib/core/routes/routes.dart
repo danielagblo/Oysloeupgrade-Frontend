@@ -22,7 +22,6 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_detail_sc
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/inbox_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/chat_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/edit_profile_screen.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/ad_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/category_ads.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/favorite_screen.dart';
@@ -40,10 +39,6 @@ import 'package:oysloe_mobile/features/dashboard/presentation/pages/services_rev
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_upload_images_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/pages/post_ad_form_screen.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/bloc/subcategories/subcategories_cubit.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/bloc/locations/locations_cubit.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:oysloe_mobile/features/onboarding/presentation/pages/onboarding_flow.dart';
 

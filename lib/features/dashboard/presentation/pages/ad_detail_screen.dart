@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +17,6 @@ import 'package:oysloe_mobile/features/dashboard/domain/entities/product_entity.
 import 'package:oysloe_mobile/features/dashboard/domain/entities/review_entity.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_detail_usecase.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/usecases/get_product_reviews_usecase.dart';
-import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ad_card.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/ads_section.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/rating_overview.dart'
@@ -1556,12 +1554,9 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
               SizedBox(height: 1.h),
               Container(
                 color: AppColors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: BlocProvider(
-                    create: (_) => sl<ProductsCubit>()..fetch(),
-                    child: const AdsSection(),
-                  ),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: AdsSection(),
                 ),
               )
             ],

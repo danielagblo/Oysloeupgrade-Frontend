@@ -134,7 +134,7 @@ final List<RouteBase> routes = <RouteBase>[
         currentIndex = 2;
       } else if (location.startsWith(AppRoutePaths.dashboardInbox)) {
         currentIndex = 3;
-      } else if (location.startsWith('/dashboard/profile')) {
+      } else if (location.startsWith(AppRoutePaths.dashboardEditProfile)) {
         currentIndex = 4;
       }
 
@@ -147,23 +147,7 @@ final List<RouteBase> routes = <RouteBase>[
       GoRoute(
         name: AppRouteNames.dashboardHome,
         path: AppRoutePaths.dashboardHome,
-        pageBuilder: (context, state) {
-          return buildPageWithDefaultTransition(
-            context: context,
-            state: state,
-            child: MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (_) => sl<ProductsCubit>()..fetch(),
-                ),
-                BlocProvider(
-                  create: (_) => sl<CategoriesCubit>()..fetch(),
-                ),
-              ],
-              child: const AnimatedHomeScreen(),
-            ),
-          );
-        },
+        pageBuilder: defaultPageBuilder(const AnimatedHomeScreen()),
         routes: [
           GoRoute(
             name: AppRouteNames.dashboardHomeAdDetail,
@@ -229,20 +213,7 @@ final List<RouteBase> routes = <RouteBase>[
               return buildPageWithDefaultTransition(
                 context: context,
                 state: state,
-                child: MultiBlocProvider(
-                  providers: [
-                    BlocProvider(
-                      create: (_) => sl<CategoriesCubit>()..fetch(),
-                    ),
-                    BlocProvider(
-                      create: (_) => sl<SubcategoriesCubit>(),
-                    ),
-                    BlocProvider(
-                      create: (_) => sl<LocationsCubit>()..fetch(),
-                    ),
-                  ],
-                  child: PostAdFormScreen(selectedImages: selectedImages),
-                ),
+                child: PostAdFormScreen(selectedImages: selectedImages),
               );
             },
           ),
@@ -277,16 +248,7 @@ final List<RouteBase> routes = <RouteBase>[
       GoRoute(
         name: AppRouteNames.dashboardEditProfile,
         path: AppRoutePaths.dashboardEditProfile,
-        pageBuilder: (context, state) {
-          return buildPageWithDefaultTransition(
-            context: context,
-            state: state,
-            child: BlocProvider(
-              create: (_) => sl<ProfileCubit>()..hydrate(),
-              child: const EditProfileScreen(),
-            ),
-          );
-        },
+        pageBuilder: defaultPageBuilder(const EditProfileScreen()),
       ),
       GoRoute(
         name: AppRouteNames.dashboardAds,
@@ -316,25 +278,9 @@ final List<RouteBase> routes = <RouteBase>[
           return buildPageWithDefaultTransition(
             context: context,
             state: state,
-              child: MultiBlocProvider(
-                providers: [
-                  BlocProvider(
-                    create: (_) => sl<ProductsCubit>()..fetch(),
-                  ),
-                  BlocProvider(
-                    create: (_) => sl<CategoriesCubit>()..fetch(),
-                  ),
-                  BlocProvider(
-                    create: (_) => sl<SubcategoriesCubit>(),
-                  ),
-                  BlocProvider(
-                    create: (_) => sl<LocationsCubit>()..fetch(),
-                  ),
-                ],
-                child: CategoryAdsScreen(
-                  initialCategoryLabel: initialCategory,
-                  initialCategoryId: initialCategoryId,
-                ),
+            child: CategoryAdsScreen(
+              initialCategoryLabel: initialCategory,
+              initialCategoryId: initialCategoryId,
             ),
           );
         },

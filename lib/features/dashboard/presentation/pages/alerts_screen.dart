@@ -5,7 +5,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'package:oysloe_mobile/core/common/widgets/adaptive_progress_indicator.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
-import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/core/utils/alert_time_utils.dart';
@@ -14,40 +13,15 @@ import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts
 import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_state.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/alert_tile.dart';
 
-
-class AlertsScreen extends StatefulWidget {
+class AlertsScreen extends StatelessWidget {
   const AlertsScreen({super.key});
 
   @override
-  State<AlertsScreen> createState() => _AlertsScreenState();
-}
-
-class _AlertsScreenState extends State<AlertsScreen> {
-
-  @override
-  void initState() {
-    super.initState();
-    sl<AlertsCubit>().fetchAlerts();
-  }
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider<AlertsCubit>(
-      create: (_) => sl<AlertsCubit>(),
-      child: const _AlertsView(),
-    );
+    // AlertsCubit is provided at NavigationShell level
+    return const _AlertsView();
   }
 }
-// class AlertsScreen extends StatelessWidget {
-//   const AlertsScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocProvider(
-//       create: (_) => sl<AlertsCubit>()..fetchAlerts(),
-//       child: const _AlertsView(),
-//     );
-//   }
-// }
 
 class _AlertsView extends StatelessWidget {
   const _AlertsView();

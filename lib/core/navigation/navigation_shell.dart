@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oysloe_mobile/core/common/widgets/app_snackbar.dart';
 import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/navigation/navigation_state.dart';
 import 'package:oysloe_mobile/core/routes/routes.dart';
 import 'package:oysloe_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/products/products_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/categories/categories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profile_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/alerts/alerts_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/locations/locations_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/subcategories/subcategories_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/terms_conditions/terms_conditions_cubit.dart';
+import 'package:oysloe_mobile/features/dashboard/presentation/bloc/privacy_policies/privacy_policies_cubit.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/bottom_navigation.dart';
 import 'package:oysloe_mobile/features/dashboard/presentation/widgets/profile_menu_drawer.dart';
 
@@ -27,11 +36,31 @@ class _NavigationShellState extends State<NavigationShell> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int? _forcedIndex; // When end drawer is open, highlight Profile tab
 
+  // Dashboard-level cubits - created once and shared across all dashboard screens
+  late final ProductsCubit _productsCubit;
+  late final CategoriesCubit _categoriesCubit;
+  late final ProfileCubit _profileCubit;
+  late final AlertsCubit _alertsCubit;
+  late final LocationsCubit _locationsCubit;
+  late final SubcategoriesCubit _subcategoriesCubit;
+  late final TermsConditionsCubit _termsConditionsCubit;
+  late final PrivacyPoliciesCubit _privacyPoliciesCubit;
+
   @override
   void initState() {
     super.initState();
     _navigationState = NavigationState();
     _navigationState.setCurrentIndex(widget.currentIndex);
+
+    // Initialize cubits once and fetch initial data
+    _productsCubit = sl<ProductsCubit>()..fetch();
+    _categoriesCubit = sl<CategoriesCubit>()..fetch();
+    _profileCubit = sl<ProfileCubit>()..hydrate();
+    _alertsCubit = sl<AlertsCubit>()..fetchAlerts();
+    _locationsCubit = sl<LocationsCubit>()..fetch();
+    _subcategoriesCubit = sl<SubcategoriesCubit>();
+    _termsConditionsCubit = sl<TermsConditionsCubit>()..fetch();
+    _privacyPoliciesCubit = sl<PrivacyPoliciesCubit>()..fetch();
   }
 
   @override
@@ -87,7 +116,18 @@ class _NavigationShellState extends State<NavigationShell> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _productsCubit),
+        BlocProvider.value(value: _categoriesCubit),
+        BlocProvider.value(value: _profileCubit),
+        BlocProvider.value(value: _alertsCubit),
+        BlocProvider.value(value: _locationsCubit),
+        BlocProvider.value(value: _subcategoriesCubit),
+        BlocProvider.value(value: _termsConditionsCubit),
+        BlocProvider.value(value: _privacyPoliciesCubit),
+      ],
+      child: PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
@@ -133,11 +173,20 @@ class _NavigationShellState extends State<NavigationShell> {
           },
         ),
       ),
+      ),
     );
   }
 
   @override
   void dispose() {
+    _productsCubit.close();
+    _categoriesCubit.close();
+    _profileCubit.close();
+    _alertsCubit.close();
+    _locationsCubit.close();
+    _subcategoriesCubit.close();
+    _termsConditionsCubit.close();
+    _privacyPoliciesCubit.close();
     _navigationState.dispose();
     super.dispose();
   }

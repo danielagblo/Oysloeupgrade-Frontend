@@ -5,7 +5,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'package:oysloe_mobile/core/common/widgets/adaptive_progress_indicator.dart';
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
-import 'package:oysloe_mobile/core/di/dependency_injection.dart';
 import 'package:oysloe_mobile/core/themes/theme.dart';
 import 'package:oysloe_mobile/core/themes/typo.dart';
 import 'package:oysloe_mobile/features/dashboard/domain/entities/privacy_policy_entity.dart';
@@ -17,10 +16,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<PrivacyPoliciesCubit>(
-      create: (_) => sl<PrivacyPoliciesCubit>()..fetch(),
-      child: const _PrivacyPolicyView(),
-    );
+    // PrivacyPoliciesCubit is provided at NavigationShell level
+    return const _PrivacyPolicyView();
   }
 }
 

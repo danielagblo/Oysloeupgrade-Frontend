@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'package:oysloe_mobile/core/common/widgets/appbar.dart';
@@ -14,7 +13,6 @@ import 'package:oysloe_mobile/features/dashboard/presentation/bloc/profile/profi
 import 'package:oysloe_mobile/features/dashboard/presentation/models/edit_profile_draft.dart';
 
 import 'edit_profile_final_screen.dart';
-import '../widgets/ad_input.dart';
 
 class SetPaymentAccountScreen extends StatefulWidget {
   const SetPaymentAccountScreen({super.key, required this.initialDraft});
